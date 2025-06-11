@@ -1,0 +1,88 @@
+{
+  "Animation": {
+    "day": "dagur",
+    "days": "dagar",
+    "hour": "klukkustund",
+    "hours": "klukkustundir",
+    "minute": "mínúta",
+    "minutes": "mínútur",
+    "second": "sekúnda",
+    "seconds": "sekúndur",
+    "speed": "hraði",
+    "week": "vika",
+    "weeks": "vikur",
+    "year": "ár",
+    "years": "ár"
+  },
+  "Common": {
+    "3D_map": "Þrívíddarkort",
+    "app_title": "Jarðskjálftar",
+    "data": "Gögn",
+    "information": "Upplýsingar",
+    "input": "Inntak",
+    "legend": "Skýring",
+    "map_views": "Kort",
+    "overview_map": "Yfirlitskort",
+    "overview_table": "Tafla",
+    "picking": "Upplýsingatól",
+    "plots": "Gröf",
+    "sources": "Gagnaheimildir",
+    "visualisations": "Kort og gröf"
+  },
+  "Filtering": {
+    "add_filter": "Bæta við síu",
+    "filtering": "Síun",
+    "remove_filter": "Fjarlægja síu"
+  },
+  "Formatting": {
+    "antialiasing": "Afstöllun",
+    "antialiasing_descr": "Stilla hvort afstöllun sé sett á punktana, sem er mælt með fyrir stóra punkta. ",
+    "cmapping": {
+      "categorical": "Flokkuð",
+      "custom": "Sérsnið",
+      "linear": "Línuleg",
+      "single": "Föst"
+    },
+    "color": "Litur",
+    "color_settings": "Litastillingar",
+    "colour": "Litir",
+    "formatting": "Hönnun",
+    "mapping": "Litavörpun",
+    "opacity": "Ógagnsæi",
+    "opacity_descr": "Ógagnsæi (%) af punktunum.",
+    "parameter": "Breyta",
+    "parameter_descr": "Breyta sem ákvarðar lit fyrir skjálftana eftir  litavörpunina. Breytur ",
+    "scale": "Stærð",
+    "scale_descr": "Altækur stærðarstuðull fyrir punktana. "
+  },
+  "Layers": {
+    "layers": "Kortlög"
+  },
+  "Locale": {
+    "day": "dagur"
+  },
+  "Sources": {
+    "add": "Bæta við",
+    "column_headers": "Dálkahausar",
+    "data_sources": "Gagnaheimildir",
+    "filename": "Skrárheiti",
+    "formatting": "Hönnun",
+    "num_events": "Fjöldi skjálftar",
+    "options": "Stillingar",
+    "remove_data_source": "Fjarlægja gagnaheimild",
+    "upload_files": "Flytja upp"
+  },
+  "Table": {
+    "dep": "Dýpi (km)",
+    "lat": "Lengdargráða",
+    "lon": "Breiddargráða",
+    "time": "Tími"
+  },
+  "Variables": {
+    "alias": "Læsilegt nafn",
+    "mapping": "Tengd(ar) breyta/ur",
+    "unit": "Eining",
+    "variable": "Breyta",
+    "variables": "Breytur"
+  }
+}

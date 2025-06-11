@@ -1,0 +1,89 @@
+{
+  "Animation": {
+    "day": "day",
+    "days": "days",
+    "hour": "hour",
+    "hours": "hours",
+    "minute": "minute",
+    "minutes": "minutes",
+    "second": "second",
+    "seconds": "seconds",
+    "speed": "speed",
+    "week": "week",
+    "weeks": "weeks",
+    "year": "year",
+    "years": "years"
+  },
+  "Common": {
+    "3D_map": "3D map",
+    "app_title": "Earthquakes",
+    "data": "Data",
+    "information": "Information",
+    "input": "Input",
+    "legend": "Legend",
+    "map_views": "Map views",
+    "overview_map": "Map view",
+    "overview_table": "Table",
+    "picking": "Information tool",
+    "plots": "Plots",
+    "sources": "Sources",
+    "visualisations": "Visualisations"
+  },
+  "Filtering": {
+    "add_filter": "Add filter",
+    "filtering": "Filtering",
+    "remove_filter": "Remove filter"
+  },
+  "Formatting": {
+    "antialiasing": "Anti-aliasing",
+    "antialiasing_descr": "Toggle anti-aliasing for all points, recommended for large markers.",
+    "cmapping": {
+      "categorical": "Categorical",
+      "custom": "Custom",
+      "linear": "Linear",
+      "single": "Single"
+    },
+    "color": "Colour",
+    "color_settings": "Colour settings",
+    "colour": "Colour",
+    "formatting": "Formatting",
+    "mapping": "Mapping",
+    "opacity": "Opacity",
+    "opacity_descr": "Opacity (%) for all points.",
+    "parameter": "Parameter",
+    "parameter_descr": "Parameter (float) which dictates the colour mapping for the earthquakes. Custom parameters can be set in the 'Data Sources' tab (to be implemented).",
+    "scale": "Scale",
+    "scale_descr": "Global radius multiplier for all points."
+  },
+  "Layers": {
+    "layers": "Layers"
+  },
+  "Locale": {
+    "day": "day"
+  },
+  "Sources": {
+    "add": "Add",
+    "column_headers": "Column headers",
+    "data_sources": "Data sources",
+    "filename": "Filename",
+    "formatting": "Formatting",
+    "num_events": "Number of events",
+    "options": "Options",
+    "remove_data_source": "Remove data source",
+    "summary": "Summary",
+    "upload_files": "Upload files"
+  },
+  "Table": {
+    "dep": "Depth (km)",
+    "lat": "Latitude (degrees)",
+    "lon": "Longitude (degrees)",
+    "time": "Time"
+  },
+  "Variables": {
+    "alias": "Display name",
+    "mapping": "Mapped variable(s)",
+    "unit": "Unit",
+    "variable": "Variable",
+    "variables": "Variables"
+  }
+}
