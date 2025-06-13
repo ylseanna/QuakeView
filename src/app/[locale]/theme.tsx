@@ -82,4 +82,14 @@ export const theme: ThemeOptions = createTheme({
       fontWeight: "normal",
     },
   },
+  components: {
+    MuiToolbar: {
+      styleOverrides: {
+        dense: {
+          height: 24,
+          minHeight: 24,
+        },
+      },
+    },
+  },
 });

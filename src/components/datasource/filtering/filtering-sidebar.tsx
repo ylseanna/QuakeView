@@ -1,23 +1,21 @@
 import { Drawer, Toolbar, Typography } from "@mui/material";
-import { DataSource } from "../types";
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import FilteringElement from "./filtering-element";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 interface FormattingProps {
-  dataSources: DataSource[];
-  // setDataSources: Dispatch<SetStateAction<DataSource[] | null>>;
   setFiltering: CallableFunction;
   drawerOpen: boolean;
 }
 
 export default function FilteringSidebar({
-  dataSources,
-  // setDataSources,
   setFiltering,
   drawerOpen,
 }: FormattingProps) {
   const t = useTranslations("Filtering");
+
+  const dataSources = useProjectStore((state) => state.dataSources);
 
   const DRAWER_WIDTH = "360px";
 
@@ -41,7 +39,9 @@ export default function FilteringSidebar({
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
+            top: "30px"
           },
+          
         }}
       >
         <Toolbar />
@@ -50,12 +50,12 @@ export default function FilteringSidebar({
         </Typography>
         {!dataSources
           ? null
-          : (dataSources as DataSource[]).map((dataSource) => (
+          : dataSources.allIDs.map((id) => (
               <FilteringElement
-                key={dataSource.internal_id}
-                dataSource={dataSource}
+                key={id}
+                dataSource={dataSources.byID[id]}
                 setFiltering={setFiltering}
-                single={dataSources.length > 1 ? false : true}
+                single={dataSources.allIDs.length > 1 ? false : true}
               />
             ))}
       </Drawer>

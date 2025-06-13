@@ -3,7 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { DataSource, EarthQuake, Extent } from "@/components/datasource/types";
+import { EarthQuake, Extent } from "@/components/datasource/types";
 
 import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
@@ -17,17 +17,16 @@ import { Button, LinearProgress } from "@mui/material";
 import { generateDataSourceLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
 // import { TerrainLayer } from "@deck.gl/geo-layers";
 // import { GeoJsonLayer } from "@deck.gl/layers";
 
 interface DeckGLProps {
-  dataSources: DataSource[] | null;
   extent: Extent | null;
   positionOffset: number;
 }
 
 export default function ThreeDDeckGLView({
-  dataSources,
   extent,
   positionOffset,
 }: DeckGLProps) {
@@ -50,6 +49,8 @@ export default function ThreeDDeckGLView({
 
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
+  const dataSources = useProjectStore((state) => state.dataSources);
+  const { data } = useDataStore((state) => state);
 
   useEffect(() => {
     mapContainer.current = document.getElementsByTagName("main")[0];
@@ -61,24 +62,39 @@ export default function ThreeDDeckGLView({
 
   // LAYERS
   const layers = useMemo(() => {
-    const layers_to_set = generateDataSourceLayers(
-      "3D",
-      dataSources as DataSource[],
-      sessionInterface,
-      GPUfiltering,
-      positionOffset
-    );
+    const layers_to_set = dataSources.allIDs.map((id) => {
+      if (data[id]) {
+        const layer = generateDataSourceLayers(
+          "3D",
+          dataSources.byID[id],
+          data[id].data,
+          sessionInterface,
+          GPUfiltering,
+          positionOffset
+        );
 
-    // Tooltip
-    layers_to_set.forEach((layer) => {
-      layer.onHover = (info: PickingInfo<EarthQuake>) => {
-        setHoverInfo(info);
-        return true;
-      };
+        layer.onHover = (info: PickingInfo<EarthQuake>) => {
+          setHoverInfo(info);
+          return true;
+        };
+
+        return layer
+      }
     });
 
-    return layers_to_set;
-  }, [dataSources, positionOffset, sessionInterface, GPUfiltering]);
+    console.log(layers_to_set);
+
+    return layers_to_set
+
+  }, [
+    dataSources.allIDs,
+    dataSources.byID,
+    data,
+    sessionInterface,
+    GPUfiltering,
+    positionOffset,
+  ]);
+
 
   // VIEWSTATE & RESET VIEW
   const [initialViewState, setInitialViewState] =
@@ -149,12 +165,17 @@ export default function ThreeDDeckGLView({
       >
         {IsLoading && <LinearProgress variant="query" />}
         {hoverInfo && (
-          <MapToolTip pickingInfo={hoverInfo} dataSources={dataSources} />
+          <MapToolTip pickingInfo={hoverInfo} />
         )}
-        <Button onClick={flyToDataSource} sx={{left: "36px"}}>reset view</Button>
+        <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
+          reset view
+        </Button>
 
         <ZoomWidget placement="top-left" />
-        <FullscreenWidget placement="top-left" container={mapContainer.current} />
+        <FullscreenWidget
+          placement="top-left"
+          container={mapContainer.current!}
+        />
       </DeckGL>
     </>
   );

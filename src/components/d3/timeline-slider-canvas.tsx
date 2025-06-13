@@ -34,10 +34,11 @@ import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { CheckBox, Pause, PlayArrow, RestartAlt } from "@mui/icons-material";
 import { dataSourceDataUrl } from "../datasource/data-source-query";
 import { useTranslations } from "next-intl";
-import strftime from "strftime";
+// import strftime from "strftime";
 import useAnimationFrame from "use-animation-frame";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { GradientHorizontal, Speedometer } from "mdi-material-ui";
+import { useDataStore } from "@/providers/data-store-provider";
 
 type D3Earthquake = EarthQuake & { date: Date };
 
@@ -50,13 +51,7 @@ const NoAnimationSlider = styled(Slider)(() => ({
   },
 }));
 
-export default function TimelineSlider({
-  dataSources,
-  setFiltering,
-}: {
-  dataSources: DataSource[];
-  setFiltering?: CallableFunction;
-}) {
+export default function TimelineSlider() {
   const t = useTranslations();
   const theme = useTheme();
 
@@ -87,28 +82,9 @@ export default function TimelineSlider({
 
   // DATA
 
-  const [data, setData] = useState<D3Earthquake[] | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-
-  useEffect(() => {
-    d3.json(dataSourceDataUrl(dataSources[0]))
-      .then((data) => {
-        console.log("loading data");
-        if (!data) {
-          console.log("no data");
-        } else {
-          (data as D3Earthquake[]).forEach((d: D3Earthquake) => {
-            const t = Math.round(d["t"] as number);
-            d.date = new Date(t);
-          });
-
-          setData(data as D3Earthquake[]);
-        }
-      })
-      .then(() => {
-        setIsLoading(false);
-      });
-  }, [dataSources]); // Only load once
+  const { data } = useDataStore((state) => state);
+  const dataSources = useProjectStore((state) => state.dataSources);
 
   // RESPONSIVE SIZING AND LOADING
 
@@ -136,32 +112,36 @@ export default function TimelineSlider({
   // DATA BOUNDS
 
   const t_min = Math.min(
-    ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "t")!
-          .bounds[0]
+    ...dataSources.allIDs.map(
+      (id) =>
+        dataSources.byID[id].metadata.data_descr.find(
+          (el) => el.variable == "t"
+        )!.bounds[0]
     )
   );
   const t_max = Math.max(
-    ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "t")!
-          .bounds[1]
+    ...dataSources.allIDs.map(
+      (id) =>
+        dataSources.byID[id].metadata.data_descr.find(
+          (el) => el.variable == "t"
+        )!.bounds[1]
     )
   );
 
   const m_min = Math.min(
-    ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "mag")!
-          .bounds[0]
+    ...dataSources.allIDs.map(
+      (id) =>
+        dataSources.byID[id].metadata.data_descr.find(
+          (el) => el.variable == "mag"
+        )!.bounds[0]
     )
   );
   const m_max = Math.max(
-    ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "mag")!
-          .bounds[1]
+    ...dataSources.allIDs.map(
+      (id) =>
+        dataSources.byID[id].metadata.data_descr.find(
+          (el) => el.variable == "mag"
+        )!.bounds[1]
     )
   );
 
@@ -175,7 +155,7 @@ export default function TimelineSlider({
       setLocalDomain([t_min, t_max]);
       setTimeFiltering([t_min, t_max]);
     } else {
-      setLocalDomain(GPUfiltering.t);
+      setLocalDomain(GPUfiltering.t as [number, number]);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -202,7 +182,7 @@ export default function TimelineSlider({
     } else {
       return 86400; //s s⁻1
     }
-  }, [animationSpeed]);
+  }, [animationSpeed]) as number;
 
   useAnimationFrame((e) => {
     if (isPlaying == "playing") {
@@ -220,8 +200,8 @@ export default function TimelineSlider({
         }
       };
 
-      setLocalDomain(calcNewPosition());
-      setTimeFiltering(calcNewPosition());
+      setLocalDomain(calcNewPosition() as [number, number]);
+      setTimeFiltering(calcNewPosition() as [number, number]);
     }
   });
 
@@ -309,7 +289,7 @@ export default function TimelineSlider({
   }, [onBrush]);
 
   const moveBrush = useCallback(
-    (newDomain) => {
+    (newDomain: [number, number]) => {
       const brush = brushRef.current;
       if (brush) {
         d3.select("#timeline-graph")
@@ -339,18 +319,22 @@ export default function TimelineSlider({
   }, [localDomain, moveBrush, t_max, t_min]);
 
   const drawPoint = useCallback(
-    (context: CanvasRenderingContext2D, d: D3Earthquake) => {
+    (context: CanvasRenderingContext2D, d: Earthuake) => {
       context.beginPath();
 
-      const clr = ColorMapping(d, dataSources[0].formatting.color)!;
+      const clr = ColorMapping(
+        d,
+        dataSources.byID[dataSources.allIDs[0]].formatting.color
+      )!;
       context.fillStyle = `rgb(${clr[0]},${clr[1]},${clr[2]})`;
-      const px = xScale(d.date);
+      const px = xScale(new Date(d.t));
       const py = yScale(d.mag);
 
       context.arc(px, py, 1.2, 0, 2 * Math.PI, true);
       context.fill();
     },
-    [dataSources, xScale, yScale]
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [xScale, yScale]
   );
 
   // draw points
@@ -359,14 +343,18 @@ export default function TimelineSlider({
 
     const context = contextRef.current!;
 
-    if (data && context) {
+    if (context) {
       // context.clearRect(0, 0, width, height);
 
-      (data as D3Earthquake[]).forEach((d) => {
-        drawPoint(context, d);
+      dataSources.allIDs.forEach((id) => {
+        if (data[id]) {
+          (data[id].data as EarthQuake[]).forEach((d) => {
+            drawPoint(context, d);
+          });
+        }
       });
     }
-  }, [data, drawPoint]);
+  }, [data, dataSources.allIDs, drawPoint]);
 
   // Define and generate plots
   const contextRef = useRef<CanvasRenderingContext2D>(null);
@@ -475,7 +463,7 @@ export default function TimelineSlider({
             },
           }}
         >
-          {isLoading && (
+          {/* {isLoading && (
             <Skeleton
               sx={{
                 position: "absolute",
@@ -486,7 +474,7 @@ export default function TimelineSlider({
               width={dimensions.width - margin.left - margin.right}
               height={dimensions.height - margin.top - margin.bottom}
             />
-          )}
+          )} */}
         </Box>
 
         {/* <NoAnimationSlider
@@ -550,8 +538,8 @@ export default function TimelineSlider({
           >
             {isPlaying == "stopped" ? <PlayArrow /> : <Pause />}
           </IconButton>
-          <Divider orientation="vertical" sx={{ m: 0.5, mr:1 }} flexItem/>
-          <Speedometer sx={{mr:1}}/>
+          <Divider orientation="vertical" sx={{ m: 0.5, mr: 1 }} flexItem />
+          <Speedometer sx={{ mr: 1 }} />
           <Input
             value={animationSpeed.multiplier}
             size="small"
@@ -622,8 +610,9 @@ export default function TimelineSlider({
                 ? t("Animation.years")
                 : t("Animation.year")}
             </MenuItem>
-          </Select>{" /s"}
-          <Divider orientation="vertical" sx={{ m: 0.5, ml: 1 }} flexItem/>
+          </Select>
+          {" /s"}
+          <Divider orientation="vertical" sx={{ m: 0.5, ml: 1 }} flexItem />
           <Checkbox
             size="small"
             checked={tapered}

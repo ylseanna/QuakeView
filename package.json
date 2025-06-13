@@ -1,5 +1,5 @@
 {
-  "name": "nextjs-electron",
+  "name": "quakeview",
   "version": "0.1.0",
   "private": true,
   "main": "build/main.js",
@@ -65,6 +65,7 @@
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@deck.gl/core": "^9.1.0",
+    "@deck.gl/extensions": "^9.1.12",
     "@deck.gl/geo-layers": "^9.1.8",
     "@deck.gl/layers": "^9.1.0",
     "@deck.gl/mapbox": "^9.1.0",
@@ -87,13 +88,14 @@
     "d3fc": "^15.2.13",
     "deck.gl": "^9.1.11",
     "document-register-element": "^1.14.10",
-    "electron": "^36.3.1",
+    "electron": "^37.0.0",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.9.4",
     "maplibre-gl": "^4.7.1",
     "mdi-material-ui": "^7.9.4",
     "mui-color-input": "^6.0.0",
+    "mui-file-input": "^7.0.0",
     "next": "^15.2.4",
     "next-intl": "^3.26.3",
     "react": "^19.0.0",
@@ -108,6 +110,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/lodash": "^4.17.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",

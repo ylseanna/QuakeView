@@ -5,6 +5,8 @@ from shapely import centroid, multipoints
 import json
 import os
 from numpy import float64, int64
+import logging
+
 
 # from obspy import UTCDateTime
 from datetime import datetime
@@ -82,7 +84,7 @@ default_variable_mapping = {
 
 
 @app.route("/api/map_data")
-@cache.cached(timeout=50)
+# @cache.cached(timeout=50)
 def map_data():
     mode = request.args.get("mode")
 
@@ -92,19 +94,15 @@ def map_data():
 
     if mode == "get_availability":
         return Response(
-            json.dumps(
-                [path.name for path in sorted(Path("/backend/data").glob("*"))]
-            ),
+            json.dumps([path.name for path in sorted(Path("/backend/data").glob("*"))]),
             mimetype="application/json",
         )
 
     if mode == "metadata_query":
         # GET DATA
-        filename = request.args.get("filename")
+        filepath = request.args.get("filepath")
 
-        filename = "data/" + filename
-
-        df = load_to_df(filename)
+        df = load_to_df(filepath)
 
         # GET EXTENT
 
@@ -188,7 +186,6 @@ def map_data():
         # DEFINE OPTIONAL PARAMS
 
         def variable_mapping(dtype):
-            print(dtype)
             if dtype in (float, float64, int, int64):
                 return "number"
             else:
@@ -209,8 +206,6 @@ def map_data():
             if column_name not in [el["mapped_var"] for el in required_data_descr]
         ]
 
-        print(optional_data_descr)
-
         # OUTPUT
 
         meta_data_dict = {
@@ -227,6 +222,8 @@ def map_data():
             },
         }
 
+        app.logger.info(meta_data_dict)
+
         return Response(json.dumps(meta_data_dict), mimetype="application/json")
     if mode == "unique_values":
         filename = request.args.get("filename")
@@ -242,7 +239,7 @@ def map_data():
         return Response(json.dumps(unique_values), mimetype="application/json")
     if mode == "data_query" or mode is None:
         # LOAD FILE
-        filename = request.args.get("filename")
+        filename = request.args.get("filepath")
 
         added_vars = request.args.get("added_vars")
 
@@ -255,7 +252,7 @@ def map_data():
 
 
 @app.route("/api/plot_data")
-@cache.cached(timeout=50)
+# @cache.cached(timeout=50)
 def plot_data():
     mode = request.args.get("mode")
 
@@ -283,7 +280,7 @@ def plot_data():
         )
 
 
-@cache.memoize()
+# @cache.memoize()
 def generate_event_dict(df, added_vars=None):
     # LOAD VARS
 
@@ -313,14 +310,10 @@ def generate_event_dict(df, added_vars=None):
     return event_dict
 
 
-@cache.memoize()
-def load_to_df(filename):
+# @cache.memoize()
+def load_to_df(filepath):
     # LOAD FILE
-    filename = request.args.get("filename")
-
-    filename = "data/" + filename
-
-    df = pd.read_csv(filename)
+    df = pd.read_csv(filepath)
 
     # DATETIME
 

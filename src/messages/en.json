@@ -16,7 +16,8 @@
   },
   "Common": {
     "3D_map": "3D map",
-    "app_title": "Earthquakes",
+    "app_title": "Earthquake Catalogues",
+    "configure": "Configure",
     "data": "Data",
     "information": "Information",
     "input": "Input",
@@ -27,6 +28,7 @@
     "picking": "Information tool",
     "plots": "Plots",
     "sources": "Sources",
+    "timeline": "Timeline",
     "visualisations": "Visualisations"
   },
   "Filtering": {
@@ -66,6 +68,7 @@
     "column_headers": "Column headers",
     "data_sources": "Data sources",
     "filename": "Filename",
+    "filepath": "Filepath",
     "formatting": "Formatting",
     "num_events": "Number of events",
     "options": "Options",

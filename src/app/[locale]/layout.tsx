@@ -52,6 +52,13 @@ declare module "@mui/material/Typography" {
   }
 }
 
+declare global {
+  interface Window {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    electronAPI: any;
+  }
+}
+
 export default async function LocaleLayout({
   children,
   params,

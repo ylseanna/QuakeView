@@ -2,22 +2,24 @@
 
 // import { useTranslations } from "next-intl";
 import { Grid2, Paper, SxProps, Typography } from "@mui/material";
-import { DataSource } from "../../datasource/types";
 import LegendElement from "./legend-element";
 import { useTranslations } from "next-intl";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 interface LegendProps {
-  dataSources: DataSource[] | null;
   sx?: SxProps;
 }
 
-export default function Legend({ dataSources, sx }: LegendProps) {
+export default function Legend({ sx }: LegendProps) {
   const t = useTranslations("Common");
 
+  const dataSources = useProjectStore((state) => state.dataSources);
+
   if (
-    dataSources!.length > 1 ||
-    (dataSources!.length == 1 &&
-      dataSources![0].formatting.color.mapping != "single")
+    dataSources.allIDs!.length > 1 ||
+    (dataSources.allIDs!.length == 1 &&
+      dataSources.byID![dataSources.allIDs[0]].formatting.color.mapping !=
+        "single")
   ) {
     return (
       <Paper
@@ -40,13 +42,10 @@ export default function Legend({ dataSources, sx }: LegendProps) {
         </Typography>
         <Grid2 container direction="column" spacing={2} sx={{ width: "200px" }}>
           {dataSources &&
-            dataSources.map((dataSource: DataSource) => (
-              <Grid2
-                size="grow"
-                key={`LegendElement-${dataSource.internal_id}`}
-              >
-                {dataSources.length > 1 &&
-                  dataSource.formatting.color.mapping == "linear" && (
+            dataSources.allIDs.map((id) => (
+              <Grid2 size="grow" key={`LegendElement-${id}`}>
+                {dataSources.allIDs.length > 1 &&
+                  dataSources.byID[id].formatting.color.mapping == "linear" && (
                     <Typography
                       fontSize={10}
                       fontWeight="bold"
@@ -59,11 +58,11 @@ export default function Legend({ dataSources, sx }: LegendProps) {
                         textOverflow: "ellipsis",
                       }}
                     >
-                      {dataSource.filename}
+                      {dataSources.byID[id].filename}
                     </Typography>
                   )}
 
-                <LegendElement dataSource={dataSource} />
+                <LegendElement dataSource={dataSources.byID[id]} />
               </Grid2>
             ))}
         </Grid2>

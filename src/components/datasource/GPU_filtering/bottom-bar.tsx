@@ -1,15 +1,12 @@
 import { Box, Paper, Slide, useTheme } from "@mui/material";
-import { DataSource } from "../types";
 import { RefObject, useEffect, useState } from "react";
 import TimelineSlider from "../../d3/timeline-slider-canvas";
 
 export default function BottomBar({
-  dataSources,
   setFiltering,
   drawerOpen,
   parentRef,
 }: {
-  dataSources: DataSource[];
   setFiltering: CallableFunction;
   drawerOpen: boolean;
   parentRef?: RefObject<HTMLElement>;
@@ -55,10 +52,7 @@ export default function BottomBar({
             height: `calc(${DRAWER_HEIGHT}px - ${theme.spacing(2)})`,
           }}
         >
-          <TimelineSlider
-            dataSources={dataSources}
-            setFiltering={setFiltering}
-          />
+          <TimelineSlider />
         </Box>
       </Paper>
     </Slide>

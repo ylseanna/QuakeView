@@ -26,6 +26,9 @@ html {
 
 /* D3 overrides */
 
+.draggableArea {
+  app-region: drag;
+}
 
 /* #deckgl-wrapper {
   background-color: #FFF;

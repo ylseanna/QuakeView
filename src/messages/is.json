@@ -16,7 +16,8 @@
   },
   "Common": {
     "3D_map": "Þrívíddarkort",
-    "app_title": "Jarðskjálftar",
+    "app_title": "Jarðskjálftaskrár",
+    "configure": "Samskipa",
     "data": "Gögn",
     "information": "Upplýsingar",
     "input": "Inntak",
@@ -27,6 +28,7 @@
     "picking": "Upplýsingatól",
     "plots": "Gröf",
     "sources": "Gagnaheimildir",
+    "timeline": "Tímalína",
     "visualisations": "Kort og gröf"
   },
   "Filtering": {
@@ -66,6 +68,7 @@
     "column_headers": "Dálkahausar",
     "data_sources": "Gagnaheimildir",
     "filename": "Skrárheiti",
+    "filepath": "Leið",
     "formatting": "Hönnun",
     "num_events": "Fjöldi skjálftar",
     "options": "Stillingar",

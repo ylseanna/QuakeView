@@ -7,6 +7,7 @@ import {
   IconButton,
   TextField,
   Typography,
+  Alert,
 } from "@mui/material";
 
 import {
@@ -129,6 +130,7 @@ export default function DataSourceVariableForm({
 
   return (
     <>
+    <Alert severity="warning" sx={{mt:1}}>Changing the variable mappings is not implemented yet, please adjust your input catalogs as a temporary work-around</Alert>
       <Grid2 container spacing={1} direction="column">
         <Grid2 container spacing={1} alignItems="flex-end">
           <Grid2 size={1.5} sx={{ ml: 1.5 }}>

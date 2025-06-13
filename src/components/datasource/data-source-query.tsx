@@ -19,7 +19,5 @@ export function dataSourceDataUrl(dataSource: DataSource) {
   const addedVars = encodeURIComponent(
     JSON.stringify(dataSource.interface.addedVars)
   );
-  console.log(process.env.NEXT_PUBLIC_HOST)
-
-  return `http://${process.env.NEXT_PUBLIC_HOST}${process.env.NEXT_PUBLIC_APP_BASE_PATH}/api/map_data?mode=data_query&filename=${dataSource.filename}${addedVars ? "&added_vars=" + addedVars : ""}${var_mappings ? var_mappings_uri : ""}`
+  return `/api/map_data?mode=data_query&filepath=${dataSource.filepath}${addedVars ? "&added_vars=" + addedVars : ""}${var_mappings ? var_mappings_uri : ""}`
 }

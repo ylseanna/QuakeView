@@ -4,7 +4,6 @@ import { PickingInfo } from "@deck.gl/core";
 // import { useTranslations } from "next-intl";
 import {
   EarthQuake,
-  DataSource,
   DataSourceDataDescription,
 } from "../datasource/types";
 import { Grid2, Paper, SxProps, Typography } from "@mui/material";
@@ -12,7 +11,6 @@ import { useProjectStore } from "@/providers/project-store-provider";
 
 interface MapToolTipProps {
   pickingInfo: PickingInfo<EarthQuake>;
-  dataSources: DataSource[] | null;
 }
 
 const tooltipStyle: SxProps = {
@@ -25,15 +23,14 @@ const tooltipStyle: SxProps = {
 
 export default function MapToolTip({
   pickingInfo,
-  dataSources,
 }: MapToolTipProps) {
   //   const t = useTranslations("Common");
 
+  const dataSources = useProjectStore((state) => state.dataSources);
+
   const dataSourceID = pickingInfo.layer!.id.split("_")[1];
 
-  const dataSource = dataSources?.find(
-    (dataSource) => dataSource.internal_id == dataSourceID
-  );
+  const dataSource = dataSources.byID[dataSourceID]
 
   const { sessionInterface } = useProjectStore((state) => state);
 

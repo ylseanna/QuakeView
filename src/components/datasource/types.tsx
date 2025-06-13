@@ -14,6 +14,7 @@ export type EarthQuake = {
 export type DataSource = {
   internal_id: string;
   filename: string;
+  filepath: string;
   name: string;
   interface: { pickable: boolean; visible: boolean; addedVars: string[] };
   filtering: DataSourceFiltering;

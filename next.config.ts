@@ -12,13 +12,14 @@ const defaultLocale = "en";
 
 module.exports = withNextIntl({
   reactStrictMode: false,
-
   output: "standalone",
   basePath: basePath,
   env: {
     HOST: "localhost:8090",
     API_HOST: "localhost:8100",
   },
+  transpilePackages: ['mui-file-input'],
+  devIndicators: false,
   // Redirect basePath to path with locale due to next-intl not supporting basePath
   async redirects() {
     return [

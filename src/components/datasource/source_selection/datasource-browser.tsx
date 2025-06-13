@@ -1,26 +1,17 @@
 "use client";
 
-import {
-  DataSource,
-  DATASOURCE_JSON_CODEC,
-} from "@/components/datasource/types";
-
 import DataTab from "./datasource-tab";
-import { useLocalStorageState } from "@toolpad/core";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 export default function DataSourceBrowser() {
-  const [dataSources, setDataSources] = useLocalStorageState<DataSource[]>("data-sources", [], {
-    codec: DATASOURCE_JSON_CODEC,
-  });
-
-
+  const dataSourceIDS = useProjectStore((state) => state.dataSources.allIDs);
 
   return (
     <div>
-      {!dataSources
+      {!dataSourceIDS
         ? null
-        : (dataSources as DataSource[]).map((dataSource) => (
-            <DataTab key={dataSource.internal_id} dataSource={dataSource} dataSources={dataSources} setDataSources={setDataSources}/>
+        : dataSourceIDS.map((dataSourceID) => (
+            <DataTab key={"DataTab-" + dataSourceID} id={dataSourceID} />
           ))}
     </div>
   );

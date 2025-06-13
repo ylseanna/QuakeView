@@ -12,7 +12,6 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import { DataSource } from "./types";
 import { useTranslations } from "next-intl";
 import {
   ColorLens,
@@ -24,9 +23,7 @@ import {
 } from "@mui/icons-material";
 import {
   ChangeEvent,
-  Dispatch,
   RefObject,
-  SetStateAction,
   useEffect,
   useRef,
   useState,
@@ -38,11 +35,7 @@ import Legend from "../map/legend/legend";
 import BottomBar from "./GPU_filtering/bottom-bar";
 import { useProjectStore } from "@/providers/project-store-provider";
 
-interface LegendProps {
-  dataSources: DataSource[];
-  setDataSources: Dispatch<SetStateAction<DataSource[] | null>>;
-}
-export default function Actions({ dataSources, setDataSources }: LegendProps) {
+export default function Actions() {
   const t = useTranslations();
 
   const [panelPosition, setPanelPosition] = useState(0);
@@ -56,7 +49,21 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
   const [sidebarOpen, setSidebarOpen] = useState<string | null>(null);
   const [bottombarOpen, setBottombarOpen] = useState<boolean>(false);
 
-  const { sessionInterface, interfaceActions } = useProjectStore((state) => state);
+  const { sessionInterface, interfaceActions } = useProjectStore(
+    (state) => state
+  );
+
+  const dataSources = useProjectStore((state) => state.dataSources);
+
+  const setFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setFormatting
+  );
+  const setFiltering = useProjectStore(
+    (state) => state.dataSourceActions.setFiltering
+  );
+  const setVisible = useProjectStore(
+    (state) => state.dataSourceActions.setVisible
+  );
 
   // if any sidebar open, also move panel
   useEffect(() => {
@@ -114,51 +121,50 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
   //   }
   // };
 
-
   // Filtering
 
-  const setFiltering = (
-    id: string,
-    variableToModify: string,
-    value: [number, number] | null,
-  ) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    );
+  // const setFiltering = (
+  //   id: string,
+  //   variableToModify: string,
+  //   value: [number, number] | null
+  // ) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   );
 
-    const modifiedDataSource = dataSources[indexToModify];
+  //   const modifiedDataSource = dataSources[indexToModify];
 
-    if (value) {
-      modifiedDataSource.filtering = {
-        ...modifiedDataSource.filtering,
-        [variableToModify]: value,
-      };
-    } else {
-      delete modifiedDataSource.filtering[variableToModify]
-    }
+  //   if (value) {
+  //     modifiedDataSource.filtering = {
+  //       ...modifiedDataSource.filtering,
+  //       [variableToModify]: value,
+  //     };
+  //   } else {
+  //     delete modifiedDataSource.filtering[variableToModify];
+  //   }
 
-    dataSources[indexToModify] = modifiedDataSource;
+  //   dataSources[indexToModify] = modifiedDataSource;
 
-    setDataSources(dataSources);
-  };
+  //   setDataSources(dataSources);
+  // };
 
   // LAYER TAB
 
   const [layersVisible, setLayersVisible] = useState(false);
 
-  const setVisible = (id: string, value: boolean) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    );
+  // const setVisible = (id: string, value: boolean) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   );
 
-    const modifiedDataSource = dataSources[indexToModify];
+  //   const modifiedDataSource = dataSources[indexToModify];
 
-    modifiedDataSource.interface.visible = value;
+  //   modifiedDataSource.interface.visible = value;
 
-    dataSources[indexToModify] = modifiedDataSource;
+  //   dataSources[indexToModify] = modifiedDataSource;
 
-    setDataSources(dataSources);
-  };
+  //   setDataSources(dataSources);
+  // };
 
   // CLICK-AWAY
 
@@ -256,10 +262,10 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
                 spacing={0.5}
               >
                 {dataSources &&
-                  dataSources.map((dataSource) => (
+                  dataSources.allIDs.map((id) => (
                     <Grid2
                       size="grow"
-                      key={dataSource.internal_id}
+                      key={id}
                       direction="row"
                       display={"flex"}
                       alignItems={"center"}
@@ -268,16 +274,16 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
                         noWrap
                         sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
                       >
-                        {dataSource.filename}
+                        {dataSources.byID[id].filename}
                       </Typography>
                       <Checkbox
-                        checked={dataSource.interface.visible}
+                        checked={dataSources.byID[id].interface.visible}
                         icon={<VisibilityOff />}
                         checkedIcon={<Visibility />}
                         color="default"
                         onChange={(event: ChangeEvent<HTMLInputElement>) => {
                           setVisible(
-                            dataSource.internal_id,
+                            id,
                             event.target.checked
                           );
                         }}
@@ -290,12 +296,10 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
           )}
         </Paper>
         <FormattingSidebar
-          dataSources={dataSources}
-          setDataSources={setDataSources}
+          setFormatting={setFormatting}
           drawerOpen={sidebarOpen == "formatting"}
         />
         <FilteringSidebar
-          dataSources={dataSources}
           // setDataSources={setDataSources}
           setFiltering={setFiltering}
           drawerOpen={sidebarOpen == "filtering"}
@@ -303,7 +307,6 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
 
         {dataSources && (
           <Legend
-            dataSources={dataSources}
             sx={{
               transform: `translate(-${panelPosition}px, -${bottombarPosition}px)`,
               transition: "transform.225s",
@@ -312,36 +315,37 @@ export default function Actions({ dataSources, setDataSources }: LegendProps) {
         )}
       </Box>
       {/* BOTTOM BAR */}
-      <Paper
-        sx={{
-          position: "fixed",
-          display: "flex",
-          flexDirection: "column",
-          transform: `translateY(-${bottombarPosition}px)`,
-          transition: "transform.225s",
-          alignSelf: "center",
-          bottom: 0,
-          p: 1,
-          borderRadius: "24px 24px 0 0",
-          zIndex: 1200,
-          color: "var(--theme-palette-text-primary)",
-        }}
-      >
-        <Tooltip
-          title={bottombarOpen == true ? "" : t("Formatting.formatting")}
-          placement="top"
-        >
-          <Button onClick={toggleBottomBar}>Timeline</Button>
-        </Tooltip>
-      </Paper>
 
-      {dataSources && (
-        <BottomBar
-          dataSources={dataSources}
-          setFiltering={setFiltering}
-          drawerOpen={bottombarOpen}
-          parentRef={actionsRef as RefObject<HTMLElement>}
-        />
+      {dataSources.allIDs.length > 0 && (
+        <>
+          <Paper
+            sx={{
+              position: "fixed",
+              display: "flex",
+              flexDirection: "column",
+              transform: `translateY(-${bottombarPosition}px)`,
+              transition: "transform.225s",
+              alignSelf: "center",
+              bottom: 0,
+              p: 1,
+              borderRadius: "24px 24px 0 0",
+              zIndex: 1200,
+              color: "var(--theme-palette-text-primary)",
+            }}
+          >
+            <Tooltip
+              title={bottombarOpen == true ? "" : t("Formatting.formatting")}
+              placement="top"
+            >
+              <Button onClick={toggleBottomBar}>{t("Common.timeline")}</Button>
+            </Tooltip>
+          </Paper>
+          <BottomBar
+            setFiltering={setFiltering}
+            drawerOpen={bottombarOpen}
+            parentRef={actionsRef as RefObject<HTMLElement>}
+          />
+        </>
       )}
     </>
   );

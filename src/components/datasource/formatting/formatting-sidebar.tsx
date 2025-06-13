@@ -1,19 +1,17 @@
 import { Drawer, Toolbar, Typography } from "@mui/material";
-import { DataSource, DataSourceFormatting } from "../types";
 import DataSourceFormattingElement from "./formatting-element";
-import { Dispatch, SetStateAction, useRef } from "react";
+import { useRef } from "react";
 import { useTranslations } from "next-intl";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 interface FormattingProps {
-  dataSources: DataSource[];
-  setDataSources: Dispatch<SetStateAction<DataSource[] | null>>;
+  setFormatting: CallableFunction;
   drawerOpen: boolean;
   single?: boolean;
 }
 
 export default function FormattingSidebar({
-  dataSources,
-  setDataSources,
+  setFormatting,
   drawerOpen,
 }: FormattingProps) {
   const t = useTranslations("Formatting");
@@ -27,23 +25,7 @@ export default function FormattingSidebar({
 
   const ref = useRef(null);
 
-  const setFormatting = (
-    id: string,
-    keyToModify: keyof DataSourceFormatting,
-    value: never
-  ) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    );
-
-    const modifiedDataSource = dataSources[indexToModify];
-
-    modifiedDataSource.formatting[keyToModify] = value;
-
-    dataSources[indexToModify] = modifiedDataSource;
-
-    setDataSources(dataSources);
-  };
+  const dataSources = useProjectStore((state) => state.dataSources);
 
   return (
     <>
@@ -58,6 +40,7 @@ export default function FormattingSidebar({
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
+            top: "30px"
           },
         }}
       >
@@ -67,12 +50,12 @@ export default function FormattingSidebar({
         </Typography>
         {!dataSources
           ? null
-          : (dataSources as DataSource[]).map((dataSource) => (
+          : dataSources.allIDs .map((id) => (
               <DataSourceFormattingElement
-                key={dataSource.internal_id}
-                dataSource={dataSource}
+                key={id}
+                dataSource={dataSources.byID[id]}
                 setFormatting={setFormatting}
-                single={(dataSources.length > 1 ? false : true)}
+                single={(dataSources.allIDs.length > 1 ? false : true)}
               />
             ))}
       </Drawer>

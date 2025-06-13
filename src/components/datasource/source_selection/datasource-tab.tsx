@@ -19,13 +19,13 @@ import {
   Typography,
 } from "@mui/material";
 
-import {
-  DataSource,
-  DataSourceDataDescription,
-  DataSourceFormatting,
-} from "@/components/datasource/types";
+// import {
+//   DataSource,
+//   DataSourceDataDescription,
+//   DataSourceFormatting,
+// } from "@/components/datasource/types";
 import { useTranslations } from "next-intl";
-import { Dispatch, SetStateAction, useCallback } from "react";
+// import { Dispatch, SetStateAction, useCallback } from "react";
 import DataSourceFormattingForm from "../formatting/formatting-form";
 
 import DataSourceVariableForm from "../variables/variable-form";
@@ -35,111 +35,109 @@ import {
   SubAccordionSummary,
 } from "../../layout/accordion";
 import FilteringForm from "../filtering/filtering-form";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
 
 interface DataTabProps {
-  dataSource: DataSource;
-  dataSources: DataSource[];
-  setDataSources: Dispatch<SetStateAction<DataSource[] | null>>;
+  id: string;
 }
 
 export default function DataTab({
-  dataSource,
-  dataSources,
-  setDataSources,
+  id
 }: DataTabProps) {
   const t = useTranslations();
 
-  const removeDataSource = useCallback(
-    (internalId: string) => {
-      const filteredDataSources = dataSources!.filter(
-        (obj) => ![internalId].includes(obj.internal_id)
-      );
+  const dataSource = useProjectStore((state) => state.dataSources.byID[id]);
+  const removeDataSource = useProjectStore((state) => state.dataSourceActions.removeDataSource);
+  const { removeData } = useDataStore((state) => state);
 
-      setDataSources(filteredDataSources);
-    },
-    [dataSources, setDataSources]
-  );
+  // dataSourceSubactions
+  const setFormatting = useProjectStore((state) => state.dataSourceActions.setFormatting);
+  const setFiltering = useProjectStore((state) => state.dataSourceActions.setFiltering);
+  const setVariableDescr = useProjectStore((state) => state.dataSourceActions.setVariableDescr);
+  const setAddedVars = useProjectStore((state) => state.dataSourceActions.setAddedVars);
 
-  const setFormatting = (
-    id: string,
-    keyToModify: keyof DataSourceFormatting,
-    value: never
-  ) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    ) as number;
 
-    const modifiedDataSource = dataSources![indexToModify];
+  // const setFormatting = (
+  //   id: string,
+  //   keyToModify: keyof DataSourceFormatting,
+  //   value: never
+  // ) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   ) as number;
 
-    modifiedDataSource.formatting[keyToModify] = value;
+  //   const modifiedDataSource = dataSources![indexToModify];
 
-    dataSources![indexToModify] = modifiedDataSource;
+  //   modifiedDataSource.formatting[keyToModify] = value;
 
-    setDataSources(dataSources);
-  };
+  //   dataSources![indexToModify] = modifiedDataSource;
 
-  const setFiltering = (
-    id: string,
-    variableToModify: string,
-    value: [number, number] | null,
-  ) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    );
+  //   setDataSources(dataSources);
+  // };
 
-    const modifiedDataSource = dataSources[indexToModify];
+  // const setFiltering = (
+  //   id: string,
+  //   variableToModify: string,
+  //   value: [number, number] | null,
+  // ) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   );
 
-    if (value) {
-      modifiedDataSource.filtering = {
-        ...modifiedDataSource.filtering,
-        [variableToModify]: value,
-      };
-    } else {
-      delete modifiedDataSource.filtering[variableToModify]
-    }
+  //   const modifiedDataSource = dataSources[indexToModify];
 
-    dataSources[indexToModify] = modifiedDataSource;
+  //   if (value) {
+  //     modifiedDataSource.filtering = {
+  //       ...modifiedDataSource.filtering,
+  //       [variableToModify]: value,
+  //     };
+  //   } else {
+  //     delete modifiedDataSource.filtering[variableToModify]
+  //   }
 
-    setDataSources(dataSources);
-  };
+  //   dataSources[indexToModify] = modifiedDataSource;
 
-  const setVariableDescr = (
-    id: string,
-    variableToModify: string,
-    keyToModify: keyof DataSourceDataDescription,
-    value: never
-  ) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    ) as number;
+  //   setDataSources(dataSources);
+  // };
 
-    const modifiedDataSource = dataSources![indexToModify];
+  // const setVariableDescr = (
+  //   id: string,
+  //   variableToModify: string,
+  //   keyToModify: keyof DataSourceDataDescription,
+  //   value: never
+  // ) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   ) as number;
 
-    const modifiedVariableObject = modifiedDataSource.metadata.data_descr.find(
-      (dataDescription: DataSourceDataDescription) =>
-        dataDescription.variable == variableToModify
-    );
+  //   const modifiedDataSource = dataSources![indexToModify];
 
-    modifiedVariableObject![keyToModify] = value;
+  //   const modifiedVariableObject = modifiedDataSource.metadata.data_descr.find(
+  //     (dataDescription: DataSourceDataDescription) =>
+  //       dataDescription.variable == variableToModify
+  //   );
 
-    dataSources![indexToModify] = modifiedDataSource;
+  //   modifiedVariableObject![keyToModify] = value;
 
-    setDataSources(dataSources);
-  };
+  //   dataSources![indexToModify] = modifiedDataSource;
 
-  const setAddedVars = (id: string, value: string[]) => {
-    const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
-    ) as number;
+  //   setDataSources(dataSources);
+  // };
 
-    const modifiedDataSource = dataSources![indexToModify];
+  // const setAddedVars = (id: string, value: string[]) => {
+  //   const indexToModify = dataSources?.findIndex(
+  //     (dataSource) => dataSource.internal_id === id
+  //   ) as number;
 
-    modifiedDataSource.interface.addedVars = value;
+  //   const modifiedDataSource = dataSources![indexToModify];
 
-    dataSources![indexToModify] = modifiedDataSource;
+  //   modifiedDataSource.interface.addedVars = value;
 
-    setDataSources(dataSources);
-  };
+  //   dataSources![indexToModify] = modifiedDataSource;
+
+  //   setDataSources(dataSources);
+  // };
 
   return (
     <Accordion>
@@ -157,7 +155,7 @@ export default function DataTab({
           <Box sx={{ display: "flex", p: 1, pl: 0 }}>
             <IconButton
               size="small"
-              onClick={() => removeDataSource(dataSource.internal_id)}
+              onClick={() => {removeDataSource(dataSource.internal_id); removeData(dataSource.internal_id)}}
             >
               <Close />
             </IconButton>
@@ -174,6 +172,14 @@ export default function DataTab({
               </Grid2>
               <Grid2  size={6}>
                 <Typography>{dataSource.filename}</Typography>
+              </Grid2>
+              <Grid2 size={2}>
+                <Typography noWrap>
+                  <b>{t("Sources.filepath")}:</b>
+                </Typography>
+              </Grid2>
+              <Grid2  size={6}>
+                <Typography>{dataSource.filepath}</Typography>
               </Grid2>
               <Grid2 size={2}>
                 <Typography noWrap>

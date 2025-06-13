@@ -8,22 +8,55 @@ import Map, {
   ScaleControl,
   NavigationControl,
 } from "react-map-gl/maplibre";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { LinearProgress } from "@mui/material";
 import { ViewState } from "react-map-gl/maplibre";
 
 import DeckGLlayers from "../../../../components/map/deckgl-layers";
 import { useLocalStorageState } from "@toolpad/core";
 import { VIEWSTATE_JSON_CODEC } from "../../../../components/map/types";
-import {
-  DataSource,
-  DATASOURCE_JSON_CODEC,
-} from "../../../../components/datasource/types";
 import { AttributionControl } from "react-map-gl";
 import Actions from "../../../../components/datasource/actions";
+import { useDataStore } from "@/providers/data-store-provider";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { fetchData } from "@/components/datasource/load-data";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
+
+  // load data (synchronized accros app)
+  const { dataSources } = useProjectStore((state) => state);
+  const { data, addData } = useDataStore((state) => state);
+  const [dataLoading, setDataLoading] = useState(false);
+
+  useEffect(() => {
+    dataSources.allIDs.forEach(async (id: string) => {
+      if (!Object.keys(data).includes(id)) {
+        setDataLoading(true);
+
+        const fetched_data = await fetchData(dataSources.byID[id]);
+        console.log(fetched_data);
+
+        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+
+        setDataLoading(false);
+      } else if (
+        !(
+          JSON.stringify(data[id].addedVars.sort()) ===
+          JSON.stringify(dataSources.byID[id].interface.addedVars.sort())
+        ) // check for equality
+      ) {
+        setDataLoading(true);
+
+        const fetched_data = await fetchData(dataSources.byID[id]);
+        console.log(fetched_data);
+
+        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+
+        setDataLoading(false);
+      }
+    });
+  }, [data, addData, dataSources]);
 
   // bounds
   const [viewState, setViewState] = useLocalStorageState<ViewState>(
@@ -35,14 +68,6 @@ export default function Page() {
       pitch: 0,
     } as ViewState,
     { codec: VIEWSTATE_JSON_CODEC }
-  );
-
-  const [dataSources, setDataSources] = useLocalStorageState<DataSource[]>(
-    "data-sources",
-    [],
-    {
-      codec: DATASOURCE_JSON_CODEC,
-    }
   );
 
   const onMapLoad = () => {
@@ -62,7 +87,7 @@ export default function Page() {
         setDataSources={setDataSources}
       /> */}
 
-      {IsLoading && <LinearProgress />}
+      {(IsLoading || dataLoading ) && <LinearProgress />}
       <>
         <Map
           onLoad={onMapLoad}
@@ -76,8 +101,8 @@ export default function Page() {
           ]}
           style={{
             width: "100%",
-            height: "calc(100vh - 64px)",
-            position: "absolute"
+            height: "calc(100vh - 64px - 30px)",
+            position: "absolute",
           }}
           maxPitch={0}
           attributionControl={false}
@@ -87,11 +112,11 @@ export default function Page() {
           <FullscreenControl position="top-left" />
           <NavigationControl position="top-left" />
 
-          <DeckGLlayers dataSources={dataSources} />
+          <DeckGLlayers />
         </Map>
       </>
       <>
-        <Actions dataSources={dataSources!} setDataSources={setDataSources} />
+        <Actions />
       </>
     </>
   );
