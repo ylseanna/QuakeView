@@ -309,7 +309,7 @@ export default function TimelineSlider() {
       moveBrush(localDomain);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [localDomain]);
 
   // change listener, i.e. sync d3 and slider
   useEffect(() => {
@@ -319,7 +319,7 @@ export default function TimelineSlider() {
   }, [localDomain, moveBrush, t_max, t_min]);
 
   const drawPoint = useCallback(
-    (context: CanvasRenderingContext2D, d: Earthuake) => {
+    (context: CanvasRenderingContext2D, d: EarthQuake) => {
       context.beginPath();
 
       const clr = ColorMapping(
@@ -339,6 +339,8 @@ export default function TimelineSlider() {
 
   // draw points
   const draw = useCallback(() => {
+    setIsLoading(true)
+
     console.log("draw called");
 
     const context = contextRef.current!;
@@ -354,7 +356,10 @@ export default function TimelineSlider() {
         }
       });
     }
-  }, [data, dataSources.allIDs, drawPoint]);
+
+    setIsLoading(false)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data, dataSources.byID[dataSources.allIDs[0]].formatting.color, drawPoint]);
 
   // Define and generate plots
   const contextRef = useRef<CanvasRenderingContext2D>(null);
@@ -463,7 +468,7 @@ export default function TimelineSlider() {
             },
           }}
         >
-          {/* {isLoading && (
+          {isLoading && (
             <Skeleton
               sx={{
                 position: "absolute",
@@ -474,7 +479,7 @@ export default function TimelineSlider() {
               width={dimensions.width - margin.left - margin.right}
               height={dimensions.height - margin.top - margin.bottom}
             />
-          )} */}
+          )}
         </Box>
 
         {/* <NoAnimationSlider

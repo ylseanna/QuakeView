@@ -3,7 +3,6 @@ import { RefObject, useEffect, useState } from "react";
 import TimelineSlider from "../../d3/timeline-slider-canvas";
 
 export default function BottomBar({
-  setFiltering,
   drawerOpen,
   parentRef,
 }: {
@@ -31,7 +30,7 @@ export default function BottomBar({
   }, [parentRef]);
 
   return (
-    <Slide direction="up" in={drawerOpen} style={{ visibility: "visible" }}>
+    <Slide direction="up" in={drawerOpen} style={{ visibility: "visible" }} mountOnEnter unmountOnExit>
       <Paper
         square
         sx={{

@@ -7,6 +7,8 @@ import {
 import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
+import * as _ from "lodash";
+
 import { useEffect, useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
@@ -34,14 +36,18 @@ export default function Page() {
 
         setDataLoading(false);
       } else if (
-        !(
-          JSON.stringify(data[id].addedVars.sort()) ===
-          JSON.stringify(dataSources.byID[id].interface.addedVars.sort())
-        ) // check for equality
+        !_.isEmpty(
+          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+        )
       ) {
+        console.log();
+
+        let fetched_data = [];
+
+        fetched_data = await fetchData(dataSources.byID[id]);
+
         setDataLoading(true);
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
         console.log(fetched_data);
 
         addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
@@ -49,7 +55,7 @@ export default function Page() {
         setDataLoading(false);
       }
     });
-  }, [data, addData, dataSources]);
+  }, [data, addData, dataSources, dataLoading]);
 
   const calculateExtent = () => {
     let extent: Extent | null = null;
@@ -79,7 +85,7 @@ export default function Page() {
 
   return (
     <>
-     {dataLoading && <LinearProgress/>}
+      {dataLoading && <LinearProgress />}
       <Actions />
       <>
         <ThreeDDeckGLView

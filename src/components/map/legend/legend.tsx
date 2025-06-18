@@ -45,7 +45,7 @@ export default function Legend({ sx }: LegendProps) {
             dataSources.allIDs.map((id) => (
               <Grid2 size="grow" key={`LegendElement-${id}`}>
                 {dataSources.allIDs.length > 1 &&
-                  dataSources.byID[id].formatting.color.mapping == "linear" && (
+                  (dataSources.byID[id].formatting.color.mapping == "linear" || dataSources.byID[id].formatting.color.mapping == "categorical") && (
                     <Typography
                       fontSize={10}
                       fontWeight="bold"

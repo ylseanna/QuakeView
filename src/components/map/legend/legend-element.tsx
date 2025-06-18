@@ -2,6 +2,7 @@ import { Box, Grid2, Typography } from "@mui/material";
 import { DataSource } from "../../datasource/types";
 // import { useTranslations } from "next-intl";
 import ColormapLegend from "./colormap-legend";
+import CategoricalLegend from "./categorical-legend";
 
 interface LegendElementProps {
   dataSource: DataSource;
@@ -10,6 +11,8 @@ interface LegendElementProps {
 export default function LegendElement({ dataSource }: LegendElementProps) {
   return dataSource.formatting.color.mapping == "linear" ? (
     <ColormapLegend dataSource={dataSource} />
+  ) :dataSource.formatting.color.mapping == "categorical" ?  (
+      <CategoricalLegend dataSource={dataSource} />
   ) : (
     dataSource.formatting.color.mapping == "single" && (
       <Grid2 container alignItems="center">

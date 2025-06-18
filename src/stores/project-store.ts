@@ -82,7 +82,7 @@ export type ProjectStore = ProjectState & ProjectActions;
 export const defaultInitState: ProjectState = {
   count: 0,
   sessionInterface: {
-    pickable: true,
+    pickable: false,
     animation: { tapered: false, speed: { multiplier: 1, unit: "day" } },
   },
   GPUfiltering: { t: [0, 2147483647 * 1000], mag: [-100, 100] },

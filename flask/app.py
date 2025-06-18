@@ -88,9 +88,7 @@ default_variable_mapping = {
 def map_data():
     mode = request.args.get("mode")
 
-    argument_dict = request.args.to_dict()
-
-    print(argument_dict)
+    # argument_dict = request.args.to_dict()
 
     if mode == "get_availability":
         return Response(
@@ -99,6 +97,10 @@ def map_data():
         )
 
     if mode == "metadata_query":
+        argument_dict = request.args.to_dict()
+
+        print("METADATA REQUEST", argument_dict)
+
         # GET DATA
         filepath = request.args.get("filepath")
 
@@ -112,8 +114,8 @@ def map_data():
 
         centroid = MultiPoint.centroid
 
-        print(MultiPoint.centroid)
-        print(MultiPoint.bounds)
+        # print(MultiPoint.centroid)
+        # print(MultiPoint.bounds)
 
         # DEFINE REQUIRED PARAMS
 
@@ -238,6 +240,10 @@ def map_data():
 
         return Response(json.dumps(unique_values), mimetype="application/json")
     if mode == "data_query" or mode is None:
+        argument_dict = request.args.to_dict()
+
+        print("MAP DATA REQUEST", argument_dict)
+
         # LOAD FILE
         filename = request.args.get("filepath")
 
@@ -258,7 +264,7 @@ def plot_data():
 
     argument_dict = request.args.to_dict()
 
-    print(argument_dict)
+    print("PLOT DATA REQUEST", argument_dict)
 
     if mode == "timeline_plot" or mode is None:
         # LOAD FILE

@@ -6,6 +6,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 import { useEffect, useState } from "react";
 import { fetchData } from "@/components/datasource/load-data";
+import * as _ from "lodash";
 
 export default function Page() {
   const { count, countActions } = useProjectStore((state) => state);
@@ -14,41 +15,44 @@ export default function Page() {
 
   // load data (synchronized accros app)
   const { data, addData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false)
+  const [dataLoading, setDataLoading] = useState(false);
 
   useEffect(() => {
     dataSources.allIDs.forEach(async (id: string) => {
       if (!Object.keys(data).includes(id)) {
-        setDataLoading(true)
+        setDataLoading(true);
 
         const fetched_data = await fetchData(dataSources.byID[id]);
         console.log(fetched_data);
 
         addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false)
+        setDataLoading(false);
       } else if (
-        !(
-          JSON.stringify(data[id].addedVars.sort()) ===
-          JSON.stringify(dataSources.byID[id].interface.addedVars.sort())
-        ) // check for equality
+        !_.isEmpty(
+          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+        )
       ) {
-        setDataLoading(true)
+        console.log();
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
+        let fetched_data = [];
+
+        fetched_data = await fetchData(dataSources.byID[id]);
+
+        setDataLoading(true);
+
         console.log(fetched_data);
 
         addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false)
+        setDataLoading(false);
       }
     });
-  }, [data, addData, dataSources]);
+  }, [data, addData, dataSources, dataLoading]);
 
   return (
     <PageContainer sx={{ position: "relative" }}>
-
-      { dataLoading && <LinearProgress/>}
+      {dataLoading && <LinearProgress />}
       {/* <Box height={300}>
         {dataSources && <TimelineSlider dataSources={dataSources} />}
       </Box> */}

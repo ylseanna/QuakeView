@@ -2,6 +2,8 @@
 
 import { defaultDEMStyle } from "../../../../components/map/map_styles/default";
 
+import * as _ from "lodash";
+
 import "maplibre-gl/dist/maplibre-gl.css";
 import Map, {
   FullscreenControl,
@@ -41,14 +43,18 @@ export default function Page() {
 
         setDataLoading(false);
       } else if (
-        !(
-          JSON.stringify(data[id].addedVars.sort()) ===
-          JSON.stringify(dataSources.byID[id].interface.addedVars.sort())
-        ) // check for equality
+        !_.isEmpty(
+          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+        )
       ) {
+        console.log();
+
+        let fetched_data = [];
+
+        fetched_data = await fetchData(dataSources.byID[id]);
+
         setDataLoading(true);
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
         console.log(fetched_data);
 
         addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
@@ -56,7 +62,7 @@ export default function Page() {
         setDataLoading(false);
       }
     });
-  }, [data, addData, dataSources]);
+  }, [data, addData, dataSources, dataLoading]);
 
   // bounds
   const [viewState, setViewState] = useLocalStorageState<ViewState>(
@@ -87,7 +93,7 @@ export default function Page() {
         setDataSources={setDataSources}
       /> */}
 
-      {(IsLoading || dataLoading ) && <LinearProgress />}
+      {(IsLoading || dataLoading) && <LinearProgress />}
       <>
         <Map
           onLoad={onMapLoad}
