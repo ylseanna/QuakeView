@@ -1,18 +1,26 @@
 {
   "name": "quakeview",
-  "version": "0.1.0",
+  "description": "Interactive earthquake catalog visualiser",
+  "author": "Ylse Anna de Vries (ylseanna) <yad2@hi.is>",
+  "version": "0.8.0",
   "private": true,
   "main": "build/main.js",
   "proxy": "localhost:8100",
   "build": {
     "asar": true,
-    "executableName": "NextJSElectron",
-    "appId": "com.saybackend.nextjs-electron",
+    "executableName": "QuakeView",
+    "appId": "frl.ylse.quakeview",
     "asarUnpack": [
       "node_modules/next",
       "node_modules/@img",
       "node_modules/sharp",
       "**\\*.{node,dll}"
+    ],
+    "extraResources": [
+      {
+        "from": "flask",
+        "to": "flask"
+      }
     ],
     "files": [
       "build",
@@ -43,6 +51,10 @@
         "deb"
       ],
       "category": "Development"
+    },
+    "directories": {
+      "buildResources": "resources",
+      "output": "release"
     }
   },
   "scripts": {
@@ -60,7 +72,9 @@
     "dev": "npm-run-all --parallel electron:dev next:dev",
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
-    "electron:watch": "cross-env NODE_ENV='development' nodemon"
+    "electron:watch": "cross-env NODE_ENV='development' nodemon",
+    "app:dir": "electron-builder --dir",
+    "app:dist": "electron-builder"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
@@ -89,7 +103,6 @@
     "d3fc": "^15.2.13",
     "deck.gl": "^9.1.11",
     "document-register-element": "^1.14.10",
-    "electron": "^37.0.0-beta.5",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.9.4",
@@ -110,15 +123,18 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@electron-forge/cli": "^7.8.1",
     "@eslint/eslintrc": "^3",
     "@types/lodash": "^4.17.17",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "electron": "^37.0.0-beta.5",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  }
+  },
+  "postinstall": "electron-builder install-app-deps"
 }

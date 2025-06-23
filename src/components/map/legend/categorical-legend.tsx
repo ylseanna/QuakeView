@@ -42,58 +42,60 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
       )!;
 
       if (varDataDescription) {
+        const colorCalc = (value: string | number) => {
+          const color = ColorMapping(
+            data.data.find((el) => el[varDataDescription.variable] == value)!,
+            dataSource.formatting.color
+          );
+          return `rgb(${color![0]},${color![1]},${color![2]})`;
+        };
 
-      const colorCalc = (value: string | number) => {
-        const color = ColorMapping(
-          data.data.find(
-            (el) => el[varDataDescription.variable] == value
-          )!,
-          dataSource.formatting.color
+        const unique_data_elements = data.data
+          .map((el) => el[dataSource.formatting.color.categorical.variable])
+          .filter((value, index, array) => array.indexOf(value) === index);
+
+        const frequencies = unique_data_elements.map((element) =>
+          frequency(
+            data.data.map(
+              (el) => el[dataSource.formatting.color.categorical.variable]
+            ),
+            element
+          )
         );
-        return `rgb(${color![0]},${color![1]},${color![2]})`;
-      };
 
-      const unique_data_elements = data.data
-        .map((el) => el[dataSource.formatting.color.categorical.variable])
-        .filter((value, index, array) => array.indexOf(value) === index);
+        const categories = [];
 
-      const frequencies = unique_data_elements.map((element) =>
-        frequency(
-          data.data.map(
-            (el) => el[dataSource.formatting.color.categorical.variable]
-          ),
-          element
-        )
-      );
+        let i = 0;
+        for (const value of unique_data_elements) {
+          categories.push({
+            value: value,
+            frequency: frequencies[i],
+            color: data.data && colorCalc(value),
+          });
+          i++;
+        }
 
-      const categories = [];
+        const sorted_categories = _.orderBy(
+          categories,
+          ["frequency", "value"],
+          ["desc", "asc"]
+        );
 
-      let i = 0;
-      for (const value of unique_data_elements) {
-        categories.push({
-          value: value,
-          frequency: frequencies[i],
-          color: data.data && colorCalc(value),
-        });
-        i++;
+        // const nums = unique_data_elements
+        //   .filter((n) => typeof n == "number")
+        //   .sort((a, b) => a - b); // If the data type of a given element is a number store it in this array (and then sort numerically)
+        // const non_nums = unique_data_elements
+        //   .filter((x) => typeof x != "number")
+        //   .sort(); // Store everything that is not a number in an array (and then sort lexicographically)
+
+        // const sorted_unique_data_elements = [...nums, ...non_nums]; // combine the two arrays
+
+        // console.log(frequencies);
+        // console.log(sorted_unique_data_elements);
+
+        setCategories(sorted_categories);
+        setVariableDataDescription(varDataDescription);
       }
-
-      const sorted_categories = _.orderBy(categories, ["frequency", "value"], ["desc", "asc"])
-
-      // const nums = unique_data_elements
-      //   .filter((n) => typeof n == "number")
-      //   .sort((a, b) => a - b); // If the data type of a given element is a number store it in this array (and then sort numerically)
-      // const non_nums = unique_data_elements
-      //   .filter((x) => typeof x != "number")
-      //   .sort(); // Store everything that is not a number in an array (and then sort lexicographically)
-
-      // const sorted_unique_data_elements = [...nums, ...non_nums]; // combine the two arrays
-
-      // console.log(frequencies);
-      // console.log(sorted_unique_data_elements);
-
-      setCategories(sorted_categories);
-      setVariableDataDescription(varDataDescription); }
     }
   }, [
     data,
@@ -106,13 +108,23 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
     <div ref={parentRef}>
       <Stack
         id={`ColormapLegend-${dataSource.internal_id}`}
-        style={{
+        sx={{
           width: "200px",
-          height: "200px",
+          maxHeight: "150px",
           overflowY: "scroll",
+          scrollbarWidth: "none",
+          transition: "max-height .2s",
+          scrollbarGutter: "stable",
+          ":hover": {
+            scrollbarWidth: "auto",
+            maxHeight: "calc(100vh - 64px - 30px - 32px - 32px - 26px)",
+          },
+          ":hover .headrow": {
+            maxHeight: "auto",
+          },
         }}
       >
-        <Grid2 container direction="row">
+        <Grid2 className="headrow" container direction="row">
           <Grid2 size={2}></Grid2>
           <Grid2 size="grow">
             <Typography
@@ -132,7 +144,7 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
           </Grid2>
         </Grid2>
         {categories &&
-          categories.slice(0,64).map((category) => (
+          categories.slice(0, 64).map((category) => (
             <Grid2
               container
               key={"Index-" + category.value}

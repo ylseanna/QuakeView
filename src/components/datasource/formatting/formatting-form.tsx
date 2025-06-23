@@ -435,8 +435,8 @@ export default function DataSourceFormattingForm({
                               loading="lazy"
                               width="100%"
                               height="16px"
-                              srcSet={`${process.env.NEXT_PUBLIC_APP_BASE_PATH}/images/cmap_previews/preview_${cmap}.png 2x`}
-                              src={`${process.env.NEXT_PUBLIC_APP_BASE_PATH}/images/cmap_previews/preview_${cmap}.png`}
+                              srcSet={`/images/cmap_previews/preview_${cmap}.png 2x`}
+                              src={`/images/cmap_previews/preview_${cmap}.png`}
                               alt=""
                             />
                           </Box>
@@ -663,8 +663,8 @@ export default function DataSourceFormattingForm({
                               loading="lazy"
                               width="100%"
                               height="16px"
-                              srcSet={`${process.env.NEXT_PUBLIC_APP_BASE_PATH}/images/cmap_previews/preview_${cmap}.png 2x`}
-                              src={`${process.env.NEXT_PUBLIC_APP_BASE_PATH}/images/cmap_previews/preview_${cmap}.png`}
+                              srcSet={`/images/cmap_previews/preview_${cmap}.png 2x`}
+                              src={`/images/cmap_previews/preview_${cmap}.png`}
                               alt=""
                             />
                           </Box>

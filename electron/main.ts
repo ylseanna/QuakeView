@@ -2,8 +2,9 @@ import { is } from "@electron-toolkit/utils";
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { getPort } from "get-port-please";
 import { startServer } from "next/dist/server/lib/start-server";
-import { join } from "path";
-import { spawn, ChildProcess } from "child_process";
+import path, { join } from "path";
+import { spawn, ChildProcess, execFile, exec } from "child_process";
+
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -45,6 +46,8 @@ const createWindow = () => {
     }
   };
 
+  // startFlaskServer();
+
   const python: ChildProcess = spawn("flask", [
     "--app",
     "./flask/app.py",
@@ -60,6 +63,55 @@ const createWindow = () => {
 
   loadURL();
   return mainWindow;
+};
+
+const startFlaskServer = () => {
+  let backend = path.join(process.cwd(), "flask/dist/app");
+
+  if (process.platform == "win32") {
+    backend = path.join(process.cwd(), "flask/dist/app.exe");
+  }
+
+  const execfile = execFile;
+  execfile(
+    backend,
+    {
+      windowsHide: true,
+    },
+    (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+      }
+      if (stdout) {
+        console.log(stdout);
+      }
+      if (stderr) {
+        console.log(stderr);
+      }
+    }
+  );
+};
+
+const closeFlaskServer = () => {
+  if (process.platform == "win32") {
+    exec("taskkill /f /t /im app.exe", (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+    });
+  } else if (process.platform == "linux") {
+    exec("kill -9 `lsof -i:8100 -t`", (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      console.log(`stdout: ${stdout}`);
+      console.log(`stderr: ${stderr}`);
+    });
+  }
 };
 
 const startNextJSServer = async () => {
@@ -103,5 +155,7 @@ app.whenReady().then(() => {
 });
 
 app.on("window-all-closed", () => {
+  closeFlaskServer();
+
   if (process.platform !== "darwin") app.quit();
 });

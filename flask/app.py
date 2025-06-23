@@ -1,11 +1,10 @@
-from flask import Flask, request, Response
+from flask import Flask, request, Response, send_file
 from flask_caching import Cache
 from pathlib import Path
-from shapely import centroid, multipoints
+from shapely import multipoints
 import json
 import os
 from numpy import float64, int64
-import logging
 
 
 # from obspy import UTCDateTime
@@ -314,6 +313,17 @@ def generate_event_dict(df, added_vars=None):
         event_dict.append(event_row)
 
     return event_dict
+
+
+@app.route("/api/tiles/<z>/<x>/<y>.png")
+def get_tile(z, x, y):
+    base_path = Path("/home/yadevries/Data/DEM/tiles")
+
+    tile_path = base_path / str(z) / str(x) / (str(y) + ".png")
+
+    # return str(tile_path)
+
+    return send_file(tile_path, mimetype="image/png")
 
 
 # @cache.memoize()

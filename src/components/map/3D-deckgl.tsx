@@ -18,7 +18,12 @@ import { generateDataSourceLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
-// import { TerrainLayer } from "@deck.gl/geo-layers";
+
+import { GeoJsonLayer } from "@deck.gl/layers";
+import { TerrainLayer } from "@deck.gl/geo-layers";
+import { MaskExtension } from "@deck.gl/extensions";
+import { TerrainLoader } from "@loaders.gl/terrain";
+
 // import { GeoJsonLayer } from "@deck.gl/layers";
 
 interface DeckGLProps {
@@ -78,14 +83,13 @@ export default function ThreeDDeckGLView({
           return true;
         };
 
-        return layer
+        return layer;
       }
     });
 
     console.log(layers_to_set);
 
-    return layers_to_set
-
+    return layers_to_set;
   }, [
     dataSources.allIDs,
     dataSources.byID,
@@ -94,7 +98,6 @@ export default function ThreeDDeckGLView({
     GPUfiltering,
     positionOffset,
   ]);
-
 
   // VIEWSTATE & RESET VIEW
   const [initialViewState, setInitialViewState] =
@@ -120,6 +123,43 @@ export default function ThreeDDeckGLView({
   };
 
   const deckRef = useRef(null);
+
+  const terrainlayer = useMemo(
+    () =>
+      new TerrainLayer({
+        elevationData: "/api/tiles/{z}/{x}/{y}.png",
+
+        loaders: [TerrainLoader],
+        elevationDecoder: {
+          rScaler: 4,
+          gScaler: 0,
+          bScaler: 0,
+          offset: 0,
+        },
+        visible: false,
+        fp64: true,
+        maxZoom: 12,
+        meshMaxError: 0,
+        tesselator: "martini",
+        getTranslation: [0,0, positionOffset],
+
+        opacity: 1,
+        extensions: [new MaskExtension()],
+        maskByInstance: true,
+        maskId: "geofence",
+      }),
+    [positionOffset]
+  );
+
+  const maskLayer = useMemo(
+    () =>
+      new GeoJsonLayer({
+        id: "geofence",
+        data: "/geojsonfiles/coastline.geojson",
+        operation: "mask",
+      }),
+    []
+  );
 
   // const checkLayerLoad = useCallback(() => {
   //   if (layers) {
@@ -151,7 +191,7 @@ export default function ThreeDDeckGLView({
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
         }}
-        layers={[...layers]}
+        layers={[...layers, terrainlayer, maskLayer]}
         initialViewState={initialViewState}
         style={{
           width: "100%",
@@ -164,9 +204,7 @@ export default function ThreeDDeckGLView({
         // onAfterRender={checkLayerLoad}
       >
         {IsLoading && <LinearProgress variant="query" />}
-        {hoverInfo && (
-          <MapToolTip pickingInfo={hoverInfo} />
-        )}
+        {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
         <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
           reset view
         </Button>
