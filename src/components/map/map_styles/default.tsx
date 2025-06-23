@@ -7,7 +7,7 @@ import coastline from "./geojsonfiles/coastline.geojson" with { type: "json" };
 import centralvolc from "./geojsonfiles/centralvolc.geojson" with { type: "json" };
 import joklar from "./geojsonfiles/joklar.geojson" with { type: "json" };
 // import lakes from "./geojsonfiles/lakes.geojson" with { type: "json" };
-import thjodvegur from "./geojsonfiles/road1.geojson" with { type: "json" };
+// import thjodvegur from "./geojsonfiles/road1.geojson" with { type: "json" };
 
 const ocean = mask(coastline);
 

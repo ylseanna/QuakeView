@@ -18,8 +18,6 @@ import { useTheme } from "@emotion/react";
 import { Settings } from "@mui/icons-material";
 
 import { DataStoreProvider } from "@/providers/data-store-provider";
-import { useRouter } from "@/i18n/routing";
-
 
 function ToolbarActionsSearch() {
   return (
@@ -36,7 +34,7 @@ export default function DashboardPagesLayout(props: {
   const t = useTranslations("Common");
   const locale = useLocale();
   const theme = useTheme() as Theme;
-  
+
   const NAVIGATION: Navigation = [
     // {
     //   kind: "header",
@@ -108,7 +106,13 @@ export default function DashboardPagesLayout(props: {
           alignItems: "center",
         }}
       >
-        <Typography sx={{ fontSize: "10", fontWeight: "bold", color: theme.palette.primary.main }}>
+        <Typography
+          sx={{
+            fontSize: "10",
+            fontWeight: "bold",
+            color: theme.palette.primary.main,
+          }}
+        >
           QuakeView
         </Typography>
       </Box>

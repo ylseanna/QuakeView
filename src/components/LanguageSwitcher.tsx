@@ -1,9 +1,6 @@
 "use client";
 
 import { useLocale } from "next-intl";
-import { createNavigation } from "next-intl/navigation";
-import { defineRouting } from "next-intl/routing";
-
 import Button from "@mui/material/Button";
 
 import { Link, useRouter, usePathname } from "@/i18n/routing";
