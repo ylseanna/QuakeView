@@ -1,9 +1,7 @@
 from flask import Flask, request, Response, send_file
-from flask_caching import Cache
 from pathlib import Path
 from shapely import multipoints
 import json
-import os
 from numpy import float64, int64
 
 
@@ -12,35 +10,7 @@ from datetime import datetime
 
 import pandas as pd
 
-# Flask-Caching config
-config = {
-    "CACHE_DEFAULT_TIMEOUT": 0,
-    "CACHE_TYPE": "FileSystemCache",
-    "CACHE_DIR": "cache",
-}
-
 app = Flask(__name__)
-app.config.from_mapping(config)
-if os.environ.get("ENV") == "development":
-    # Disable cache if running in development mode
-    app.config["CACHE_TYPE"] = "NullCache"
-cache = Cache(app)
-
-# Constants
-PT_ROOT = "data/pt"  # PT data directory root
-PT_DIRLIST = None  # Recursive directory listing of the PT directory
-
-
-def init():
-    """Initializes variables needed for handling requests"""
-    global PT_DIRLIST
-
-    # Create a recursive directory listing of the PT directory
-    PT_DIRLIST = {root: dirs for root, dirs, files in os.walk(PT_ROOT)}
-
-
-init()
-
 
 class ArgumentError(Exception):
     """Error used when the user inputs invalid argument values"""

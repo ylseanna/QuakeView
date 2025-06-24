@@ -7,33 +7,6 @@
   "private": true,
   "main": "build/main.js",
   "proxy": "localhost:8100",
-  "config": {
-    "forge": {
-      "packagerConfig": {},
-      "makers": [
-        {
-          "name": "@electron-forge/maker-squirrel",
-          "config": {
-            "name": "electron_quick_start"
-          }
-        },
-        {
-          "name": "@electron-forge/maker-zip",
-          "platforms": [
-            "darwin"
-          ]
-        },
-        {
-          "name": "@electron-forge/maker-deb",
-          "config": {}
-        },
-        {
-          "name": "@electron-forge/maker-rpm",
-          "config": {}
-        }
-      ]
-    }
-  },
   "build": {
     "asar": true,
     "executableName": "QuakeView",
@@ -102,11 +75,7 @@
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
     "app:dir": "electron-builder --dir",
-    "app:dist": "electron-builder",
-    "start": "electron-forge start",
-    "package": "electron-forge package",
-    "make": "electron-forge make",
-    "publish": "electron-forge publish"
+    "app:dist": "electron-builder"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
@@ -172,6 +141,5 @@
     "postcss": "^8",
     "tailwindcss": "^3.4.1",
     "typescript": "^5"
-  },
-  "postinstall": "electron-builder install-app-deps"
+  }
 }

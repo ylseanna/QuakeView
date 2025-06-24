@@ -3,7 +3,8 @@ import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { getPort } from "get-port-please";
 import { startServer } from "next/dist/server/lib/start-server";
 import path, { join } from "path";
-import { spawn, ChildProcess, execFile, exec } from "child_process";
+import { execFile, exec } from "child_process";
+// import { spawn, ChildProcess } from "child_process";
 
 
 const createWindow = () => {
@@ -46,30 +47,30 @@ const createWindow = () => {
     }
   };
 
-  // startFlaskServer();
+  startFlaskServer();
 
-  const python: ChildProcess = spawn("flask", [
-    "--app",
-    "./flask/app.py",
-    "--debug",
-    "run",
-  ]);
-  python.stdout!.on("data", function (data) {
-    console.log("data: ", data.toString("utf8"));
-  });
-  python.stderr!.on("data", (data) => {
-    console.log(`stderr: ${data}`); // when error
-  });
+  // const python: ChildProcess = spawn("flask", [
+  //   "--app",
+  //   "./flask/app.py",
+  //   "--debug",
+  //   "run",
+  // ]);
+  // python.stdout!.on("data", function (data) {
+  //   console.log("data: ", data.toString("utf8"));
+  // });
+  // python.stderr!.on("data", (data) => {
+  //   console.log(`stderr: ${data}`); // when error
+  // });
 
   loadURL();
   return mainWindow;
 };
 
 const startFlaskServer = () => {
-  let backend = path.join(process.cwd(), "flask/dist/app");
+  let backend = path.join(process.cwd(), "flask/dist/app -p 8100");
 
   if (process.platform == "win32") {
-    backend = path.join(process.cwd(), "flask/dist/app.exe");
+    backend = path.join(process.cwd(), "flask/dist/app.exe -p 8100");
   }
 
   const execfile = execFile;

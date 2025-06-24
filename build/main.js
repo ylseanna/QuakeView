@@ -7,6 +7,10 @@ var startServer = require('next/dist/server/lib/start-server');
 var path = require('path');
 var child_process = require('child_process');
 
+function _interopDefault (e) { return e && e.__esModule ? e : { default: e }; }
+
+var path__default = /*#__PURE__*/_interopDefault(path);
+
 var __defProp = Object.defineProperty;
 var __defProps = Object.defineProperties;
 var __getOwnPropDescs = Object.getOwnPropertyDescriptors;
@@ -60,20 +64,33 @@ var createWindow = () => {
       }
     }
   };
-  const python = child_process.spawn("flask", [
-    "--app",
-    "./flask/app.py",
-    "--debug",
-    "run"
-  ]);
-  python.stdout.on("data", function(data) {
-    console.log("data: ", data.toString("utf8"));
-  });
-  python.stderr.on("data", (data) => {
-    console.log(`stderr: ${data}`);
-  });
+  startFlaskServer();
   loadURL();
   return mainWindow;
+};
+var startFlaskServer = () => {
+  let backend = path__default.default.join(process.cwd(), "flask/dist/app -p 8100");
+  if (process.platform == "win32") {
+    backend = path__default.default.join(process.cwd(), "flask/dist/app.exe -p 8100");
+  }
+  const execfile = child_process.execFile;
+  execfile(
+    backend,
+    {
+      windowsHide: true
+    },
+    (err, stdout, stderr) => {
+      if (err) {
+        console.log(err);
+      }
+      if (stdout) {
+        console.log(stdout);
+      }
+      if (stderr) {
+        console.log(stderr);
+      }
+    }
+  );
 };
 var closeFlaskServer = () => {
   if (process.platform == "win32") {
