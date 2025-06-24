@@ -1,7 +1,7 @@
 'use strict';
 
-var utils = require('@electron-toolkit/utils');
 var electron = require('electron');
+var utils = require('@electron-toolkit/utils');
 var getPortPlease = require('get-port-please');
 var startServer = require('next/dist/server/lib/start-server');
 var path = require('path');
