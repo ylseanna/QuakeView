@@ -12,15 +12,17 @@
     "next:build": "next build",
     "next:start": "next start -p 8090",
     "next:lint": "next lint",
+    "flask:dev": "flask --app flask/app.py run",
+    "flask:build": "pyinstaller -F flask/app.py --distpath flask/dist --workpath flask/build",
     "electron:dist": "electron-builder --dir",
     "electron:dist:deb": "electron-builder --linux deb",
     "electron:build": "tsup",
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
-    "build": "run-s next:build electron:build",
-    "dist": "run-s next:build electron:dist",
-    "dev": "npm-run-all --parallel electron:dev next:dev"
+    "build": "run-s next:build flask:build electron:build",
+    "dist": "run-s next:build flask:build electron:dist",
+    "dev": "npm-run-all --parallel electron:dev next:dev flask:dev"
   },
   "build": {
     "asar": true,
@@ -31,12 +33,6 @@
       "node_modules/@img",
       "node_modules/sharp",
       "**\\*.{node,dll}"
-    ],
-    "extraResources": [
-      {
-        "from": "flask",
-        "to": "flask"
-      }
     ],
     "files": [
       "build",
@@ -55,6 +51,10 @@
       {
         "from": "public",
         "to": "app/public"
+      },
+      {
+        "from": "flask",
+        "to": "app/flask"
       }
     ],
     "win": {
