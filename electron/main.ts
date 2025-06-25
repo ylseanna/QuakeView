@@ -4,8 +4,6 @@ import { getPort } from "get-port-please";
 import { startServer } from "next/dist/server/lib/start-server";
 import path, { join } from "path";
 import { execFile, exec } from "child_process";
-// import { spawn, ChildProcess } from "child_process";
-
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -34,7 +32,7 @@ const createWindow = () => {
   });
 
   const loadURL = async () => {
-    if (is.dev) {
+    if (is.dev) { // is opened externally if in dev mode
       mainWindow.loadURL("http://localhost:8090");
     } else {
       try {
@@ -46,21 +44,11 @@ const createWindow = () => {
       }
     }
   };
+  
 
-  startFlaskServer();
-
-  // const python: ChildProcess = spawn("flask", [
-  //   "--app",
-  //   "./flask/app.py",
-  //   "--debug",
-  //   "run",
-  // ]);
-  // python.stdout!.on("data", function (data) {
-  //   console.log("data: ", data.toString("utf8"));
-  // });
-  // python.stderr!.on("data", (data) => {
-  //   console.log(`stderr: ${data}`); // when error
-  // });
+  if (!is.dev) {  // is opened externally if in dev mode
+    startFlaskServer();
+  }
 
   loadURL();
   return mainWindow;
