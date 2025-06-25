@@ -22,7 +22,7 @@
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
     "build": "run-s next:build flask:build electron:build",
     "dist": "run-s next:build flask:build electron:dist",
-    "dev": "npm-run-all --parallel electron:dev next:dev flask:dev"
+    "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
   },
   "build": {
     "asar": true,
@@ -131,6 +131,7 @@
     "@types/react-dom": "^19",
     "electron": "^37.0.0",
     "electron-builder": "^26.0.12",
+    "electron-log": "^5.4.1",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "postcss": "^8",
