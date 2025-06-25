@@ -19,10 +19,10 @@ import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 
-import { GeoJsonLayer } from "@deck.gl/layers";
-import { TerrainLayer } from "@deck.gl/geo-layers";
-import { MaskExtension } from "@deck.gl/extensions";
-import { TerrainLoader } from "@loaders.gl/terrain";
+// import { GeoJsonLayer } from "@deck.gl/layers";
+// import { TerrainLayer } from "@deck.gl/geo-layers";
+// import { MaskExtension } from "@deck.gl/extensions";
+// import { TerrainLoader } from "@loaders.gl/terrain";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
 
@@ -124,42 +124,42 @@ export default function ThreeDDeckGLView({
 
   const deckRef = useRef(null);
 
-  const terrainlayer = useMemo(
-    () =>
-      new TerrainLayer({
-        elevationData: "/api/tiles/{z}/{x}/{y}.png",
+  // const terrainlayer = useMemo(
+  //   () =>
+  //     new TerrainLayer({
+  //       elevationData: "/api/tiles/{z}/{x}/{y}.png",
 
-        loaders: [TerrainLoader],
-        elevationDecoder: {
-          rScaler: 4,
-          gScaler: 0,
-          bScaler: 0,
-          offset: 0,
-        },
-        visible: false,
-        fp64: true,
-        maxZoom: 12,
-        meshMaxError: 0,
-        tesselator: "martini",
-        getTranslation: [0,0, positionOffset],
+  //       loaders: [TerrainLoader],
+  //       elevationDecoder: {
+  //         rScaler: 4,
+  //         gScaler: 0,
+  //         bScaler: 0,
+  //         offset: 0,
+  //       },
+  //       visible: false,
+  //       fp64: true,
+  //       maxZoom: 12,
+  //       meshMaxError: 0,
+  //       tesselator: "martini",
+  //       getTranslation: [0,0, positionOffset],
 
-        opacity: 1,
-        extensions: [new MaskExtension()],
-        maskByInstance: true,
-        maskId: "geofence",
-      }),
-    [positionOffset]
-  );
+  //       opacity: 1,
+  //       extensions: [new MaskExtension()],
+  //       maskByInstance: true,
+  //       maskId: "geofence",
+  //     }),
+  //   [positionOffset]
+  // );
 
-  const maskLayer = useMemo(
-    () =>
-      new GeoJsonLayer({
-        id: "geofence",
-        data: "/geojsonfiles/coastline.geojson",
-        operation: "mask",
-      }),
-    []
-  );
+  // const maskLayer = useMemo(
+  //   () =>
+  //     new GeoJsonLayer({
+  //       id: "geofence",
+  //       data: "/geojsonfiles/coastline.geojson",
+  //       operation: "mask",
+  //     }),
+  //   []
+  // );
 
   // const checkLayerLoad = useCallback(() => {
   //   if (layers) {
@@ -191,7 +191,7 @@ export default function ThreeDDeckGLView({
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
         }}
-        layers={[...layers, terrainlayer, maskLayer]}
+        layers={[...layers]}
         initialViewState={initialViewState}
         style={{
           width: "100%",
