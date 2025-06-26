@@ -4,6 +4,7 @@
   "author": "Ylse Anna de Vries (ylseanna) <yad2@hi.is>",
   "version": "0.8.0",
   "license": "GPL-3.0-or-later",
+  "homepage": "https://github.com/ylseanna/QuakeView",
   "private": true,
   "main": "build/main.js",
   "proxy": "localhost:8100",
