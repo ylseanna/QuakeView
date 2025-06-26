@@ -1,16 +1,18 @@
 import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { is } from "@electron-toolkit/utils";
-import { getPort } from "get-port-please";
-import { startServer } from "next/dist/server/lib/start-server";
+// import { getPort } from "get-port-please";
+// import { startServer } from "next/dist/server/lib/start-server";
 import path, { join } from "path";
 import { execFile, exec } from "child_process";
 
-import log from 'electron-log/main';
+import log from "electron-log/main";
+import next from "next";
+import { createServer, IncomingMessage, ServerResponse } from "http";
+import { parse } from "url";
 
 log.initialize();
 
-log.info('Log from the main process');
-
+log.info("Log from the main process");
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -38,34 +40,40 @@ const createWindow = () => {
     mainWindow.show();
   });
 
-  const loadURL = async () => {
-    if (is.dev) { // is opened externally if in dev mode
-      mainWindow.loadURL("http://localhost:8090");
-    } else {
-      try {
-        const port = await startNextJSServer();
-        console.log("Next.js server started on port:", port);
-        mainWindow.loadURL(`http://localhost:${port}`);
-      } catch (error) {
-        console.error("Error starting Next.js server:", error);
-      }
-    }
-  };
-  
+  // const loadURL = async () => {
+  //   if (is.dev) {
+  //     // is opened externally if in dev mode
+  //     mainWindow.loadURL("http://localhost:8090");
+  //   } else {
+  //     try {
+  //       const port = await startNextJSServer();
+  //       console.log("Next.js server started on port:", port);
+  //       mainWindow.loadURL(`http://localhost:${port}`);
+  //     } catch (error) {
+  //       console.error("Error starting Next.js server:", error);
+  //     }
+  //   }
+  // };
 
-  if (!is.dev) {  // is opened externally if in dev mode
+  if (!is.dev) {
+    // is opened externally if in dev mode
     startFlaskServer();
+    startNextJSServer().then(() => {
+      mainWindow.loadURL("http://localhost:8090/");
+    });
+  } else {
+    mainWindow.loadURL("http://localhost:8090/");
   }
 
-  loadURL();
+  // loadURL();
   return mainWindow;
 };
 
 const startFlaskServer = () => {
-  let backend = path.join(process.cwd(), "flask/dist/app -p 8100");
+  let backend = join(app.getAppPath(), "app", "flask", "app")
 
   if (process.platform == "win32") {
-    backend = path.join(process.cwd(), "flask/dist/app.exe -p 8100");
+    backend = join(app.getAppPath(), "app", "flask", "app.exe")
   }
 
   const execfile = execFile;
@@ -111,27 +119,57 @@ const closeFlaskServer = () => {
 };
 
 const startNextJSServer = async () => {
-  try {
-    const nextJSPort = await getPort({ portRange: [30_011, 50_000] });
-    const webDir = join(app.getAppPath(), "app");
+  log.info("Starting Next server");
+  // Use server-side rendering for both dev and production builds
 
-    await startServer({
-      dir: webDir,
-      isDev: false,
-      hostname: "localhost",
-      port: nextJSPort,
-      customServer: true,
-      allowRetry: false,
-      keepAliveTimeout: 5000,
-      minimalMode: true,
-    });
+  log.info(`Searching for Next server in ${join(app.getAppPath(), "app")}`);
 
-    return nextJSPort;
-  } catch (error) {
-    console.error("Error starting Next.js server:", error);
-    throw error;
-  }
+  log.info("Starting Next server");
+  const nextApp = next({
+    dev: is.dev,
+    dir: join(app.getAppPath(), "app"),
+    port: 8090,
+  });
+  const requestHandler = nextApp.getRequestHandler();
+
+  // Build the renderer code and watch the files
+  await nextApp.prepare();
+
+  // Create a new native HTTP server (which supports hot code reloading)
+  createServer((req: IncomingMessage, res: ServerResponse<IncomingMessage>) => {
+    const parsedUrl = parse(req.url!, true);
+    requestHandler(req, res, parsedUrl);
+  }).listen(8090, () => {
+    console.log("> Ready on http://localhost:8090");
+  });
+
+  // window.loadURL("http://localhost:8090/");
 };
+
+// const startNextJSServer = async () => {
+//   try {
+//     // const nextJSPort = await getPort({ portRange: [30_011, 50_000] });
+
+//     const nextJSPort = 8090;
+//     const webDir = join(app.getAppPath(), "app");
+
+//     await startServer({
+//       dir: webDir,
+//       isDev: false,
+//       hostname: "localhost",
+//       port: nextJSPort,
+//       customServer: true,
+//       allowRetry: false,
+//       keepAliveTimeout: 5000,
+//       minimalMode: true,
+//     });
+
+//     return nextJSPort;
+//   } catch (error) {
+//     console.error("Error starting Next.js server:", error);
+//     throw error;
+//   }
+// };
 
 async function handleFileOpen() {
   const { canceled, filePaths } = await dialog.showOpenDialog({});

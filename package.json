@@ -14,14 +14,16 @@
     "next:lint": "next lint",
     "flask:dev": "flask --app flask/app.py run",
     "flask:build": "pyinstaller -F flask/app.py --distpath flask/dist --workpath flask/build",
-    "electron:dist": "electron-builder --dir",
+    "flask:start": "./flask/dist/app",
+    "electron:dist": "electron-builder",
+    "electron:dist:dir": "electron-builder --dir",
     "electron:dist:deb": "electron-builder --linux deb",
     "electron:build": "tsup",
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
     "build": "run-s next:build flask:build electron:build",
-    "dist": "run-s next:build flask:build electron:dist",
+    "dist": "run-s next:build flask:build  electron:build electron:dist",
     "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
   },
   "build": {
@@ -37,36 +39,23 @@
     "files": [
       "build",
       {
-        "from": ".next/standalone",
-        "to": "app",
-        "filter": [
-          "!**/.env",
-          "!**/package.json"
-        ]
-      },
-      {
-        "from": ".next/static",
-        "to": "app/.next/static"
+        "from": ".next/",
+        "to": "app/.next/"
       },
       {
         "from": "public",
         "to": "app/public"
       },
       {
-        "from": "flask",
+        "from": "flask/dist",
         "to": "app/flask"
       }
     ],
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
     "linux": {
       "target": [
         "deb"
       ],
-      "category": "Development"
+      "category": "Science"
     },
     "directories": {
       "buildResources": "resources",
@@ -101,6 +90,8 @@
     "d3fc": "^15.2.13",
     "deck.gl": "^9.1.11",
     "document-register-element": "^1.14.10",
+    "electron-log": "^5.4.1",
+    "electron-router-dom": "^2.1.0",
     "get-port-please": "^3.1.2",
     "immer": "^10.1.1",
     "lodash": "^4.17.21",
@@ -124,6 +115,7 @@
     "zustand": "^5.0.5"
   },
   "devDependencies": {
+    "@esbuild/linux-x64": "^0.25.5",
     "@eslint/eslintrc": "^3",
     "@types/lodash": "^4.17.17",
     "@types/node": "^20",
@@ -131,7 +123,7 @@
     "@types/react-dom": "^19",
     "electron": "^37.0.0",
     "electron-builder": "^26.0.12",
-    "electron-log": "^5.4.1",
+    "esbuild": "^0.25.5",
     "eslint": "^9",
     "eslint-config-next": "15.1.8",
     "postcss": "^8",

@@ -12,7 +12,6 @@ const defaultLocale = "en";
 
 module.exports = withNextIntl({
   reactStrictMode: false,
-  output: "standalone",
   basePath: basePath,
   env: {
     HOST: "localhost:8090",
