@@ -2,7 +2,7 @@ import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { is } from "@electron-toolkit/utils";
 // import { getPort } from "get-port-please";
 // import { startServer } from "next/dist/server/lib/start-server";
-import path, { join } from "path";
+import { join } from "path";
 import { execFile, exec } from "child_process";
 
 import log from "electron-log/main";

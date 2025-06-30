@@ -1,11 +1,5 @@
 flask~=2.3.3
-gunicorn~=21.2.0
 numpy~=1.26.4
 pandas~=2.3.0
-geojson~=3.2.0
-geopy~=2.4.0
 datetime~=5.2
 shapely~=2.1.0
-flask-caching~=2.0.2
-debugpy~=1.8.0
-obspy~=1.4.2
