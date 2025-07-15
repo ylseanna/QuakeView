@@ -2,7 +2,7 @@
 
 import { defaultDEMStyle } from "../../../../components/map/map_styles/default";
 
-import * as _ from "lodash";
+// import * as _ from "lodash";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import Map, {
@@ -10,7 +10,7 @@ import Map, {
   ScaleControl,
   NavigationControl,
 } from "react-map-gl/maplibre";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { LinearProgress } from "@mui/material";
 import { ViewState } from "react-map-gl/maplibre";
 
@@ -19,50 +19,50 @@ import { useLocalStorageState } from "@toolpad/core";
 import { VIEWSTATE_JSON_CODEC } from "../../../../components/map/types";
 import { AttributionControl } from "react-map-gl";
 import Actions from "../../../../components/datasource/actions";
-import { useDataStore } from "@/providers/data-store-provider";
-import { useProjectStore } from "@/providers/project-store-provider";
-import { fetchData } from "@/components/datasource/load-data";
+// import { useDataStore } from "@/providers/data-store-provider";
+// import { useProjectStore } from "@/providers/project-store-provider";
+// import { fetchData } from "@/components/datasource/load-data";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
 
-  // load data (synchronized accros app)
-  const { dataSources } = useProjectStore((state) => state);
-  const { data, addData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false);
+  // // load data (synchronized accros app)
+  // const { dataSources } = useProjectStore((state) => state);
+  // const { data, addData } = useDataStore((state) => state);
+  // const [dataLoading, setDataLoading] = useState(false);
 
-  useEffect(() => {
-    dataSources.allIDs.forEach(async (id: string) => {
-      if (!Object.keys(data).includes(id)) {
-        setDataLoading(true);
+  // useEffect(() => {
+  //   dataSources.allIDs.forEach(async (id: string) => {
+  //     if (!Object.keys(data).includes(id)) {
+  //       setDataLoading(true);
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
-        console.log(fetched_data);
+  //       const fetched_data = await fetchData(dataSources.byID[id]);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      } else if (
-        !_.isEmpty(
-          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-        )
-      ) {
-        console.log();
+  //       setDataLoading(false);
+  //     } else if (
+  //       !_.isEmpty(
+  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+  //       )
+  //     ) {
+  //       console.log();
 
-        let fetched_data = [];
+  //       let fetched_data = [];
 
-        fetched_data = await fetchData(dataSources.byID[id]);
+  //       fetched_data = await fetchData(dataSources.byID[id]);
 
-        setDataLoading(true);
+  //       setDataLoading(true);
 
-        console.log(fetched_data);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      }
-    });
-  }, [data, addData, dataSources, dataLoading]);
+  //       setDataLoading(false);
+  //     }
+  //   });
+  // }, [data, addData, dataSources, dataLoading]);
 
   // bounds
   const [viewState, setViewState] = useLocalStorageState<ViewState>(
@@ -93,7 +93,7 @@ export default function Page() {
         setDataSources={setDataSources}
       /> */}
 
-      {(IsLoading || dataLoading) && <LinearProgress />}
+      {(IsLoading) && <LinearProgress />}
       <>
         <Map
           onLoad={onMapLoad}

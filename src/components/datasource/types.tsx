@@ -34,8 +34,10 @@ export type DataSourceDataDescription = {
   mapped_var: string[];
   alias: string;
   unit: string;
-  data_type: "number" | "string" | "id_string" | "dt_string";
+  data_type: "number" | "string" | "id_string" | "dt_string" | "dt_timestamp";
   bounds: [number, number];
+  kde: [number[], number[]] | null;
+  bins: [number[], number[]] | null;
   required: boolean;
 };
 
@@ -57,13 +59,13 @@ export type DataSourceColorFormatting = {
   linear: {
     variable: string;
     cmap: keyof typeof colormaps;
-    inverted: false,
+    inverted: false;
     domain: { [variable: string]: [number, number] };
   };
   categorical: {
     variable: string;
     cmap: keyof typeof colormaps_categorical;
-    inverted: false,
+    inverted: false;
   };
 };
 

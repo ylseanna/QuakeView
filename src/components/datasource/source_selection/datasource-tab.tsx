@@ -4,6 +4,7 @@ import {
   Close,
   ColorLens,
   ExpandMore,
+  FilterAlt,
   Numbers,
   ScatterPlot,
 } from "@mui/icons-material";
@@ -251,7 +252,7 @@ export default function DataTab({
                 id="panel2a-header"
                 sx={{ flexGrow: 1 }}
               >
-                <ColorLens sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
+                <FilterAlt sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
                 <Typography>{t("Filtering.filtering")}</Typography>
               </SubAccordionSummary>
             </Box>

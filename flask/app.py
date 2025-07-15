@@ -2,7 +2,7 @@ from flask import Flask, request, Response, send_file
 from pathlib import Path
 from shapely import multipoints
 import json
-from numpy import float64, int64
+from numpy import histogram, float64, int64
 
 
 # from obspy import UTCDateTime
@@ -11,6 +11,7 @@ from datetime import datetime
 import pandas as pd
 
 app = Flask(__name__)
+
 
 class ArgumentError(Exception):
     """Error used when the user inputs invalid argument values"""
@@ -96,6 +97,8 @@ def map_data():
                 "unit": "",
                 "data_type": "id_string",
                 "bounds": None,
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
@@ -105,15 +108,19 @@ def map_data():
                 "unit": "",
                 "data_type": "dt_string",
                 "bounds": None,
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
                 "variable": "t",
                 "mapped_var": None,
-                "alias": "",
+                "alias": "Time",
                 "unit": "",
                 "data_type": "dt_timestamp",
                 "bounds": [df["t"].min(), df["t"].max()],
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
@@ -123,6 +130,8 @@ def map_data():
                 "unit": "degrees",
                 "data_type": "number",
                 "bounds": [df["X"].min(), df["X"].max()],
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
@@ -132,6 +141,8 @@ def map_data():
                 "unit": "degrees",
                 "data_type": "number",
                 "bounds": [df["Y"].min(), df["Y"].max()],
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
@@ -141,6 +152,8 @@ def map_data():
                 "unit": "km",
                 "data_type": "number",
                 "bounds": [df["Z"].min(), df["Z"].max()],
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
             {
@@ -150,6 +163,8 @@ def map_data():
                 "unit": "M",
                 "data_type": "number",
                 "bounds": [df["ML"].min(), df["ML"].max()],
+                "bins": None,
+                "kde" : None,
                 "required": True,
             },
         ]
@@ -171,11 +186,19 @@ def map_data():
                 "bounds": [float(df[column_name].min()), float(df[column_name].max())]
                 if df.dtypes[column_name] in (float, float64, int, int64)
                 else None,
+                "bins": None,
+                "kde" : None,
                 "required": False,
             }
             for column_name in df.columns
             if column_name not in [el["mapped_var"] for el in required_data_descr]
         ]
+
+        # DATA OUTLINES
+
+        for data_descr in required_data_descr + optional_data_descr:
+            if data_descr["data_type"] == "number":
+                bins, bin_edges = histogram()
 
         # OUTPUT
 

@@ -1,6 +1,5 @@
 "use client";
 
-import * as React from "react";
 import Stack from "@mui/material/Stack";
 import InfoIcon from "@mui/icons-material/Info";
 import PublicIcon from "@mui/icons-material/Public";
@@ -13,11 +12,16 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { RotateOrbit } from "mdi-material-ui";
-import { Box, Theme, Typography } from "@mui/material";
+import { Box, LinearProgress, Theme, Typography } from "@mui/material";
 import { useTheme } from "@emotion/react";
 import { Settings } from "@mui/icons-material";
 
-import { DataStoreProvider } from "@/providers/data-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
+import { fetchData } from "@/components/datasource/load-data";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { ReactNode, useEffect, useState } from "react";
+
+import * as _ from "lodash";
 
 function ToolbarActionsSearch() {
   return (
@@ -28,9 +32,7 @@ function ToolbarActionsSearch() {
   );
 }
 
-export default function DashboardPagesLayout(props: {
-  children: React.ReactNode;
-}) {
+export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const t = useTranslations("Common");
   const locale = useLocale();
   const theme = useTheme() as Theme;
@@ -92,6 +94,45 @@ export default function DashboardPagesLayout(props: {
     },
   ];
 
+  // load data (synchronized accros app)
+  const { dataSources } = useProjectStore((state) => state);
+  const { data, addData } = useDataStore((state) => state);
+  const [dataLoading, setDataLoading] = useState(false);
+
+  useEffect(() => {
+    dataSources.allIDs.forEach(async (id: string) => {
+      if (data) {
+        if (!Object.keys(data).includes(id)) {
+          setDataLoading(true);
+          console.log(`Fetching data for ${id}`);
+
+          await fetchData(dataSources.byID[id]).then((fetched_data) => {
+            console.log(fetched_data);
+
+            addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+
+            setDataLoading(false);
+          });
+        } else if (
+          !_.isEmpty(
+            _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+          )
+        ) {
+          setDataLoading(true);
+          console.log(`Fetching data for ${id}`);
+
+          await fetchData(dataSources.byID[id]).then((fetched_data) => {
+            console.log(fetched_data);
+
+            addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+
+            setDataLoading(false);
+          });
+        }
+      }
+    });
+  }, [data, addData, dataSources]);
+
   return (
     <>
       <Box
@@ -123,7 +164,8 @@ export default function DashboardPagesLayout(props: {
           toolbarActions: ToolbarActionsSearch,
         }}
       >
-        <DataStoreProvider>{props.children}</DataStoreProvider>
+        {dataLoading && <LinearProgress />}
+        {props.children}
       </DashboardLayout>
     </>
   );

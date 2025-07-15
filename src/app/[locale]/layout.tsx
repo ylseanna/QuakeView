@@ -12,6 +12,8 @@ export const viewport: Viewport = {
 };
 
 import "@fontsource-variable/archivo";
+import "@fontsource-variable/ibm-plex-sans";
+
 
 import { Suspense, ReactNode } from "react";
 
@@ -30,6 +32,7 @@ import { routing } from "@/i18n/routing";
 import { AppTheme } from "@toolpad/core";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
+import { DataStoreProvider } from "@/providers/data-store-provider";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
@@ -93,7 +96,9 @@ export default async function LocaleLayout({
                 branding={BRANDING}
                 // router={router}
               >
-                <ProjectStoreProvider>{children}</ProjectStoreProvider>
+                <ProjectStoreProvider>
+                  <DataStoreProvider>{children}</DataStoreProvider>
+                </ProjectStoreProvider>
               </NextAppProvider>
             </Suspense>
           </NextIntlClientProvider>

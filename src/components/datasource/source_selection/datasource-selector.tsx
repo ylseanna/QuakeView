@@ -14,7 +14,7 @@ import {
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { Folder } from "mdi-material-ui";
-import { getInitDataSource } from "../add-datasource";
+import { getInitDataSource } from "./add-datasource";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 export default function DataSelector() {
@@ -31,6 +31,9 @@ export default function DataSelector() {
     (state) => state.dataSourceActions.addDataSource
   );
 
+  const setTimeFilteringGPU = useProjectStore(
+    (state) => state.GPUfilteringActions.setTimeFiltering
+  );
 
   return (
     <Paper sx={{ mb: 3 }}>
@@ -66,7 +69,8 @@ export default function DataSelector() {
               const filePath = await window.electronAPI.openFile();
               const initDataSource = await getInitDataSource(filePath);
               console.log(initDataSource);
-              addDataSource(initDataSource)
+              addDataSource(initDataSource);
+              setTimeFilteringGPU([0, 2147483647 * 1000]);
             }}
             sx={{ height: "100%" }}
           >

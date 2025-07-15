@@ -4,7 +4,7 @@ import {
   DataSourceDataDescription,
   DataSourceFormatting,
   DataSourceMetaData,
-} from "./types";
+} from "../types";
 
 export const getInitDataSource = async (filepath: string) => {
   const initDataSource = await fetch(
@@ -31,12 +31,6 @@ export const getInitDataSource = async (filepath: string) => {
         name: path.basename(filepath),
         interface: { pickable: false, visible: true, addedVars: [] },
         filtering: {
-          mag: metadata.data_descr.find(
-            (dd: DataSourceDataDescription) => dd.variable == "mag"
-          )?.bounds,
-          t: metadata.data_descr.find(
-            (dd: DataSourceDataDescription) => dd.variable == "t"
-          )?.bounds,
         },
         formatting: {
           scale: 15,

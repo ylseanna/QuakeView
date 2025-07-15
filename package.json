@@ -85,6 +85,7 @@
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
     "@fontsource-variable/archivo": "^5.1.0",
+    "@fontsource-variable/ibm-plex-sans": "^5.2.6",
     "@mui/icons-material": "^6.2.1",
     "@mui/material": "^6.2.1",
     "@mui/material-nextjs": "^6.2.1",

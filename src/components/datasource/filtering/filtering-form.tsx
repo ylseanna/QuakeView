@@ -50,7 +50,10 @@ const FilteringEditingRow = ({
   const [localDomain, setLocalDomain] = useState<[number, number]>(bounds);
 
   return (
-    <SubAccordion variant="outlined" sx={{ borderRadius: theme.spacing(1) }}>
+    <SubAccordion
+      variant="outlined"
+      sx={{ borderRadius: theme.spacing(1), width: "100%" }}
+    >
       <Box sx={{ display: "flex" }}>
         <SubAccordionSummary
           expandIcon={<ExpandMore />}
@@ -63,7 +66,6 @@ const FilteringEditingRow = ({
             {dataDescr?.alias ? dataDescr.alias : dataDescr?.variable}
           </Typography>
         </SubAccordionSummary>
-        {(variable != "mag" && variable != "t") && (
           <Tooltip title={t("remove_filter")}>
             <Box sx={{ display: "flex", p: 1, pl: 0 }}>
               <IconButton
@@ -76,7 +78,6 @@ const FilteringEditingRow = ({
               </IconButton>
             </Box>
           </Tooltip>
-        )}
       </Box>
       <SubAccordionDetails>
         <HistogramSlider
@@ -114,11 +115,10 @@ export default function FilteringForm({
   return (
     <>
       <Autocomplete
-        disabled
         options={dataSource.metadata.data_descr
           .filter(
             (el) =>
-              el.data_type == "number" &&
+              (el.data_type == "number" || el.data_type == "dt_timestamp") &&
               !Object.keys(dataSource.filtering).includes(el.variable) &&
               (el.required ||
                 dataSource.interface.addedVars.includes(el.variable))
@@ -154,23 +154,18 @@ export default function FilteringForm({
             </Box>
           );
         }}
-        sx={{mt:1}}
+        sx={{ mt: 1 }}
       />
       <Grid2 container direction="column" spacing={1} sx={{ mt: 1 }}>
-        {Object.entries(dataSource.filtering).map(
-          ([variable, bounds]) =>
- (
-              <FilteringEditingRow
-                key={
-                  "FilteringOption-" + variable + "-" + dataSource.internal_id
-                }
-                variable={variable}
-                bounds={bounds}
-                setFiltering={setFiltering}
-                dataSource={dataSource}
-              />
-            )
-        )}
+        {Object.entries(dataSource.filtering).map(([variable, bounds]) => (
+          <FilteringEditingRow
+            key={"FilteringOption-" + variable + "-" + dataSource.internal_id}
+            variable={variable}
+            bounds={bounds}
+            setFiltering={setFiltering}
+            dataSource={dataSource}
+          />
+        ))}
       </Grid2>
     </>
   );

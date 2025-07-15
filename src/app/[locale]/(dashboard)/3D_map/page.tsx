@@ -7,55 +7,55 @@ import {
 import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import * as _ from "lodash";
+// import * as _ from "lodash";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
-import { fetchData } from "@/components/datasource/load-data";
-import { LinearProgress } from "@mui/material";
+// import { useDataStore } from "@/providers/data-store-provider";
+// import { fetchData } from "@/components/datasource/load-data";
+// import { LinearProgress } from "@mui/material";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
 
-  // load data (synchronized accros app)
-  const { data, addData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false);
+  // // load data (synchronized accros app)
+  // const { data, addData } = useDataStore((state) => state);
+  // const [dataLoading, setDataLoading] = useState(false);
 
-  useEffect(() => {
-    dataSources.allIDs.forEach(async (id: string) => {
-      if (!Object.keys(data).includes(id)) {
-        setDataLoading(true);
+  // useEffect(() => {
+  //   dataSources.allIDs.forEach(async (id: string) => {
+  //     if (!Object.keys(data).includes(id)) {
+  //       setDataLoading(true);
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
-        console.log(fetched_data);
+  //       const fetched_data = await fetchData(dataSources.byID[id]);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      } else if (
-        !_.isEmpty(
-          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-        )
-      ) {
-        console.log();
+  //       setDataLoading(false);
+  //     } else if (
+  //       !_.isEmpty(
+  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+  //       )
+  //     ) {
+  //       console.log();
 
-        let fetched_data = [];
+  //       let fetched_data = [];
 
-        fetched_data = await fetchData(dataSources.byID[id]);
+  //       fetched_data = await fetchData(dataSources.byID[id]);
 
-        setDataLoading(true);
+  //       setDataLoading(true);
 
-        console.log(fetched_data);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      }
-    });
-  }, [data, addData, dataSources, dataLoading]);
+  //       setDataLoading(false);
+  //     }
+  //   });
+  // }, [data, addData, dataSources, dataLoading]);
 
   const calculateExtent = () => {
     let extent: Extent | null = null;
@@ -85,7 +85,7 @@ export default function Page() {
 
   return (
     <>
-      {dataLoading && <LinearProgress />}
+      {/* {dataLoading && <LinearProgress />} */}
       <Actions />
       <>
         <ThreeDDeckGLView

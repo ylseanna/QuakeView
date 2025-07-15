@@ -2,7 +2,7 @@ import { DataSource, EarthQuake } from "../datasource/types";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
-import { dataSourceDataUrl } from "../datasource/data-source-query";
+import { useDataStore } from "@/providers/data-store-provider";
 
 export default function HistogramSlider({
   id,
@@ -17,7 +17,7 @@ export default function HistogramSlider({
 }: {
   id?: string;
   dataSource: DataSource;
-  variable: string,
+  variable: string;
   value: SliderOwnProps["value"];
   min: SliderOwnProps["max"];
   max: SliderOwnProps["max"];
@@ -25,6 +25,8 @@ export default function HistogramSlider({
   onChange: SliderOwnProps["onChange"];
   onChangeCommitted: SliderOwnProps["onChangeCommitted"];
 }) {
+  const { data } = useDataStore((state) => state);
+
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isLoading, setIsLoading] = useState(true);
@@ -63,50 +65,49 @@ export default function HistogramSlider({
       .domain([min, max] as Iterable<d3.NumberValue>)
       .range([margin.left, width - margin.right]);
 
-    d3.json(dataSourceDataUrl(dataSource)).then((data) => {
-      if (!data) {
-        console.log("no data");
-      } else {
-        const bins = d3.bin().thresholds(50).domain([min!, max!])(
-          (data as EarthQuake[]).map(
-            (d) => d[variable]
-          ) as ArrayLike<number>
+    // d3.json(dataSourceDataUrl(dataSource)).then((data) => {
+    //   if (!data) {
+    //     console.log("no data");
+    //   } else {
+    if (data[dataSource.internal_id]) {
+      const bins = d3.bin().thresholds(50).domain([min!, max!])(
+        (data[dataSource.internal_id].data as EarthQuake[]).map(
+          (d) => d[variable]
+        ) as ArrayLike<number>
+      );
+
+      const y = d3
+        .scaleLinear()
+        .domain([0, d3.max(bins, (d) => d.length)] as Iterable<d3.NumberValue>)
+        .range([height, margin.top]);
+
+      svg
+        .append("g")
+        .selectAll()
+        .data(bins)
+        .join("rect")
+        .attr("x", (d) => x(d.x0!))
+        .attr("width", (d) => x(d.x1!) - x(d.x0!))
+        .attr("y", (d) => y(d.length))
+        .attr("height", (d) => y(0) - y(d.length))
+        .attr("fill", "var(--mui-palette-text-primary)")
+        .attr("fill-opacity", 0.4);
+
+      const xAxes = svg
+        .append("g")
+        .attr("transform", `translate(0, ${height})`)
+        .call(
+          d3.axisBottom(x)
+          // .tickFormat(() => "")
         );
 
-        const y = d3
-          .scaleLinear()
-          .domain([
-            0,
-            d3.max(bins, (d) => d.length),
-          ] as Iterable<d3.NumberValue>)
-          .range([height, margin.top]);
-
-        svg
-          .append("g")
-          .selectAll()
-          .data(bins)
-          .join("rect")
-          .attr("x", (d) => x(d.x0!))
-          .attr("width", (d) => x(d.x1!) - x(d.x0!))
-          .attr("y", (d) => y(d.length))
-          .attr("height", (d) => y(0) - y(d.length))
-          .attr("fill", "var(--mui-palette-text-primary)")
-          .attr("fill-opacity", 0.4);
-
-        const xAxes = svg
-          .append("g")
-          .attr("transform", `translate(0, ${height})`)
-          .call(
-            d3.axisBottom(x)
-            // .tickFormat(() => "")
-          );
-
-        xAxes.selectAll("line").attr("stroke-opacity", 0.6);
-        xAxes.selectAll("path").remove();
-      }
+      xAxes.selectAll("line").attr("stroke-opacity", 0.6);
+      xAxes.selectAll("path").remove();
+      // }
       setIsLoading(false);
-      //   // X axis
-    });
+    }
+    //   // X axis
+    // });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dataSource.internal_id,
@@ -116,6 +117,7 @@ export default function HistogramSlider({
     max,
     step,
     dimensions,
+    data,
   ]);
 
   return (

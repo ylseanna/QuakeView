@@ -1,58 +1,58 @@
 "use client";
 
 import { PageContainer } from "@toolpad/core";
-import { Button, Divider, Paper, Box, LinearProgress } from "@mui/material";
+import { Button, Divider, Paper, Box } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
-import { useEffect, useState } from "react";
-import { fetchData } from "@/components/datasource/load-data";
-import * as _ from "lodash";
+// import { useDataStore } from "@/providers/data-store-provider";
+// import { useEffect, useState } from "react";
+// import { fetchData } from "@/components/datasource/load-data";
+// import * as _ from "lodash";
 
 export default function Page() {
   const { count, countActions } = useProjectStore((state) => state);
 
   const { dataSources } = useProjectStore((state) => state);
 
-  // load data (synchronized accros app)
-  const { data, addData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false);
+  // // load data (synchronized accros app)
+  const { data } = useDataStore((state) => state);
+  // const [dataLoading, setDataLoading] = useState(false);
 
-  useEffect(() => {
-    dataSources.allIDs.forEach(async (id: string) => {
-      if (!Object.keys(data).includes(id)) {
-        setDataLoading(true);
+  // useEffect(() => {
+  //   dataSources.allIDs.forEach(async (id: string) => {
+  //     if (!Object.keys(data).includes(id)) {
+  //       setDataLoading(true);
 
-        const fetched_data = await fetchData(dataSources.byID[id]);
-        console.log(fetched_data);
+  //       const fetched_data = await fetchData(dataSources.byID[id]);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      } else if (
-        !_.isEmpty(
-          _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-        )
-      ) {
-        console.log();
+  //       setDataLoading(false);
+  //     } else if (
+  //       !_.isEmpty(
+  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+  //       )
+  //     ) {
+  //       console.log();
 
-        let fetched_data = [];
+  //       let fetched_data = [];
 
-        fetched_data = await fetchData(dataSources.byID[id]);
+  //       fetched_data = await fetchData(dataSources.byID[id]);
 
-        setDataLoading(true);
+  //       setDataLoading(true);
 
-        console.log(fetched_data);
+  //       console.log(fetched_data);
 
-        addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-        setDataLoading(false);
-      }
-    });
-  }, [data, addData, dataSources, dataLoading]);
+  //       setDataLoading(false);
+  //     }
+  //   });
+  // }, [data, addData, dataSources, dataLoading]);
 
   return (
     <PageContainer sx={{ position: "relative" }}>
-      {dataLoading && <LinearProgress />}
       {/* <Box height={300}>
         {dataSources && <TimelineSlider dataSources={dataSources} />}
       </Box> */}
