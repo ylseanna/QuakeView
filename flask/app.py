@@ -196,9 +196,9 @@ def map_data():
 
         # DATA OUTLINES
 
-        for data_descr in required_data_descr + optional_data_descr:
-            if data_descr["data_type"] == "number":
-                bins, bin_edges = histogram()
+        # for data_descr in required_data_descr + optional_data_descr:
+        #     if data_descr["data_type"] == "number":
+        #         bins, bin_edges = histogram()
 
         # OUTPUT
 
