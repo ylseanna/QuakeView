@@ -159,7 +159,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
       </Box>
       <DashboardLayout
         navigation={NAVIGATION}
-        sx={{ height: "calc(100vh - 30px)" }}
+        sx={{ height: "calc(100vh - 30px)"}}
         slots={{
           toolbarActions: ToolbarActionsSearch,
         }}

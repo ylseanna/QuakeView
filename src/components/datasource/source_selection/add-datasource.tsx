@@ -5,16 +5,18 @@ import {
   DataSourceFormatting,
   DataSourceMetaData,
 } from "../types";
+import { dataSourceMetaDataUrl } from "../data-source-query";
+import { DefaultVariableMappings } from "../constants";
 
 export const getInitDataSource = async (filepath: string) => {
   const initDataSource = await fetch(
-    `/api/map_data?mode=metadata_query&filepath=${encodeURIComponent(filepath)}`
+    dataSourceMetaDataUrl(filepath, DefaultVariableMappings)
   )
     .then((res) => res.json())
     .then((metadata: DataSourceMetaData) => {
       const internal_id = crypto.randomUUID();
 
-      console.log(metadata.data_descr)
+      console.log(metadata.data_descr);
 
       const colormapsBounds = metadata.data_descr!.map(
         (dataDescr: DataSourceDataDescription) => {
@@ -24,14 +26,13 @@ export const getInitDataSource = async (filepath: string) => {
         }
       );
 
-      const initDataSource =  {
+      const initDataSource = {
         internal_id: internal_id,
         filepath: filepath,
         filename: path.basename(filepath),
         name: path.basename(filepath),
         interface: { pickable: false, visible: true, addedVars: [] },
-        filtering: {
-        },
+        filtering: {},
         formatting: {
           scale: 15,
           opacity: 100,
@@ -56,8 +57,8 @@ export const getInitDataSource = async (filepath: string) => {
         metadata: metadata,
       } as DataSource;
 
-      return initDataSource
+      return initDataSource;
     });
 
-    return initDataSource
+  return initDataSource;
 };

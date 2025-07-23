@@ -13,7 +13,7 @@
     "next:build": "next build",
     "next:start": "next start -p 8090",
     "next:lint": "next lint",
-    "flask:dev": "flask --app flask/app.py run -h localhost -p 8100",
+    "flask:dev": "flask --app flask/app.py run -h localhost -p 8100 --debug",
     "flask:build": "pyinstaller -F flask/app.py --distpath flask/dist --workpath flask/build",
     "flask:start": "./flask/dist/app",
     "electron:dist": "electron-builder",

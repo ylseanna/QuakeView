@@ -73,13 +73,14 @@ def map_data():
 
         # GET DATA
         filepath = request.args.get("filepath")
+        variable_mapping = json.loads(request.args.get("var_mapping"))
 
-        df = load_to_df(filepath)
+        df = load_to_df(filepath, variable_mapping=variable_mapping)
 
         # GET EXTENT
 
         MultiPoint = multipoints(
-            [(event["X"], event["Y"], event["Z"]) for _, event in df.iterrows()]
+            [(event["lon"], event["lat"], event["dep"]) for _, event in df.iterrows()]
         )
 
         centroid = MultiPoint.centroid
@@ -93,78 +94,95 @@ def map_data():
             {
                 "variable": "id",
                 "mapped_var": ["EventID", "evid"],
+                "mapping_valid": True if column_mapping["id"] is not None else False,
                 "alias": "Event ID",
                 "unit": "",
                 "data_type": "id_string",
                 "bounds": None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "dt",
                 "mapped_var": ["DT", "datetime", "Datetime"],
+                "mapping_valid": True if column_mapping["dt"] is not None else False,
                 "alias": "Time",
                 "unit": "",
                 "data_type": "dt_string",
                 "bounds": None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "t",
                 "mapped_var": None,
+                "mapping_valid": True if column_mapping["dt"] is not None else False,
                 "alias": "Time",
                 "unit": "",
                 "data_type": "dt_timestamp",
-                "bounds": [df["t"].min(), df["t"].max()],
+                "bounds": [df["t"].min(), df["t"].max()]
+                if column_mapping["dt"] is not None
+                else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "lon",
                 "mapped_var": ["X", "lon", "Longitude"],
+                "mapping_valid": True if column_mapping["lon"] is not None else False,
                 "alias": "Longitude",
                 "unit": "degrees",
                 "data_type": "number",
-                "bounds": [df["X"].min(), df["X"].max()],
+                "bounds": [df["lon"].min(), df["lon"].max()]
+                if column_mapping["lon"] is not None
+                else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "lat",
                 "mapped_var": ["Y", "lat", "Latitude"],
+                "mapping_valid": True if column_mapping["lat"] is not None else False,
                 "alias": "Latitude",
                 "unit": "degrees",
                 "data_type": "number",
-                "bounds": [df["Y"].min(), df["Y"].max()],
+                "bounds": [df["lat"].min(), df["lat"].max()]
+                if column_mapping["lat"] is not None
+                else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "dep",
                 "mapped_var": ["Z", "dep", "Depth"],
+                "mapping_valid": True if column_mapping["dep"] is not None else False,
                 "alias": "Depth",
                 "unit": "km",
                 "data_type": "number",
-                "bounds": [df["Z"].min(), df["Z"].max()],
+                "bounds": [df["dep"].min(), df["dep"].max()]
+                if column_mapping["dep"] is not None
+                else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
                 "variable": "mag",
                 "mapped_var": ["ML", "mag", "Magnitude"],
+                "mapping_valid": True if column_mapping["mag"] is not None else False,
                 "alias": "Magnitude",
                 "unit": "M",
                 "data_type": "number",
-                "bounds": [df["ML"].min(), df["ML"].max()],
+                "bounds": [df["mag"].min(), df["mag"].max()]
+                if column_mapping["mag"] is not None
+                else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
         ]
@@ -180,6 +198,7 @@ def map_data():
         optional_data_descr = [
             {
                 "variable": column_name,
+                "mapping_valid": True,
                 "alias": "",
                 "data_type": variable_mapping(df.dtypes[column_name]),
                 "unit": "",
@@ -187,7 +206,7 @@ def map_data():
                 if df.dtypes[column_name] in (float, float64, int, int64)
                 else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": False,
             }
             for column_name in df.columns
@@ -216,7 +235,7 @@ def map_data():
             },
         }
 
-        app.logger.info(meta_data_dict)
+        # app.logger.info(meta_data_dict)
 
         return Response(json.dumps(meta_data_dict), mimetype="application/json")
     if mode == "unique_values":
@@ -320,9 +339,37 @@ def get_tile(z, x, y):
 
 
 # @cache.memoize()
-def load_to_df(filepath):
+def load_to_df(filepath, variable_mapping):
     # LOAD FILE
     df = pd.read_csv(filepath)
+
+    # GET VAR MAPPINGS
+
+    column_mapping = {}
+
+    for variable, mapping in variable_mapping.items():
+        for column_name in mapping:
+            print(variable, column_name)
+            if column_name in df.columns.values:
+                column_mapping[variable] = column_name
+
+            # else
+            if not column_mapping[variable]:
+                column_mapping[variable] = None
+
+    # APPLY VAR MAPPINGS
+
+    print(column_mapping)
+
+    print(df.columns)
+
+    print({v: k for k, v in column_mapping.items() if v is not None or v != "dt"})
+
+    df.rename(
+        columns={v: k for k, v in column_mapping.items() if v is not None or v != "dt"}
+    )  # invert and filter mapping
+
+    print(df.columns)
 
     # DATETIME
 
