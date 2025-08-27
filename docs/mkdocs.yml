@@ -1,0 +1,9 @@
+site_name: QuakeView
+repo_url: https://github.com/ylseanna/QuakeView
+copyright: ©2025, QuakeView developers
+theme: readthedocs
+nav:
+- index.md
+- userguide.md
+- about.md
+docs_dir: content
