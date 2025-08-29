@@ -4,7 +4,7 @@ on:
   workflow_dispatch:
   
 jobs:
-  Run-Build-Binaries:
+  Explore-GitHub-Actions:
     runs-on: windows-latest
     steps:
       - name: Check out repository code
