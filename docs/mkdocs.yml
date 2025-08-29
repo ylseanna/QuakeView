@@ -1,9 +1,13 @@
 site_name: QuakeView
 repo_url: https://github.com/ylseanna/QuakeView
+edit_uri: edit/main/docs/content/
 copyright: ©2025, QuakeView developers
-theme: readthedocs
+theme:
+  name: readthedocs
+  logo: img/quakeview_white_vertical.png
 nav:
-- index.md
+- Home: index.md
+- installation.md
 - userguide.md
-- about.md
+- dev.md
 docs_dir: content

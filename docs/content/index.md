@@ -1,16 +1,16 @@
 # QuakeView
 
+QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland for use in Iceland. It aims to allow for rapid importing and analysis of user-made catalogs.
 
-## Commands
+QuakeView is an open-source program written in react/next.js, with a python back-end and runs in an electron wrapper.
 
-* `mkdocs new [dir-name]` - Create a new project.
-* `mkdocs serve` - Start the live-reloading docs server.
-* `mkdocs build` - Build the documentation site.
-* `mkdocs -h` - Print help message and exit.
+## Features
 
-## Project layout
+- Importing of arbitrary `.csv` catalogs, with in-program import and filtering controls
+- 2D and 3D maps of the imported events (tested up to 60.000 events)
+- Dynamic formatting of events, e.g. scaling, opacity, color(maps)
+- GPU acceleration of 3D maps and plots
 
-    mkdocs.yml    # The configuration file.
-    docs/
-        index.md  # The documentation homepage.
-        ...       # Other markdown pages, images and other files.
+## Contact
+
+Ylse Anna de Vries - <yad2@hi.is>

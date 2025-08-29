@@ -1,9 +1,7 @@
-# User Guide
+# User guide
 
-## Installation
+This guide assumes you have succesfully [installed](.instalation.md) the program on your operating system.
 
-## Development guide
+## Getting started
 
-### Environment
-
-### Build instructions
+Catalogs are loaded as .csv files.
