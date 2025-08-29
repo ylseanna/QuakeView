@@ -15,25 +15,38 @@ jobs:
 
       - run: cd ${{ github.workspace }}
       
-      - run: echo "Setting up node and python"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '24.2.0'
 
-      - run: npm i
+      - name: Cache npm dependencies
+        uses: actions/cache@v2
+        with:
+          path: '~/.npm'
+          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-node-
 
-      - uses: actions/setup-python@v5
+      - name: Install dependencies
+        run: npm install # or yarn install
+
+      - name: Install python dependencies
+        uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
       - run: pip install flask/requirements.txt
       - run: pip install pyinstaller
-          
-      
 
       - name: List files in the repository
         run: |
           ls
+
+      - name: Build
+      - run: npm run build
+
+      - name: Create binaries
+      - run: npm run electron:dist:msi
           
       - run: echo "Job status is ${{ job.status }}."
