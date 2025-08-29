@@ -1,5 +1,5 @@
-name: Build releases
-run-name: ${{ github.actor }} is testing out GitHub Actions
+name: Build binaries
+run-name: ${{ github.actor }} is building binaries
 on:
   workflow_dispatch:
   
@@ -13,23 +13,27 @@ jobs:
     
       - run: echo "Branch - ${{ github.ref }}, repository - ${{ github.repository }}."
 
+      - run: cd ${{ github.workspace }}
+      
       - run: echo "Setting up node and python"
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
           node-version: '24.2.0'
 
+      - run: npm i
+
       - uses: actions/setup-python@v5
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
-      - run: pip install -r ${{ github.workspace }}/flask/requirements.txt
+      - run: pip install flask/requirements.txt
       - run: pip install pyinstaller
           
       
 
       - name: List files in the repository
         run: |
-          ls ${{ github.workspace }}
+          ls
           
       - run: echo "Job status is ${{ job.status }}."
