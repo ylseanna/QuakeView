@@ -36,7 +36,7 @@ jobs:
         with:
           python-version: '3.13'
           cache: 'pip' # caching pip dependencies
-      - run: pip install flask/requirements.txt
+      - run: pip install ./flask/requirements.txt
       - run: pip install pyinstaller
 
       - name: List files in the repository
