@@ -43,9 +43,9 @@ jobs:
         run: ls
 
       - name: Build
-      - run: npm run build
+        run: npm run build
 
       - name: Create binaries
-      - run: npm run electron:dist:msi
+        run: npm run electron:dist:msi
           
       - run: echo "Job status is ${{ job.status }}."
