@@ -19,6 +19,7 @@
     "electron:dist": "electron-builder",
     "electron:dist:dir": "electron-builder --dir",
     "electron:dist:deb": "electron-builder --linux deb",
+    "electron:dist:exe": "electron-builder --linux deb",
     "electron:build": "tsup",
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
@@ -65,6 +66,11 @@
         "deb"
       ],
       "category": "Science"
+    },
+    "windows": {
+      "target": [
+        "msi"
+      ]
     },
     "directories": {
       "buildResources": "resources",
