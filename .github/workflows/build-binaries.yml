@@ -30,6 +30,8 @@ jobs:
           cache: "pip" # caching pip dependencies
       - run: pip install -r ${{ github.workspace }}/flask/requirements.txt pyinstaller
 
+      - run: pip freeze
+
       - name: List files in the repository
         run: ls
 
