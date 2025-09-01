@@ -21,11 +21,12 @@ jobs:
           node-version: "24.2.0"
           cache: "npm"
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
-      - run: npm install # or yarn install
+      - run: npm ci # or yarn install
 
       - name: Setup esbuild
-        run: npm install --save-exact --save-dev esbuild
-      
+        run: npm install esbuild
+        run: npm install @esbuild/win32-x64
+
       - run: ./node_modules/.bin/esbuild --version
 
       - name: Install python dependencies
