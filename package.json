@@ -19,7 +19,7 @@
     "electron:dist": "electron-builder",
     "electron:dist:dir": "electron-builder --dir",
     "electron:dist:deb": "electron-builder --linux deb",
-    "electron:dist:msi": "electron-builder --msi",
+    "electron:dist:msi": "electron-builder --win",
     "electron:build": "tsup",
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
