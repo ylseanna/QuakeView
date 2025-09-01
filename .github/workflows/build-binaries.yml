@@ -26,7 +26,6 @@ jobs:
       - name: Setup esbuild
         run: npm install esbuild
       
-      - run: npm install @esbuild/aix-ppc64
       - run: npm install @esbuild/win32-x64
 
       - run: ./node_modules/.bin/esbuild --version
