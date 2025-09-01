@@ -2,7 +2,7 @@ name: Build binaries
 run-name: ${{ github.actor }} is building binaries
 on:
   workflow_dispatch:
-  
+
 jobs:
   Build-Binaries-Windows:
     runs-on: windows-latest
@@ -10,32 +10,24 @@ jobs:
       - name: Check out repository code
         uses: actions/checkout@v4
       - run: echo "${{ github.repository }} repository has been cloned to the runner."
-    
+
       - run: echo "Branch - ${{ github.ref }}, repository - ${{ github.repository }}."
 
       - run: cd ${{ github.workspace }}
-      
+
       - name: Setup Node
         uses: actions/setup-node@v4
         with:
-          node-version: '24.2.0'
-
-      - name: Cache npm dependencies
-        uses: actions/cache@v4
-        with:
-          path: '~/.npm'
-          key: ${{ runner.os }}-node-${{ hashFiles('**/package-lock.json') }}
-          restore-keys: |
-            ${{ runner.os }}-node-
-
-      - name: Install dependencies
-        run: npm install # or yarn install
+          node-version: "24.2.0"
+          cache: "npm"
+          cache-dependency-path: ${{ github.workspace }}/package-lock.json
+      - run: npm install # or yarn install
 
       - name: Install python dependencies
         uses: actions/setup-python@v5
         with:
-          python-version: '3.13'
-          cache: 'pip' # caching pip dependencies
+          python-version: "3.13"
+          cache: "pip" # caching pip dependencies
       - run: pip install -r ${{ github.workspace }}/flask/requirements.txt
       - run: pip install pyinstaller
 
@@ -47,5 +39,5 @@ jobs:
 
       - name: Create binaries
         run: npm run electron:dist:msi
-          
+
       - run: echo "Job status is ${{ job.status }}."
