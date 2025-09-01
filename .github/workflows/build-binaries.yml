@@ -23,7 +23,7 @@ jobs:
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
       - run: npm install # or yarn install
 
-      - run: npm install @esbuild\aix-ppc64
+      - run: npm install esbuild-windows-64
 
       - name: Install python dependencies
         uses: actions/setup-python@v5
