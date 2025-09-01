@@ -24,7 +24,8 @@ jobs:
       - run: npm install # or yarn install
 
       - name: Setup esbuild
-      - run: npm install --save-exact --save-dev esbuild
+        run: npm install --save-exact --save-dev esbuild
+      
       - run: ./node_modules/.bin/esbuild --version
 
       - name: Install python dependencies
