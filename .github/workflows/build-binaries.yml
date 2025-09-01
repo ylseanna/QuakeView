@@ -28,8 +28,7 @@ jobs:
         with:
           python-version: "3.13"
           cache: "pip" # caching pip dependencies
-      - run: pip install -r ${{ github.workspace }}/flask/requirements.txt
-      - run: pip install pyinstaller
+      - run: pip install -r ${{ github.workspace }}/flask/requirements.txt pyinstaller
 
       - name: List files in the repository
         run: ls
