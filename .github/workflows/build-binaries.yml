@@ -28,7 +28,7 @@ jobs:
       
       - run: npm install @esbuild/win32-x64
 
-      - run: ./node_modules/.bin/esbuild --version
+      - run: npm list
 
       - name: Install python dependencies
         uses: actions/setup-python@v5
