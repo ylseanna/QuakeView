@@ -40,7 +40,6 @@ export default function FormattingSidebar({
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
-            top: "30px"
           },
         }}
       >

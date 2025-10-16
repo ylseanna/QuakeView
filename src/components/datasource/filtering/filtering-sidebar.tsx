@@ -39,7 +39,6 @@ export default function FilteringSidebar({
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
-            top: "30px",
           },
         }}
       >

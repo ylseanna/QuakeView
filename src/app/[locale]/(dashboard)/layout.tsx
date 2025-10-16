@@ -22,6 +22,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { ReactNode, useEffect, useState } from "react";
 
 import * as _ from "lodash";
+import Header from "@/components/Header";
 
 function ToolbarActionsSearch() {
   return (
@@ -135,7 +136,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
   return (
     <>
-      <Box
+      {/* <Box
         className="draggableArea"
         sx={{
           height: "30px",
@@ -156,13 +157,19 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
         >
           QuakeView
         </Typography>
-      </Box>
+      </Box> */}
       <DashboardLayout
         navigation={NAVIGATION}
-        sx={{ height: "calc(100vh - 30px)" }}
+        sx={{
+          height: "calc(100vh - 32px)",
+          header: { height: "33px" },
+          ".MuiToolbar-root": { minHeight: "32px" },
+          button: {},
+        }}
         slots={{
           toolbarActions: ToolbarActionsSearch,
         }}
+        slotProps={{}}
       >
         {dataLoading && <LinearProgress />}
         {props.children}
