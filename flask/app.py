@@ -98,7 +98,7 @@ def map_data():
                 "data_type": "id_string",
                 "bounds": None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -109,7 +109,7 @@ def map_data():
                 "data_type": "dt_string",
                 "bounds": None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -120,7 +120,7 @@ def map_data():
                 "data_type": "dt_timestamp",
                 "bounds": [df["t"].min(), df["t"].max()],
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -131,7 +131,7 @@ def map_data():
                 "data_type": "number",
                 "bounds": [df["X"].min(), df["X"].max()],
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -142,7 +142,7 @@ def map_data():
                 "data_type": "number",
                 "bounds": [df["Y"].min(), df["Y"].max()],
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -153,7 +153,7 @@ def map_data():
                 "data_type": "number",
                 "bounds": [df["Z"].min(), df["Z"].max()],
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
             {
@@ -164,7 +164,7 @@ def map_data():
                 "data_type": "number",
                 "bounds": [df["ML"].min(), df["ML"].max()],
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": True,
             },
         ]
@@ -187,7 +187,7 @@ def map_data():
                 if df.dtypes[column_name] in (float, float64, int, int64)
                 else None,
                 "bins": None,
-                "kde" : None,
+                "kde": None,
                 "required": False,
             }
             for column_name in df.columns
@@ -233,8 +233,6 @@ def map_data():
         return Response(json.dumps(unique_values), mimetype="application/json")
     if mode == "data_query" or mode is None:
         argument_dict = request.args.to_dict()
-
-        print("MAP DATA REQUEST", argument_dict)
 
         # LOAD FILE
         filename = request.args.get("filepath")

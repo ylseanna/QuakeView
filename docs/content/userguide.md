@@ -1,6 +1,6 @@
 # User guide
 
-This guide assumes you have succesfully [installed](.instalation.md) the program on your operating system.
+This guide assumes you have succesfully [installed](installation.md) the program on your operating system.
 
 ## Getting started
 

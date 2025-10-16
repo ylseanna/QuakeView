@@ -8,8 +8,9 @@ It is possible to run development versions and build the applications from sourc
 
 > _Currently the choice of operating systems is limited._
 
-| Platform | Distribution | Version   | File(s) |
-| -------- | ------------ | --------- | ------- |
-| Linux    | Ubuntu       | 22.04 LTS |         |
+| Platform | Distribution | Version   | File(s)                                                                                  |
+| -------- | ------------ | --------- | ---------------------------------------------------------------------------------------- |
+| Linux    | Ubuntu       | 24.04 LTS | [quakeview_0.8.0_ubuntu_24.04.deb](releases/quakeview_0.8.0_ubuntu_24.04.deb){:download} |
+|          |              | 22.04 LTS | [quakeview_0.8.0_ubuntu_22.04.deb](releases/quakeview_0.8.0_ubuntu_22.04.deb){:download} |
 
 <!-- ## Platform-specific instructions -->

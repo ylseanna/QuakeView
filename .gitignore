@@ -47,3 +47,9 @@ cache
 #flask
 *app.spec
 
+#docs
+docs/site.zip
+docs/site
+docs/content/releases/*
+
+

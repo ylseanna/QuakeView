@@ -5,9 +5,11 @@ copyright: ©2025, QuakeView developers
 theme:
   name: readthedocs
   logo: img/quakeview_white_vertical.png
+markdown_extensions:
+  - attr_list
 nav:
-- Home: index.md
-- installation.md
-- userguide.md
-- dev.md
+  - Home: index.md
+  - installation.md
+  - userguide.md
+  - dev.md
 docs_dir: content

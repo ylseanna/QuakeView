@@ -29,7 +29,7 @@ const createWindow = () => {
     titleBarOverlay: {
       color: "#FFFFFF00",
       // symbolColor: "#000",
-      height: 29,
+      height: 32,
     },
   });
 
