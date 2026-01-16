@@ -1,7 +1,6 @@
 "use client";
 
-import { PageContainer } from "@toolpad/core";
-import { Button, Divider, Paper, Box } from "@mui/material";
+import { Button, Divider, Paper, Box, Container } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 // import { useDataStore } from "@/providers/data-store-provider";
@@ -52,7 +51,7 @@ export default function Page() {
   // }, [data, addData, dataSources, dataLoading]);
 
   return (
-    <PageContainer sx={{ position: "relative" }}>
+    <Container sx={{pt: 2}}>
       {/* <Box height={300}>
         {dataSources && <TimelineSlider dataSources={dataSources} />}
       </Box> */}
@@ -70,7 +69,7 @@ export default function Page() {
           <span key={key}>{key}</span>
         ))}
       </Box>
-      <Paper sx={{ p: 2, m: 2 }}>
+      <Paper sx={{ p: 2}}>
         Count: {count}
         <Divider sx={{ mt: 2, mb: 2 }} />
         <Button variant="outlined" onClick={countActions.incrementCount}>
@@ -80,6 +79,6 @@ export default function Page() {
           decrement count
         </Button>
       </Paper>
-    </PageContainer>
+    </Container>
   );
 }

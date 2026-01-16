@@ -30,6 +30,10 @@ html {
   app-region: drag;
 }
 
+.noDragArea {
+  app-region: no-drag;
+}
+
 /* #deckgl-wrapper {
   background-color: #FFF;
 } */

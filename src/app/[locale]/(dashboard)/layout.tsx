@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import Stack from "@mui/material/Stack";
@@ -12,8 +13,7 @@ import LanguageSwitcher from "../../../components/LanguageSwitcher";
 import { useTranslations } from "next-intl";
 import { useLocale } from "next-intl";
 import { RotateOrbit } from "mdi-material-ui";
-import { Box, LinearProgress, Theme, Typography } from "@mui/material";
-import { useTheme } from "@emotion/react";
+import { Box, LinearProgress } from "@mui/material";
 import { Settings } from "@mui/icons-material";
 
 import { useDataStore } from "@/providers/data-store-provider";
@@ -21,8 +21,9 @@ import { fetchData } from "@/components/datasource/load-data";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ReactNode, useEffect, useState } from "react";
 
-import * as _ from "lodash";
-import Header from "@/components/Header";
+import { isEmpty, xor } from "lodash";
+import TitleBar from "@/components/navigation/title-bar";
+import NavBar from "@/components/navigation/nav-bar";
 
 function ToolbarActionsSearch() {
   return (
@@ -36,7 +37,6 @@ function ToolbarActionsSearch() {
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const t = useTranslations("Common");
   const locale = useLocale();
-  const theme = useTheme() as Theme;
 
   const NAVIGATION: Navigation = [
     // {
@@ -103,6 +103,9 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
   useEffect(() => {
     dataSources.allIDs.forEach(async (id: string) => {
       if (data) {
+        console.log(Object.keys(data));
+        console.log(id);
+        console.log(Object.keys(data).includes(id))
         if (!Object.keys(data).includes(id)) {
           setDataLoading(true);
           console.log(`Fetching data for ${id}`);
@@ -114,21 +117,21 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
             setDataLoading(false);
           });
-        } else if (
-          !_.isEmpty(
-            _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-          )
-        ) {
-          setDataLoading(true);
-          console.log(`Fetching data for ${id}`);
+        // } else if (
+        //   isEmpty(
+        //     xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
+        //   )
+        // ) {
+        //   setDataLoading(true);
+        //   console.log(`Fetching data for ${id}`);
 
-          await fetchData(dataSources.byID[id]).then((fetched_data) => {
-            console.log(fetched_data);
+        //   await fetchData(dataSources.byID[id]).then((fetched_data) => {
+        //     console.log(fetched_data);
 
-            addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+        //     addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
 
-            setDataLoading(false);
-          });
+        //     setDataLoading(false);
+        //   });
         }
       }
     });
@@ -136,44 +139,16 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
   return (
     <>
-      {/* <Box
-        className="draggableArea"
+      <TitleBar />
+      <NavBar />
+      <Box
         sx={{
-          height: "30px",
-          width: "100%",
-          display: "flex",
-          borderBottom: `1px solid ${theme.palette.divider}`,
-          pl: 1,
-          justifyContent: "center",
-          alignItems: "center",
+          height: "calc(100vh - 32px - 64px)", display: "flex", flexDirection: "column"
         }}
-      >
-        <Typography
-          sx={{
-            fontSize: "10",
-            fontWeight: "bold",
-            color: theme.palette.primary.main,
-          }}
-        >
-          QuakeView
-        </Typography>
-      </Box> */}
-      <DashboardLayout
-        navigation={NAVIGATION}
-        sx={{
-          height: "calc(100vh - 32px)",
-          header: { height: "33px" },
-          ".MuiToolbar-root": { minHeight: "32px" },
-          button: {},
-        }}
-        slots={{
-          toolbarActions: ToolbarActionsSearch,
-        }}
-        slotProps={{}}
       >
         {dataLoading && <LinearProgress />}
         {props.children}
-      </DashboardLayout>
+      </Box>
     </>
   );
 }

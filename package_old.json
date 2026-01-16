@@ -6,9 +6,8 @@
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/ylseanna/QuakeView",
   "private": true,
-  "main": "./out/build/main.js",
+  "main": "./build/main.js",
   "proxy": "localhost:8100",
-  "type": "module",
   "scripts": {
     "next:dev": "next dev -p 8090",
     "next:build": "next build",
@@ -29,7 +28,7 @@
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
     "build": "run-s next:build flask:build electron:build",
     "dist": "run-s electron:dist",
-    "dev": "npm-run-all --parallel next:dev flask:dev vite:dev"
+    "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
   },
   "build": {
     "asar": true,
@@ -103,7 +102,7 @@
     "@mui/x-data-grid": "^7.29.12",
     "@next/bundle-analyzer": "^15.5.9",
     "@react-hooks-library/core": "^0.6.2",
-    "@toolpad/core": "^0.12.0",
+    "@toolpad/core": "0.12.0",
     "@turf/mask": "^7.3.2",
     "@types/d3": "^7.4.3",
     "@types/web": "^0.0.228",
@@ -114,7 +113,6 @@
     "document-register-element": "^1.14.10",
     "electron-log": "^5.4.3",
     "electron-router-dom": "^2.1.0",
-    "electron-vite": "^5.0.0",
     "get-port-please": "^3.2.0",
     "immer": "^10.2.0",
     "lodash": "^4.17.21",
@@ -133,11 +131,11 @@
     "regl": "^2.1.1",
     "reimg": "^1.0.0",
     "strftime": "^0.10.3",
+    "tsup": "^8.5.1",
     "use-animation-frame": "^0.2.1",
     "zustand": "^5.0.10"
   },
   "devDependencies": {
-    "@esbuild/linux-x64": "^0.25.4",
     "@eslint/eslintrc": "^3.3.3",
     "@types/lodash": "^4.17.23",
     "@types/node": "^20.19.29",
@@ -146,6 +144,8 @@
     "cross-env": "7.0.3",
     "electron": "^37.10.3",
     "electron-builder": "^26.4.0",
+    "electron-vite": "^5.0.0",
+    "esbuild": "0.27.2",
     "eslint": "^9.39.2",
     "eslint-config-next": "15.1.8",
     "npm-run-all": "4.1.5",

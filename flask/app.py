@@ -2,7 +2,7 @@ from flask import Flask, request, Response, send_file
 from pathlib import Path
 from shapely import multipoints
 import json
-from numpy import histogram, float64, int64
+from numpy import histogram, float64, int64, isnan
 
 
 # from obspy import UTCDateTime
@@ -183,9 +183,15 @@ def map_data():
                 "alias": "",
                 "data_type": variable_mapping(df.dtypes[column_name]),
                 "unit": "",
-                "bounds": [float(df[column_name].min()), float(df[column_name].max())]
-                if df.dtypes[column_name] in (float, float64, int, int64)
-                else None,
+                "bounds": (
+                    [float(df[column_name].min()), float(df[column_name].max())]
+                    if df.dtypes[column_name] in (float, float64, int, int64)
+                    and not (
+                        isnan(float(df[column_name].min()))
+                        or isnan(float(df[column_name].max()))
+                    )
+                    else None
+                ),
                 "bins": None,
                 "kde": None,
                 "required": False,

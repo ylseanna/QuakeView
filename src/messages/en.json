@@ -19,6 +19,7 @@
     "app_title": "Earthquake Catalogues",
     "configure": "Configure",
     "data": "Data",
+    "file": "File",
     "information": "Information",
     "input": "Input",
     "legend": "Legend",
@@ -30,6 +31,7 @@
     "plots": "Plots",
     "sources": "Sources",
     "timeline": "Timeline",
+    "view": "View",
     "visualisations": "Visualisations"
   },
   "Filtering": {

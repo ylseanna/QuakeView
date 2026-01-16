@@ -36,7 +36,7 @@ export default function DataSelector() {
   );
 
   return (
-    <Paper sx={{ mb: 3 }}>
+    <Paper sx={{ mb: 3, display: "flex", flexDirection: "column" }}>
       {/* {isLoading && <LinearProgress />} */}
 
       <Typography sx={{ m: 2 }} variant="h6">
