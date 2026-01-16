@@ -14,25 +14,22 @@ export const viewport: Viewport = {
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/ibm-plex-sans";
 
-
 import { Suspense, ReactNode } from "react";
 
 import LinearProgress from "@mui/material/LinearProgress";
 
 import { theme } from "./theme";
 
-import { NextAppProvider } from "@toolpad/core/nextjs";
-import { getTranslations } from "next-intl/server";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { AppTheme } from "@toolpad/core";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { DataStoreProvider } from "@/providers/data-store-provider";
+import { ThemeProvider } from "@mui/material";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
@@ -76,13 +73,6 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const t = await getTranslations("Common");
-
-  const BRANDING = await {
-    title: t("app_title"),
-    logo: "",
-  };
-
   const messages = await getMessages();
 
   return (
@@ -91,15 +81,11 @@ export default async function LocaleLayout({
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <Suspense fallback={<LinearProgress />}>
-              <NextAppProvider
-                theme={theme as AppTheme}
-                branding={BRANDING}
-                // router={router}
-              >
+              <ThemeProvider theme={theme}>
                 <ProjectStoreProvider>
                   <DataStoreProvider>{children}</DataStoreProvider>
                 </ProjectStoreProvider>
-              </NextAppProvider>
+              </ThemeProvider>
             </Suspense>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>

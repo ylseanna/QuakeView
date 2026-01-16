@@ -9,7 +9,7 @@ import { Link } from "@/i18n/routing";
 
 export default function NavBar() {
   const t = useTranslations("Common");
-//   const locale = useLocale();
+  //   const locale = useLocale();
 
   const NavigationItems = [
     {
@@ -42,7 +42,13 @@ export default function NavBar() {
   const theme = useTheme();
 
   return (
-    <Toolbar sx={{ borderBottom: `1px solid ${theme.palette.divider}`}}>
+    <Toolbar
+      sx={{
+        borderBottom: `1px solid ${theme.palette.divider}`,
+        zIndex: theme.zIndex.drawer + 200,
+        backgroundColor:  theme.palette.background.default,
+      }}
+    >
       <Stack direction="row" spacing={2}>
         {NavigationItems.map((NavigationItem) => (
           <Link key={NavigationItem.segment} href={NavigationItem.segment}>

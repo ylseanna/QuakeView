@@ -18,10 +18,13 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  height: 100%;
+  overflow: hidden;
 }
 
 html {
   font-size: 14px;
+  height: 100%
 }
 
 /* D3 overrides */

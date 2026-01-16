@@ -7,6 +7,7 @@ import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
 import { merge } from "lodash";
 import { DataSource } from "@/components/datasource/types";
+import { ViewState } from "react-map-gl/maplibre";
 
 export type ProjectState = {
   count: number;
@@ -19,6 +20,7 @@ export type ProjectState = {
 };
 
 export type SessionInterface = {
+  overViewState: ViewState;
   pickable: boolean;
   animation: {
     tapered: boolean;
@@ -40,6 +42,7 @@ export type ProjectActions = {
     incrementCount: () => void;
   };
   interfaceActions: {
+    setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
     animation: {
       setTapered: (value: boolean) => void;
@@ -82,6 +85,19 @@ export type ProjectStore = ProjectState & ProjectActions;
 export const defaultInitState: ProjectState = {
   count: 0,
   sessionInterface: {
+    overViewState: {
+      longitude: -19,
+      latitude: 65,
+      zoom: 6,
+      pitch: 0,
+      bearing: 0,
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+    },
     pickable: false,
     animation: { tapered: false, speed: { multiplier: 1, unit: "day" } },
   },
@@ -101,6 +117,10 @@ export const createProjectStore = (
           incrementCount: () => set((state) => ({ count: state.count + 1 })),
         },
         interfaceActions: {
+          setOverViewState: (value) =>
+            set((state) => {
+              state.sessionInterface.overViewState = value;
+            }),
           setPickable: (value) =>
             set((state) => {
               state.sessionInterface.pickable = value;

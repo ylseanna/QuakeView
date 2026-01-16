@@ -2,12 +2,12 @@
 
 import * as React from "react";
 import Typography from "@mui/material/Typography";
-import { PageContainer } from "@toolpad/core";
+import { Container } from "@mui/material";
 
 export default function Page() {
   return (
-    <PageContainer>
+    <Container>
       <Typography>Welcome to plots page!</Typography>
-    </PageContainer>
+    </Container>
   );
 }

@@ -2,8 +2,6 @@
 
 import { defaultDEMStyle } from "../../../../components/map/map_styles/default";
 
-// import * as _ from "lodash";
-
 import "maplibre-gl/dist/maplibre-gl.css";
 import Map, {
   FullscreenControl,
@@ -15,65 +13,20 @@ import { LinearProgress } from "@mui/material";
 import { ViewState } from "react-map-gl/maplibre";
 
 import DeckGLlayers from "../../../../components/map/deckgl-layers";
-import { useLocalStorageState } from "@toolpad/core";
-import { VIEWSTATE_JSON_CODEC } from "../../../../components/map/types";
+
 import { AttributionControl } from "react-map-gl";
 import Actions from "../../../../components/datasource/actions";
-// import { useDataStore } from "@/providers/data-store-provider";
-// import { useProjectStore } from "@/providers/project-store-provider";
-// import { fetchData } from "@/components/datasource/load-data";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { useShallow } from "zustand/react/shallow";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
 
-  // // load data (synchronized accros app)
-  // const { dataSources } = useProjectStore((state) => state);
-  // const { data, addData } = useDataStore((state) => state);
-  // const [dataLoading, setDataLoading] = useState(false);
-
-  // useEffect(() => {
-  //   dataSources.allIDs.forEach(async (id: string) => {
-  //     if (!Object.keys(data).includes(id)) {
-  //       setDataLoading(true);
-
-  //       const fetched_data = await fetchData(dataSources.byID[id]);
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     } else if (
-  //       !_.isEmpty(
-  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-  //       )
-  //     ) {
-  //       console.log();
-
-  //       let fetched_data = [];
-
-  //       fetched_data = await fetchData(dataSources.byID[id]);
-
-  //       setDataLoading(true);
-
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     }
-  //   });
-  // }, [data, addData, dataSources, dataLoading]);
-
-  // bounds
-  const [viewState, setViewState] = useLocalStorageState<ViewState>(
-    "overview-view-state",
-    {
-      longitude: -19,
-      latitude: 65,
-      zoom: 6,
-      pitch: 0,
-    } as ViewState,
-    { codec: VIEWSTATE_JSON_CODEC }
+  const { overViewState, setOverViewState } = useProjectStore(
+    useShallow((state) => ({
+      overViewState: state.sessionInterface.overViewState,
+      setOverViewState: state.interfaceActions.setOverViewState,
+    }))
   );
 
   const onMapLoad = () => {
@@ -82,23 +35,18 @@ export default function Page() {
 
   function setViewStateandLocalStorage(viewState: ViewState) {
     if (IsLoading == false) {
-      setViewState(viewState);
+      setOverViewState(viewState);
     }
   }
 
   return (
     <>
-      {/* <FormattingSidebar
-        dataSources={dataSources as DataSource[]}
-        setDataSources={setDataSources}
-      /> */}
-
-      {(IsLoading) && <LinearProgress />}
+      {IsLoading && <LinearProgress />}
       <>
         <Map
           onLoad={onMapLoad}
           reuseMaps
-          {...(viewState as object)}
+          {...(overViewState as object)}
           onMove={(evt) => setViewStateandLocalStorage(evt.viewState)}
           mapStyle={defaultDEMStyle}
           maxBounds={[
