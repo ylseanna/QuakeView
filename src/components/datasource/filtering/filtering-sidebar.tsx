@@ -1,8 +1,9 @@
-import { Drawer, Toolbar, Typography } from "@mui/material";
+import { Drawer, Typography, useTheme } from "@mui/material";
 import { useRef } from "react";
 import { useTranslations } from "next-intl";
 import FilteringElement from "./filtering-element";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { Box } from "@mui/material";
 
 interface FormattingProps {
   setFiltering: CallableFunction;
@@ -13,6 +14,7 @@ export default function FilteringSidebar({
   setFiltering,
   drawerOpen,
 }: FormattingProps) {
+  const theme = useTheme();
   const t = useTranslations("Filtering");
 
   const dataSources = useProjectStore((state) => state.dataSources);
@@ -39,10 +41,11 @@ export default function FilteringSidebar({
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
+            zIndex: theme.zIndex.appBar - 100,
           },
         }}
       >
-        <Toolbar />
+        <Box sx={{display: "box", height: "calc(64px + 32px)"}} />
         <Typography sx={sxtextbox}>
           <b>{t("filtering")}</b>
         </Typography>

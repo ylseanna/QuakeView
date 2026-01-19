@@ -1,9 +1,6 @@
-import InfoIcon from "@mui/icons-material/Info";
-import PublicIcon from "@mui/icons-material/Public";
-import TableRowsIcon from "@mui/icons-material/TableRows";
 import { Stack, Toolbar, Typography, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Settings } from "@mui/icons-material";
+import { Settings, Info, Public, TableRows } from "@mui/icons-material";
 import { RotateOrbit } from "mdi-material-ui";
 import { Link } from "@/i18n/routing";
 
@@ -11,31 +8,56 @@ export default function NavBar() {
   const t = useTranslations("Common");
   //   const locale = useLocale();
 
-  const NavigationItems = [
+  const NavigationSections = [
     {
-      segment: "/",
-      title: t("configure"),
-      icon: <Settings />,
+      section: "import",
+      title: undefined,
+      sections: [
+        {
+          segment: "/",
+          title: t("configure"),
+          icon: <Settings />,
+        },
+      ],
     },
     {
-      segment: "overview_map",
-      title: t("overview_map"),
-      icon: <PublicIcon />,
+      section: "data_overview",
+      title: undefined,
+      sections: [
+        {
+          segment: "overview_map",
+          title: t("overview_map"),
+          icon: <Public />,
+        },
+        {
+          segment: "overview_table",
+          title: t("overview_table"),
+          icon: <TableRows />,
+        },
+      ],
     },
     {
-      segment: "overview_table",
-      title: t("overview_table"),
-      icon: <TableRowsIcon />,
+      section: "views",
+      title: undefined,
+      sections: [
+        {
+          segment: "3D_map",
+          title: t("3D_map"),
+          icon: <RotateOrbit />,
+        },
+      ],
     },
+
     {
-      segment: "3D_map",
-      title: t("3D_map"),
-      icon: <RotateOrbit />,
-    },
-    {
-      segment: "information",
-      title: t("information"),
-      icon: <InfoIcon />,
+      section: "misc",
+      title: undefined,
+      sections: [
+        {
+          segment: "information",
+          title: t("information"),
+          icon: <Info />,
+        },
+      ],
     },
   ];
 
@@ -45,15 +67,19 @@ export default function NavBar() {
     <Toolbar
       sx={{
         borderBottom: `1px solid ${theme.palette.divider}`,
-        zIndex: theme.zIndex.drawer + 200,
-        backgroundColor:  theme.palette.background.default,
+        zIndex: theme.zIndex.appBar,
+        backgroundColor: theme.palette.background.default,
       }}
     >
       <Stack direction="row" spacing={2}>
-        {NavigationItems.map((NavigationItem) => (
-          <Link key={NavigationItem.segment} href={NavigationItem.segment}>
-            <Typography>{NavigationItem.title}</Typography>
-          </Link>
+        {NavigationSections.map((NavigationSection) => (
+          <Stack direction="row" spacing={2} key={NavigationSection.section}>
+            {NavigationSection.sections.map((NavigationItem) => (
+              <Link key={NavigationItem.segment} href={NavigationItem.segment}>
+                <Typography>{NavigationItem.title}</Typography>
+              </Link>
+            ))}
+          </Stack>
         ))}
       </Stack>
     </Toolbar>

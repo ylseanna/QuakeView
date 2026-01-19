@@ -52,7 +52,7 @@ export default function TitleBar() {
         paddingLeft: "4px",
         paddingRight: "100px",
         justifyContent: "space-between",
-        zIndex: theme.zIndex.drawer + 200,
+        zIndex: theme.zIndex.appBar,
         backgroundColor: theme.palette.background.paper,
       }}
       disableGutters
