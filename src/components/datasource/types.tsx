@@ -1,4 +1,3 @@
-import { Codec } from "@toolpad/core";
 import { colormaps } from "../map/crameri-colormaps";
 import { colormaps_categorical } from "../map/crameri-colormaps";
 
@@ -76,12 +75,12 @@ export type Extent = {
   polygon: string;
 };
 
-export const DATASOURCE_JSON_CODEC: Codec<DataSource[]> = {
-  parse: (raw: string) => JSON.parse(raw),
-  stringify: (value: object) => JSON.stringify(value),
-};
+// export const DATASOURCE_JSON_CODEC: Codec<DataSource[]> = {
+//   parse: (raw: string) => JSON.parse(raw),
+//   stringify: (value: object) => JSON.stringify(value),
+// };
 
-export const EXTENT_JSON_CODEC: Codec<Extent> = {
-  parse: (raw: string) => JSON.parse(raw),
-  stringify: (value: object) => JSON.stringify(value),
-};
+// export const EXTENT_JSON_CODEC: Codec<Extent> = {
+//   parse: (raw: string) => JSON.parse(raw),
+//   stringify: (value: object) => JSON.stringify(value),
+// };

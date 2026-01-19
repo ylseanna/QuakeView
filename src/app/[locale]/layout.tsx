@@ -35,12 +35,14 @@ declare module "@mui/material/styles" {
   interface TypographyVariants {
     formlabel: React.CSSProperties;
     formheader: React.CSSProperties;
+    navsectionheader: React.CSSProperties;
   }
 
   // allow configuration using `createTheme()`
   interface TypographyVariantsOptions {
     formlabel?: React.CSSProperties;
     formheader?: React.CSSProperties;
+    navsectionheader?: React.CSSProperties;
   }
 }
 
@@ -49,6 +51,7 @@ declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     formlabel: true;
     formheader: true;
+    navsectionheader: true;
   }
 }
 

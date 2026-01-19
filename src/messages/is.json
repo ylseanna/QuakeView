@@ -19,7 +19,9 @@
     "app_title": "Jarðskjálftaskrár",
     "configure": "Samskipa",
     "data": "Gögn",
+    "data_overview": "Gagnayfirlit",
     "file": "Setur",
+    "help": "Hjálp",
     "information": "Upplýsingar",
     "input": "Inntak",
     "legend": "Skýring",
@@ -32,6 +34,7 @@
     "sources": "Gagnaheimildir",
     "timeline": "Tímalína",
     "view": "Skoða",
+    "views": "Gagnasýn",
     "visualisations": "Kort og gröf"
   },
   "Filtering": {

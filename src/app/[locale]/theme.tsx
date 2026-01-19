@@ -83,6 +83,13 @@ export const theme: ThemeOptions = createTheme({
       opacity: 0.6,
       fontWeight: "normal",
     },
+    navsectionheader: {
+      fontSize: "0.7rem",
+      opacity: 0.6,
+      fontWeight: "normal",
+      letterSpacing: "0.01rem",
+      lineHeight: "0.6rem",
+    },
   },
   components: {
     MuiToolbar: {

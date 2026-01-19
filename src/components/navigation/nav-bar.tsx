@@ -1,17 +1,27 @@
-import { Stack, Toolbar, Typography, useTheme } from "@mui/material";
+import {
+  Button,
+  Divider,
+  Stack,
+  Toolbar,
+  useTheme,
+  Box,
+  Typography,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Settings, Info, Public, TableRows } from "@mui/icons-material";
-import { RotateOrbit } from "mdi-material-ui";
-import { Link } from "@/i18n/routing";
+import { Settings, Public, TableRows } from "@mui/icons-material";
+import { RotateOrbit, ChartMultiple } from "mdi-material-ui";
+import { Link, usePathname } from "@/i18n/routing";
 
 export default function NavBar() {
   const t = useTranslations("Common");
-  //   const locale = useLocale();
+  const pathname = usePathname();
+    console.log(pathname)
+
 
   const NavigationSections = [
     {
       section: "import",
-      title: undefined,
+      title: t("data"),
       sections: [
         {
           segment: "/",
@@ -22,15 +32,15 @@ export default function NavBar() {
     },
     {
       section: "data_overview",
-      title: undefined,
+      title: t("data_overview"),
       sections: [
         {
-          segment: "overview_map",
+          segment: "/overview_map",
           title: t("overview_map"),
           icon: <Public />,
         },
         {
-          segment: "overview_table",
+          segment: "/overview_table",
           title: t("overview_table"),
           icon: <TableRows />,
         },
@@ -38,27 +48,32 @@ export default function NavBar() {
     },
     {
       section: "views",
-      title: undefined,
+      title: t("views"),
       sections: [
         {
-          segment: "3D_map",
+          segment: "/3D_map",
           title: t("3D_map"),
           icon: <RotateOrbit />,
+        },
+        {
+          segment: "/plots",
+          title: t("plots"),
+          icon: <ChartMultiple />,
         },
       ],
     },
 
-    {
-      section: "misc",
-      title: undefined,
-      sections: [
-        {
-          segment: "information",
-          title: t("information"),
-          icon: <Info />,
-        },
-      ],
-    },
+    // {
+    //   section: "misc",
+    //   title: undefined,
+    //   sections: [
+    //     {
+    //       segment: "information",
+    //       title: t("information"),
+    //       icon: <Info />,
+    //     },
+    //   ],
+    // },
   ];
 
   const theme = useTheme();
@@ -69,17 +84,61 @@ export default function NavBar() {
         borderBottom: `1px solid ${theme.palette.divider}`,
         zIndex: theme.zIndex.appBar,
         backgroundColor: theme.palette.background.default,
+        p: 0,
+        height: "80px",
       }}
     >
-      <Stack direction="row" spacing={2}>
+      <Stack
+        direction="row"
+        spacing={2}
+        divider={<Divider orientation="vertical" flexItem />}
+        sx={{ height: "80px", alignItems: "center" }}
+      >
         {NavigationSections.map((NavigationSection) => (
-          <Stack direction="row" spacing={2} key={NavigationSection.section}>
-            {NavigationSection.sections.map((NavigationItem) => (
-              <Link key={NavigationItem.segment} href={NavigationItem.segment}>
-                <Typography>{NavigationItem.title}</Typography>
-              </Link>
-            ))}
-          </Stack>
+          <Box
+            key={NavigationSection.section}
+            sx={{
+              display: "flex",
+              flexDirection: "column",
+              height: "64px",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
+              variant="navsectionheader"
+              sx={{
+                color: theme.palette.text.primary,
+                height: "0.6rem",
+                mb: "4px",
+              }}
+            >
+              {NavigationSection.title}
+            </Typography>
+            <Stack direction="row" spacing={2}>
+              {NavigationSection.sections.map((NavigationItem) => (
+                <Link
+                  key={NavigationItem.segment}
+                  href={NavigationItem.segment}
+                >
+                  <Button
+                    sx={{
+                      color: (pathname == NavigationItem.segment) ? theme.palette.primary.main :  theme.palette.text.primary ,
+                      opacity: .87,
+                      flexDirection: "column",
+                      justifyContent: "center",
+                      p: "4px",
+                      fontSize: "0.8rem",
+                      textTransform: "capitalize",
+                    }}
+                  >
+                    {NavigationItem.icon}
+                    {NavigationItem.title}
+                  </Button>
+                </Link>
+              ))}
+            </Stack>
+          </Box>
         ))}
       </Stack>
     </Toolbar>

@@ -31,7 +31,7 @@ import {
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MuiColorInput } from "mui-color-input";
-import HistogramSlider from "../../d3/histogram-slider";
+import HistogramSlider from "../../interface-elements/histogram-slider";
 import {
   colormaps,
   colormaps_categorical,

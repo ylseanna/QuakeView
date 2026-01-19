@@ -20,7 +20,7 @@ import {
 } from "../../layout/accordion";
 import { SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
-import HistogramSlider from "../../d3/histogram-slider";
+import HistogramSlider from "../../interface-elements/histogram-slider";
 
 type FilteringOption = {
   variable: string;

@@ -27,6 +27,6 @@
       "@/*": ["./src/*"]
     }
   },
-  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "electron/main.js", "electron/preload.ts", "electron/main.cjs"],
+  "include": ["next-env.d.ts", "**/*.ts", "**/*.tsx", ".next/types/**/*.ts", "electron/main.js", "electron/preload.ts", "electron/main.cjs", "src/components/interface-elements/timeline-slider-canvas-regl.tsx_disable"],
   "exclude": ["node_modules"]
 }

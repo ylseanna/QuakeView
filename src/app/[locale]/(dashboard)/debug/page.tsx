@@ -15,40 +15,6 @@ export default function Page() {
 
   // // load data (synchronized accros app)
   const { data } = useDataStore((state) => state);
-  // const [dataLoading, setDataLoading] = useState(false);
-
-  // useEffect(() => {
-  //   dataSources.allIDs.forEach(async (id: string) => {
-  //     if (!Object.keys(data).includes(id)) {
-  //       setDataLoading(true);
-
-  //       const fetched_data = await fetchData(dataSources.byID[id]);
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     } else if (
-  //       !_.isEmpty(
-  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-  //       )
-  //     ) {
-  //       console.log();
-
-  //       let fetched_data = [];
-
-  //       fetched_data = await fetchData(dataSources.byID[id]);
-
-  //       setDataLoading(true);
-
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     }
-  //   });
-  // }, [data, addData, dataSources, dataLoading]);
 
   return (
     <Container sx={{pt: 2}}>

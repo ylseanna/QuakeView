@@ -47,7 +47,7 @@ export default function FormattingSidebar({
           },
         }}
       >
-        <Box sx={{ display: "box", height: "calc(64px + 32px)" }} />
+        <Box sx={{ display: "box", height: "calc(80px + 32px)" }} />
         <Typography sx={sxtextbox}>
           <b>{t("formatting")}</b>
         </Typography>

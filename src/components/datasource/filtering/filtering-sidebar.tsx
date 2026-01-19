@@ -45,7 +45,7 @@ export default function FilteringSidebar({
           },
         }}
       >
-        <Box sx={{display: "box", height: "calc(64px + 32px)"}} />
+        <Box sx={{display: "box", height: "calc(80px + 32px)"}} />
         <Typography sx={sxtextbox}>
           <b>{t("filtering")}</b>
         </Typography>

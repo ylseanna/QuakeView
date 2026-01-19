@@ -120,6 +120,7 @@
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.18.0",
     "maplibre-gl": "^4.7.1",
+    "material-ui-popup-state": "^5.3.6",
     "mdi-material-ui": "^7.9.4",
     "mui-color-input": "^6.0.0",
     "mui-file-input": "^7.0.0",
@@ -132,6 +133,8 @@
     "react-map-gl": "^7.1.9",
     "regl": "^2.1.1",
     "reimg": "^1.0.0",
+    "stardust-core": "^0.2.4",
+    "stardust-webgl": "^0.2.4",
     "strftime": "^0.10.3",
     "use-animation-frame": "^0.2.1",
     "zustand": "^5.0.10"
