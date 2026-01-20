@@ -14,10 +14,6 @@ export const viewport: Viewport = {
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/ibm-plex-sans";
 
-import { Suspense, ReactNode } from "react";
-
-import LinearProgress from "@mui/material/LinearProgress";
-
 import { theme } from "./theme";
 
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
@@ -30,6 +26,8 @@ import { routing } from "@/i18n/routing";
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { DataStoreProvider } from "@/providers/data-store-provider";
 import { ThemeProvider } from "@mui/material";
+import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
+import { ReactNode } from "react";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
@@ -81,15 +79,14 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
+        <InitColorSchemeScript attribute="class" />
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <Suspense fallback={<LinearProgress />}>
-              <ThemeProvider theme={theme}>
-                <ProjectStoreProvider>
-                  <DataStoreProvider>{children}</DataStoreProvider>
-                </ProjectStoreProvider>
-              </ThemeProvider>
-            </Suspense>
+            <ThemeProvider theme={theme}>
+              <ProjectStoreProvider>
+                <DataStoreProvider>{children}</DataStoreProvider>
+              </ProjectStoreProvider>
+            </ThemeProvider>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>
       </body>

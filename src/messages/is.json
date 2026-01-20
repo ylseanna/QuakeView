@@ -35,7 +35,10 @@
     "timeline": "Tímalína",
     "view": "Skoða",
     "views": "Gagnasýn",
-    "visualisations": "Kort og gröf"
+    "visualisations": "Kort og gröf",
+    "all_plots": "Öll gröf",
+    "GRplot": "GR graf",
+    "distributionplot": "dreifing\n"
   },
   "Filtering": {
     "add_filter": "Bæta við síu",
@@ -79,7 +82,8 @@
     "num_events": "Fjöldi skjálftar",
     "options": "Stillingar",
     "remove_data_source": "Fjarlægja gagnaheimild",
-    "upload_files": "Flytja upp"
+    "upload_files": "Flytja upp",
+    "summary": "Samantekt"
   },
   "Table": {
     "dep": "Dýpi (km)",

@@ -7,55 +7,13 @@ import {
 import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-// import * as _ from "lodash";
-
 import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-// import { useDataStore } from "@/providers/data-store-provider";
-// import { fetchData } from "@/components/datasource/load-data";
-// import { LinearProgress } from "@mui/material";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
-
-  // // load data (synchronized accros app)
-  // const { data, addData } = useDataStore((state) => state);
-  // const [dataLoading, setDataLoading] = useState(false);
-
-  // useEffect(() => {
-  //   dataSources.allIDs.forEach(async (id: string) => {
-  //     if (!Object.keys(data).includes(id)) {
-  //       setDataLoading(true);
-
-  //       const fetched_data = await fetchData(dataSources.byID[id]);
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     } else if (
-  //       !_.isEmpty(
-  //         _.xor(data[id].addedVars, dataSources.byID[id].interface.addedVars)
-  //       )
-  //     ) {
-  //       console.log();
-
-  //       let fetched_data = [];
-
-  //       fetched_data = await fetchData(dataSources.byID[id]);
-
-  //       setDataLoading(true);
-
-  //       console.log(fetched_data);
-
-  //       addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
-
-  //       setDataLoading(false);
-  //     }
-  //   });
-  // }, [data, addData, dataSources, dataLoading]);
 
   const calculateExtent = () => {
     let extent: Extent | null = null;

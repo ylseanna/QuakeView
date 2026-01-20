@@ -35,7 +35,10 @@
     "timeline": "Timeline",
     "view": "View",
     "views": "Views",
-    "visualisations": "Visualisations"
+    "visualisations": "Visualisations",
+    "GRplot": "GR plot",
+    "all_plots": "All plots",
+    "distributionplot": "distribution"
   },
   "Filtering": {
     "add_filter": "Add filter",

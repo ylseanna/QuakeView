@@ -1,12 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { Container, Paper, Typography, Box } from "@mui/material";
-import GutenbergRichterPlot from "@/components/plots/gutenberg-richter-plot";
+import { Container, Paper, Box } from "@mui/material";
 import Sidebars from "@/components/interface/sidebars";
 import Legend from "@/components/map/legend/legend";
-import MagnitudeDistributionPlot from "@/components/plots/magnitude-distribution-plot";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import MagnitudeDistributionPlot from "@/components/plots/magnitude-distribution-plot";
 
 export default function Page() {
   return (
@@ -15,11 +14,6 @@ export default function Page() {
       <Sidebars />
       <Container sx={{ mt: 2, mb: 2 }}>
         <Paper sx={{ p: 4 }}>
-          <Typography variant="h4" sx={{mb:3}}>Gutenberg-Richter relationship</Typography>
-          <GutenbergRichterPlot />
-        </Paper>
-        <Paper sx={{ p: 4, mt: 2}}>
-          <Typography variant="h4" sx={{mb:3}}>Magnitude Distribution</Typography>
           <MagnitudeDistributionPlot />
         </Paper>
       </Container>

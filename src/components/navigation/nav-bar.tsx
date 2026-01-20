@@ -9,7 +9,7 @@ import {
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { Settings, Public, TableRows } from "@mui/icons-material";
-import { RotateOrbit, ChartMultiple } from "mdi-material-ui";
+import { RotateOrbit, ChartMultiple, ChartPpf, ChartHistogram } from "mdi-material-ui";
 import { Link, usePathname } from "@/i18n/routing";
 
 export default function NavBar() {
@@ -61,8 +61,26 @@ export default function NavBar() {
         },
         {
           segment: "/plots",
-          title: t("plots"),
+          title: t("all_plots"),
           icon: <ChartMultiple />,
+          enabled: true,
+        },
+      ],
+    },
+    {
+      section: "plots",
+      title: t("plots"),
+      sections: [
+        {
+          segment: "/plots/GRplot",
+          title: t("GRplot"),
+          icon: <ChartPpf />,
+          enabled: true,
+        },
+        {
+          segment: "/plots/distributionplot",
+          title: t("distributionplot"),
+          icon: <ChartHistogram />,
           enabled: true,
         },
       ],
