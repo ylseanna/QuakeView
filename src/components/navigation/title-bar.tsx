@@ -86,8 +86,8 @@ export default function TitleBar() {
                 }}
               >
                 <MenuList dense disablePadding>
-                  <MenuItem onClick={popupState.close}>New session</MenuItem>
-                  <MenuItem onClick={popupState.close}>Load session</MenuItem>
+                  <MenuItem onClick={popupState.close} disabled>New session</MenuItem>
+                  <MenuItem onClick={popupState.close} disabled>Load session</MenuItem>
                 </MenuList>
               </Menu>
             </Fragment>

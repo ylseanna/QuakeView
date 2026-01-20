@@ -1,4 +1,4 @@
-import { EarthQuake } from "../datasource/types";
+import { DataSourceDataDescription, EarthQuake } from "../datasource/types";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 import { Skeleton } from "@mui/material";
@@ -13,9 +13,19 @@ export default function GutenbergRichterPlot() {
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isLoading, setIsLoading] = useState(true);
+  const [dataSourcesBins, setDataSourcesBins] = useState<DataSourceBins[]>([]);
 
-  const id = dataSources.allIDs[0];
-  const dataSource = dataSources.byID[id];
+  const margin = { top: 2, right: 2, bottom: 40, left: 26 },
+    width = dimensions.width,
+    height = dimensions.width * 0.5;
+
+  interface DataSourceBins {
+    id: string;
+    color: string;
+    bins: d3.Bin<number, number>[];
+    xbounds: [number, number];
+    ybounds: [number, number];
+  }
 
   useLayoutEffect(() => {
     if (parentRef.current) {
@@ -27,110 +37,221 @@ export default function GutenbergRichterPlot() {
   }, []);
 
   useEffect(() => {
-    d3.select(id ? "#" + id : `#chart-${id}`)
-      .select("svg")
-      .remove();
+    // loop over datasources and calculate bins and bounds
+
+    const dataSourcesBins = [];
+
+    for (let i = 0; i < dataSources.allIDs.length; i++) {
+      const dataSourceId = dataSources.allIDs[i];
+
+      if (data[dataSourceId]) {
+        const dataSource = dataSources.byID[dataSourceId];
+
+        const xbounds = dataSource.metadata.data_descr.find(
+          (element: DataSourceDataDescription) => element.variable == "mag",
+        )!.bounds;
+
+        const bins = d3.bin().thresholds(50).domain([xbounds[0], xbounds[1]])(
+          (data[dataSourceId].data as EarthQuake[]).map(
+            (d) => d["mag"],
+          ) as ArrayLike<number>,
+        );
+
+        const ybounds = [
+          d3.min(bins, (d) =>
+            d.length > 1 ? Math.log10(d.length) : undefined,
+          ),
+          d3.max(bins, (d) => Math.log10(d.length)),
+        ];
+
+        dataSourcesBins.push({
+          id: dataSourceId,
+          color: dataSource.formatting.color.single,
+          bins: bins,
+          xbounds: xbounds,
+          ybounds: ybounds,
+        });
+      }
+    }
+
+    setDataSourcesBins(dataSourcesBins as DataSourceBins[]);
+  }, [
+    dimensions,
+    data,
+    dataSources,
+    width,
+    margin.left,
+    margin.right,
+    margin.top,
+    margin.bottom,
+    height,
+  ]);
+
+  useEffect(() => {
+    setIsLoading(true);
+
+    d3.select("#chart-gutenberg-richter").select("svg").remove();
     // set the dimensions and margins of the graph
-    const margin = { top: 0, right: 0, bottom: 20, left: 20 },
-      width = dimensions.width,
-      height = dimensions.width * 0.5;
 
     // append the svg object to the body of the page
     const svg = d3
-      .select(id ? "#" + id : `#chart-${id}`)
+      .select("#chart-gutenberg-richter")
       .append("svg")
-      .attr("width", width - margin.left + margin.right)
-      .attr("height", height - margin.top + margin.bottom)
+      .attr("width", width - margin.left - margin.right)
+      .attr("height", height + margin.top + margin.bottom)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    if (data[id]) {
-      const bounds = dataSource.metadata.data_descr.find(
-        (element) => element.variable == "mag"
-      )!.bounds;
+    // find overall bounds
 
-      const x = d3
-        .scaleLinear()
-        .domain([bounds[0], bounds[1]] as Iterable<d3.NumberValue>)
-        .range([margin.left, width - margin.right]);
+    const overallYbounds = [
+      d3.min(dataSourcesBins, (d) => d.ybounds[0]),
+      d3.max(dataSourcesBins, (d) => d.ybounds[1]),
+    ];
 
-      const bins = d3.bin().thresholds(50).domain([bounds[0], bounds[1]])(
-        (data[id].data as EarthQuake[]).map(
-          (d) => d["mag"]
-        ) as ArrayLike<number>
-      );
+    const overallXbounds = [
+      d3.min(dataSourcesBins, (d) => d.xbounds[0]),
+      d3.max(dataSourcesBins, (d) => d.xbounds[1]),
+    ];
 
-      const ybounds = [
-        d3.min(bins, (d) => (d.length > 1 ? Math.log10(d.length) : undefined)),
-        d3.max(bins, (d) => Math.log10(d.length)),
-      ];
+    const x = d3
+      .scaleLinear()
+      .domain([
+        overallXbounds[0],
+        overallXbounds[1],
+      ] as Iterable<d3.NumberValue>)
+      .range([margin.left, width - margin.right - margin.left])
+      .nice();
 
-      const y = d3.scaleLog(ybounds as Iterable<d3.NumberValue>, [
-        height,
-        margin.top,
-      ]);
+    const y = d3.scaleLog(
+      [overallYbounds[0], overallYbounds[1]! * 1.1] as Iterable<d3.NumberValue>,
+      [height, margin.top],
+    );
+
+    // x axes
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${height})`)
+      .style("font-size", ".9rem")
+      .call(d3.axisBottom(x));
+
+    // x axes label
+    svg
+      .append("text")
+      .attr("x", (width - margin.left - margin.right) / 2)
+      .attr("y", height + margin.bottom - 4)
+      .attr("dx", margin.left)
+      .attr("font-size", "1rem")
+      .attr("text-anchor", "middle")
+      .text("Magnitude");
+
+    // y axes
+    svg
+      .append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .style("font-size", ".9rem")
+      .call(d3.axisLeft(y).tickFormat((d) => `${d}`));
+
+    // y axes label
+    svg
+      .append("text")
+      .attr("class", "axis-label")
+      .attr("transform", "rotate(-90)")
+      .attr("x", -(margin.top + height / 2))
+      .attr("y", -margin.left) // Relative to the y axis.
+      .attr("text-anchor", "middle")
+      .attr("font-size", "1rem")
+      .attr("dy", "1rem")
+      .text("log\u2081\u2080\u004E");
+
+    // Add vertical gridlines
+    svg
+      .selectAll("line.vertical-grid")
+      .data(x.ticks())
+      .enter()
+      .append("line")
+      .attr("class", "vertical-grid")
+      .attr("x1", function (d) {
+        return x(d);
+      })
+      .attr("y1", margin.top)
+      .attr("x2", function (d) {
+        return x(d);
+      })
+      .attr("y2", height)
+      .style("stroke", "gray")
+      .style("stroke-width", 0.5)
+      .style("stroke-dasharray", "2 2");
+
+    // Add top stroke
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${margin.top})`)
+      .call(d3.axisTop(x).tickSize(0).tickValues([]));
+
+    // Add right stroke
+    svg
+      .append("g")
+      .attr("transform", `translate(${width - ( 2 * (margin.left + margin.right)) + 1}, 0)`)
+      .call(d3.axisRight(y).tickSize(0).tickValues([]));
+
+    // // Add horizontal gridlines
+    // svg
+    //   .selectAll("line.horizontal-grid")
+    //   .data(y.ticks())
+    //   .enter()
+    //   .append("line")
+    //   .attr("class", "horizontal-grid")
+    //   .attr("x1", 0)
+    //   .attr("y1", function (d) {
+    //     return y(d);
+    //   })
+    //   .attr("x2", width)
+    //   .attr("y2", function (d) {
+    //     return y(d);
+    //   })
+    //   .style("stroke", "gray")
+    //   .style("stroke-width", 0.5)
+    //   .style("stroke-dasharray", "2 2");
+
+    // yAxes.selectAll("line").attr("stroke-opacity", 0.6);
+    // xAxes.selectAll("line").attr("stroke-opacity", 0.6);
+
+    for (let i = 0; i < dataSourcesBins.length; i++) {
+      const singleDataSourceBins = dataSourcesBins[i];
 
       svg
         .append("g")
         .selectAll()
-        .data(bins)
+        .data(singleDataSourceBins.bins)
         .join("rect")
         .attr("x", (d) => x(d.x0!))
         .attr("width", (d) => x(d.x1!) - x(d.x0!))
         .attr("y", (d) => y(Math.log10(d.length)))
         .attr(
           "height",
-          (d) => y(ybounds[0] as number) - y(Math.log10(d.length))
+          (d) => y(overallYbounds[0] as number) - y(Math.log10(d.length)),
         )
-        .attr("fill", "var(--mui-palette-text-primary)")
+        .attr("fill", singleDataSourceBins.color)
         .attr("fill-opacity", 0.4);
-
-      const xAxes = svg
-        .append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(
-          d3.axisBottom(x)
-          // .tickFormat(() => "")
-        );
-
-      const yAxes = svg
-        .append("g")
-        .attr("transform", `translate(${margin.left}, 0)`)
-        .call(d3.axisLeft(y).tickFormat((d) => `${d}`));
-
-      yAxes.selectAll("line").attr("stroke-opacity", 0.6);
-      xAxes.selectAll("line").attr("stroke-opacity", 0.6);
-
-      svg
-        .selectAll("line.horizontalGrid")
-        .data(y.ticks())
-        .enter()
-        .append("line")
-        .attr({
-          class: "horizontalGrid",
-          x1: margin.right,
-          x2: width,
-          y1: function (d: d3.NumberValue) {
-            return y(d);
-          },
-          y2: function (d) {
-            return y(d);
-          },
-          fill: "none",
-          "shape-rendering": "crispEdges",
-          stroke: "black",
-          "stroke-width": "1px",
-        });
 
       setIsLoading(false);
     }
-  }, [id, dimensions, data, dataSource.metadata.data_descr]);
+  }, [
+    dataSourcesBins,
+    height,
+    margin.bottom,
+    margin.left,
+    margin.right,
+    margin.top,
+    width,
+  ]);
 
   return (
     <div style={{ position: "relative" }}>
       <div
         ref={parentRef}
-        id={id ? id : `chart-${id}`}
+        id="chart-gutenberg-richter"
         style={{ position: "relative" }}
       >
         {isLoading && (

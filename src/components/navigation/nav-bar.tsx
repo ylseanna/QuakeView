@@ -27,6 +27,7 @@ export default function NavBar() {
           segment: "/",
           title: t("configure"),
           icon: <Settings />,
+          enabled: true,
         },
       ],
     },
@@ -38,11 +39,13 @@ export default function NavBar() {
           segment: "/overview_map",
           title: t("overview_map"),
           icon: <Public />,
+          enabled: true,
         },
         {
           segment: "/overview_table",
           title: t("overview_table"),
           icon: <TableRows />,
+          enabled: false,
         },
       ],
     },
@@ -54,11 +57,13 @@ export default function NavBar() {
           segment: "/3D_map",
           title: t("3D_map"),
           icon: <RotateOrbit />,
+          enabled: true,
         },
         {
           segment: "/plots",
           title: t("plots"),
           icon: <ChartMultiple />,
+          enabled: true,
         },
       ],
     },
@@ -131,6 +136,7 @@ export default function NavBar() {
                       fontSize: "0.8rem",
                       textTransform: "capitalize",
                     }}
+                    disabled={!NavigationItem.enabled}
                   >
                     {NavigationItem.icon}
                     {NavigationItem.title}
