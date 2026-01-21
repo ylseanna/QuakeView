@@ -11,18 +11,17 @@ import { ReactNode, Suspense, useEffect, useState } from "react";
 import TitleBar from "@/components/navigation/title-bar";
 import NavBar from "@/components/navigation/nav-bar";
 import { useKeyStroke } from "@react-hooks-library/core";
-import { useRouter } from "@/i18n/routing";
+import DebugWindow from "@/components/interface/debug-window";
 
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   // load data (synchronized accros app)
   const { dataSources } = useProjectStore((state) => state);
   const { data, addData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false);
-
-  const router = useRouter()
+  const [ dataLoading, setDataLoading] = useState(false);
+  const [ debugVisible, setDebugVisible] = useState(false);
 
   useKeyStroke(["F3"], ()=>{
-    router.push('/debug')
+    setDebugVisible(!debugVisible)
   })
 
   useEffect(() => {
@@ -49,6 +48,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
   return (
     <>
+      {debugVisible && <DebugWindow/> }
       <TitleBar />
       <NavBar />
       <Box

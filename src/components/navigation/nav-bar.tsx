@@ -1,22 +1,16 @@
-import {
-  Button,
-  Divider,
-  Stack,
-  Toolbar,
-  useTheme,
-  Box,
-  Typography,
-} from "@mui/material";
+import PopupState, { bindContextMenu, bindMenu } from "material-ui-popup-state";
+import { OpenInNew, Public, Settings, TableRows } from "@mui/icons-material";
+import { ChartHistogram, ChartMultiple, ChartPpf, RotateOrbit } from "mdi-material-ui";
+import { Box, Button, Divider, ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Stack, Toolbar, Typography, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Settings, Public, TableRows } from "@mui/icons-material";
-import { RotateOrbit, ChartMultiple, ChartPpf, ChartHistogram } from "mdi-material-ui";
+import { Fragment } from "react";
+
 import { Link, usePathname } from "@/i18n/routing";
 
 export default function NavBar() {
   const t = useTranslations("Common");
   const pathname = usePathname();
-    console.log(pathname)
-
+  console.log(pathname);
 
   const NavigationSections = [
     {
@@ -140,26 +134,61 @@ export default function NavBar() {
             </Typography>
             <Stack direction="row" spacing={2}>
               {NavigationSection.sections.map((NavigationItem) => (
-                <Link
+                <PopupState
                   key={NavigationItem.segment}
-                  href={NavigationItem.segment}
+                  variant="popover"
+                  popupId="demoMenu"
                 >
-                  <Button
-                    sx={{
-                      color: (pathname == NavigationItem.segment) ? theme.palette.primary.main :  theme.palette.text.primary ,
-                      opacity: .87,
-                      flexDirection: "column",
-                      justifyContent: "center",
-                      p: "4px",
-                      fontSize: "0.8rem",
-                      textTransform: "capitalize",
-                    }}
-                    disabled={!NavigationItem.enabled}
-                  >
-                    {NavigationItem.icon}
-                    {NavigationItem.title}
-                  </Button>
-                </Link>
+                  {(popupState) => (
+                    <Fragment>
+                      <Link
+                        href={NavigationItem.segment}
+                        {...bindContextMenu(popupState)}
+                      >
+                        <Button
+                          sx={{
+                            color:
+                              pathname == NavigationItem.segment
+                                ? theme.palette.primary.main
+                                : theme.palette.text.primary,
+                            opacity: 0.87,
+                            flexDirection: "column",
+                            justifyContent: "center",
+                            p: "4px",
+                            fontSize: "0.8rem",
+                            textTransform: "capitalize",
+                          }}
+                          disabled={!NavigationItem.enabled}
+                        >
+                          {NavigationItem.icon}
+                          {NavigationItem.title}
+                        </Button>
+                      </Link>
+                      <Menu
+                        {...{
+                          ...bindMenu(popupState),
+                        }}
+                        slotProps={{
+                          paper: { variant: "outlined", sx: { padding: 0 } },
+                        }}
+
+                      >
+                        <MenuList dense disablePadding sx={{ margin: 0 }}>
+                          <MenuItem onClick={popupState.close} disabled>
+                            <ListItemIcon>
+                              <OpenInNew fontSize="small" />
+                            </ListItemIcon>
+                            <ListItemText>
+                              {t("Navbar.open_in_window", {
+                                page: NavigationItem.title,
+                              })}
+                            </ListItemText>
+                          </MenuItem>
+                        </MenuList>
+                      </Menu>
+                    </Fragment>
+                  )}
+                </PopupState>
               ))}
             </Stack>
           </Box>

@@ -38,7 +38,13 @@
     "visualisations": "Visualisations",
     "GRplot": "GR plot",
     "all_plots": "All plots",
-    "distributionplot": "distribution"
+    "distributionplot": "distribution",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "Navbar": {
+      "open_in_window": "Open page \"{page}\" in new window"
+    }
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -97,5 +103,13 @@
     "unit": "Unit",
     "variable": "Variable",
     "variables": "Variables"
+  },
+  "Titlebar": {
+    "language": "Language",
+    "theme": "Theme",
+    "show_sidebar": "Show sidebar controls",
+    "show_map_tools": "Show map tools",
+    "show_animation_controls": "Show animation controls",
+    "debug_window": "Show debug window"
   }
 }

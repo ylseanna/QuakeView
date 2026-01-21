@@ -38,7 +38,13 @@
     "visualisations": "Kort og gröf",
     "all_plots": "Öll gröf",
     "GRplot": "GR graf",
-    "distributionplot": "dreifing\n"
+    "distributionplot": "dreifing\n",
+    "theme_dark": "dökk",
+    "theme_light": "ljós",
+    "theme_system": "kerfi",
+    "Navbar": {
+      "open_in_window": "Opna siða \"{page}\" í nýjum glugga"
+    }
   },
   "Filtering": {
     "add_filter": "Bæta við síu",
@@ -97,5 +103,13 @@
     "unit": "Eining",
     "variable": "Breyta",
     "variables": "Breytur"
+  },
+  "Titlebar": {
+    "language": "Tungumál",
+    "show_animation_controls": "Sýna myndlífgunnarstýring",
+    "show_map_tools": "Sýna kortstýring",
+    "show_sidebar": "Sýna hliðarvalmynd",
+    "theme": "Þema",
+    "debug_window": "Sýna kembuglugga"
   }
 }

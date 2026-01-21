@@ -15,7 +15,7 @@ export default function MagnitudeDistributionPlot() {
   const [isLoading, setIsLoading] = useState(true);
   const [dataSourcesBins, setDataSourcesBins] = useState<DataSourceBins[]>([]);
 
-  const margin = { top: 2, right: 2, bottom: 40, left: 26 },
+  const margin = { top: 2, right: 2, bottom: 40, left: 32 },
     width = dimensions.width,
     height = dimensions.width * 0.3;
 
@@ -151,7 +151,7 @@ export default function MagnitudeDistributionPlot() {
       .append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .style("font-size", ".9rem")
-      .call(d3.axisLeft(y).tickFormat((d) => `${d}`));
+      .call(d3.axisLeft(y).ticks(4).tickFormat((d) => `${d}`));
 
     // y axes label
     svg
@@ -163,7 +163,7 @@ export default function MagnitudeDistributionPlot() {
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
       .attr("dy", "1rem")
-      .text("log\u2081\u2080\u004E");
+      .text("\u004E");
 
     // Add vertical gridlines
     svg

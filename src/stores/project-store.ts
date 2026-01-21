@@ -1,16 +1,13 @@
-import {
-  DataSourceDataDescription,
-  DataSourceFormatting,
-} from "./../components/datasource/types";
-import { createStore } from "zustand/vanilla";
-import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
-import { merge } from "lodash";
-import { DataSource } from "@/components/datasource/types";
 import { ViewState } from "react-map-gl/maplibre";
+import { persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
+import { merge } from "lodash";
+
+import { DataSourceDataDescription, DataSourceFormatting } from "./../components/datasource/types";
+import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
-  count: number;
   sessionInterface: SessionInterface;
   GPUfiltering: GPU_filtering;
   dataSources: {
@@ -37,10 +34,6 @@ export type GPU_filtering = {
 };
 
 export type ProjectActions = {
-  countActions: {
-    decrementCount: () => void;
-    incrementCount: () => void;
-  };
   interfaceActions: {
     setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
@@ -62,18 +55,18 @@ export type ProjectActions = {
     setFormatting: (
       id: string,
       keyToModify: keyof DataSourceFormatting,
-      value: never
+      value: never,
     ) => void;
     setFiltering: (
       id: string,
       variableToModify: string,
-      value: [number, number] | null
+      value: [number, number] | null,
     ) => void;
     setVariableDescr: (
       id: string,
       keyToModify: string,
       variableToModify: keyof DataSourceDataDescription,
-      value: never
+      value: never,
     ) => void;
     setAddedVars: (id: string, value: never) => void;
     setVisible: (id: string, value: boolean) => void;
@@ -83,7 +76,6 @@ export type ProjectActions = {
 export type ProjectStore = ProjectState & ProjectActions;
 
 export const defaultInitState: ProjectState = {
-  count: 0,
   sessionInterface: {
     overViewState: {
       longitude: -19,
@@ -106,16 +98,12 @@ export const defaultInitState: ProjectState = {
 };
 
 export const createProjectStore = (
-  initState: ProjectState = defaultInitState
+  initState: ProjectState = defaultInitState,
 ) => {
   return createStore<ProjectStore>()(
     persist(
       immer((set) => ({
         ...initState,
-        countActions: {
-          decrementCount: () => set((state) => ({ count: state.count - 1 })),
-          incrementCount: () => set((state) => ({ count: state.count + 1 })),
-        },
         interfaceActions: {
           setOverViewState: (value) =>
             set((state) => {
@@ -157,7 +145,7 @@ export const createProjectStore = (
               delete state.dataSources.byID[id];
               state.dataSources.allIDs.splice(
                 state.dataSources.allIDs.findIndex((iid) => iid === id),
-                1
+                1,
               );
             }),
           setFormatting: (id, keyToModify, value) =>
@@ -178,7 +166,7 @@ export const createProjectStore = (
               const index = state.dataSources.byID[
                 id
               ].metadata.data_descr.findIndex(
-                (dataDescr) => dataDescr.variable === keyToModify
+                (dataDescr) => dataDescr.variable === keyToModify,
               );
               console.log(index);
               if (index !== -1)
@@ -201,7 +189,7 @@ export const createProjectStore = (
         merge: (persistedState, currentState) => {
           return merge({}, currentState, persistedState);
         },
-      }
-    )
+      },
+    ),
   );
 };

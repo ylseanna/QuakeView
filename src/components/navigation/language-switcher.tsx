@@ -15,24 +15,10 @@ export default function LanguageSwitcher() {
   function changeLocale(locale: string) {
     router.push(pathname, { locale: locale });
   }
-
-  const offset = {
-    popper: {
-      modifiers: [
-        {
-          name: "offset",
-          options: {
-            offset: [0, 15],
-          },
-        },
-      ],
-    },
-  };
-
   return (
     <div id="lngSwitcher">
       {locale === "is" ? (
-        <Tooltip slotProps={offset} title="Switch to English">
+        <Tooltip title="Switch to English">
           <Link
             className="link"
             href={pathname}
@@ -51,7 +37,7 @@ export default function LanguageSwitcher() {
           </Link>
         </Tooltip>
       ) : (
-        <Tooltip slotProps={offset} title="Skipta yfir í íslensku">
+        <Tooltip title="Skipta yfir í íslensku">
           <Link
             className="link"
             href={pathname}

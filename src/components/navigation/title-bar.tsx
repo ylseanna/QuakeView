@@ -12,6 +12,7 @@ import {
   Divider,
   ListItemText,
   ListItemIcon,
+  Typography,
 } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 
@@ -86,8 +87,12 @@ export default function TitleBar() {
                 }}
               >
                 <MenuList dense disablePadding>
-                  <MenuItem onClick={popupState.close} disabled>New session</MenuItem>
-                  <MenuItem onClick={popupState.close} disabled>Load session</MenuItem>
+                  <MenuItem onClick={popupState.close} disabled>
+                    New session
+                  </MenuItem>
+                  <MenuItem onClick={popupState.close} disabled>
+                    Load session
+                  </MenuItem>
                 </MenuList>
               </Menu>
             </Fragment>
@@ -114,17 +119,27 @@ export default function TitleBar() {
               >
                 <MenuList dense disablePadding>
                   <MenuItem
-                    sx={{ pt: 0, pb: 0, ":hover": { background: "None" } }}
+                    sx={{
+                      pt: 0,
+                      pb: 0,
+                      cursor: "initial",
+                      ":hover": { background: "None" },
+                    }}
                     disableRipple
                   >
-                    <ListItemText>Language</ListItemText>
+                    <ListItemText>{t("Titlebar.language")}</ListItemText>
                     <LanguageSwitcher />
                   </MenuItem>
                   <MenuItem
-                    sx={{ pt: 0, pb: 0, ":hover": { background: "None" } }}
+                    sx={{
+                      pt: 0,
+                      pb: 0,
+                      cursor: "initial",
+                      ":hover": { background: "None" },
+                    }}
                     disableRipple
                   >
-                    <ListItemText>Theme</ListItemText>
+                    <ListItemText>{t("Titlebar.theme")}</ListItemText>
                     <ThemeSwitcher />
                   </MenuItem>
                   <Divider />
@@ -132,19 +147,21 @@ export default function TitleBar() {
                     <ListItemIcon>
                       <Check />
                     </ListItemIcon>
-                    <ListItemText>Show sidebar controls</ListItemText>
+                    <ListItemText>{t("Titlebar.show_sidebar")}</ListItemText>
                   </MenuItem>
                   <MenuItem onClick={popupState.close} disabled>
                     <ListItemIcon>
                       <Check />
                     </ListItemIcon>
-                    <ListItemText>Show map tools</ListItemText>
+                    <ListItemText>{t("Titlebar.show_map_tools")}</ListItemText>
                   </MenuItem>
                   <MenuItem onClick={popupState.close} disabled>
                     <ListItemIcon>
                       <Check />
                     </ListItemIcon>
-                    <ListItemText>Show animation controls</ListItemText>
+                    <ListItemText>
+                      {t("Titlebar.show_animation_controls")}
+                    </ListItemText>
                   </MenuItem>
                 </MenuList>
               </Menu>
@@ -166,6 +183,7 @@ export default function TitleBar() {
                 slotProps={{
                   paper: {
                     variant: "outlined",
+                    sx: { width: 280, maxWidth: "100%" },
                   },
                 }}
               >
@@ -173,8 +191,23 @@ export default function TitleBar() {
                   <MenuItem onClick={popupState.close}>
                     <Link href={"tutorial"}>Tutorial page</Link>
                   </MenuItem>
-                  <MenuItem onClick={popupState.close}>
-                    <Link href={"debug"}>Debug page</Link>
+                  <Divider />
+                  <MenuItem
+                    sx={{
+                      pt: 0,
+                      pb: 0,
+                      cursor: "initial",
+                      ":hover": { background: "None" },
+                    }}
+                    disableRipple
+                  >
+                    <ListItemText>{t("Titlebar.debug_window")}</ListItemText>
+                    <Typography
+                      variant="body2"
+                      sx={{ color: "text.secondary" }}
+                    >
+                      F3
+                    </Typography>
                   </MenuItem>
                 </MenuList>
               </Menu>

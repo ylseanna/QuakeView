@@ -130,6 +130,7 @@
     "react": "^19.2.3",
     "react-color": "^2.19.3",
     "react-dom": "^19.2.3",
+    "react-json-tree": "^0.20.0",
     "react-map-gl": "^7.1.9",
     "regl": "^2.1.1",
     "reimg": "^1.0.0",

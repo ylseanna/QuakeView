@@ -1,9 +1,10 @@
-import { EarthQuake } from "../datasource/types";
+import { Box, Skeleton } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Box, Skeleton } from "@mui/material";
-import { useDataStore } from "@/providers/data-store-provider";
+
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
+import { EarthQuake } from "../datasource/types";
 
 export default function GutenbergRichterPlot() {
   const { dataSources } = useProjectStore((state) => state);
@@ -22,7 +23,7 @@ export default function GutenbergRichterPlot() {
   interface PointData {
     id: string;
     color: string;
-    data: { x: number; y: number }[];
+    mags: number[];
     xbounds: [number, number];
     ybounds: [number, number];
   }
@@ -45,31 +46,20 @@ export default function GutenbergRichterPlot() {
       const dataSourceID = dataSources.allIDs[i];
 
       if (data[dataSourceID]) {
-        const xs = (data[dataSourceID].data as EarthQuake[]).map(
-          (d) => d["mag"],
-        ) as number[];
+        const mags = (data[dataSourceID].data as EarthQuake[])
+          .map((d) => d["mag"])
+          .toSorted((a, b) => a - b)
+          .reverse() as number[];
 
-        const ys = (data[dataSourceID].data as EarthQuake[]).map(
-          (d) =>
-            data[dataSourceID].data.filter((eq) => eq["mag"] >= d["mag"])
-              .length,
-        ) as number[];
+        console.log(mags);
 
-        const xys = [];
+        const xbounds = [d3.min(mags), d3.max(mags)];
 
-        for (let i = 0; i < xs.length; i++) {
-          xys.push({ x: xs[i], y: ys[i] });
-        }
-
-        console.log(xys)
-
-        const xbounds = [d3.min(xs), d3.max(xs)];
-
-        const ybounds = [d3.min(ys), d3.max(ys)]!;
+        const ybounds = [1, mags.length]!;
 
         dataSourcesPointData.push({
           id: dataSourceID,
-          data: xys,
+          mags: mags,
           xbounds: xbounds,
           ybounds: ybounds,
         } as PointData);
@@ -115,13 +105,13 @@ export default function GutenbergRichterPlot() {
       .range([margin.left, width - margin.right - margin.left])
       .nice();
 
-    const y = d3.scaleLog(
-      [
+    const y = d3
+      .scaleLog()
+      .domain([
         overallYbounds[0]!,
         overallYbounds[1]! * 1.1,
-      ] as Iterable<d3.NumberValue>,
-      [height - margin.bottom, margin.top],
-    );
+      ] as Iterable<d3.NumberValue>)
+      .range([height - margin.bottom, margin.top]);
 
     // x axes
     svg
@@ -145,7 +135,7 @@ export default function GutenbergRichterPlot() {
       .append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .style("font-size", ".9rem")
-      .call(d3.axisLeft(y).tickFormat((d) => `${d}`));
+      .call(d3.axisLeft(y).ticks(4).tickFormat((d) => `${Math.log10(d as number)}`));
 
     // y axes label
     svg
@@ -157,7 +147,19 @@ export default function GutenbergRichterPlot() {
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
       .attr("dy", "1rem")
-      .text("log\u2081\u2080\u004E");
+      .text("log\u2081\u2080\u004E(≥M)");
+
+    // Add top stroke
+    svg
+      .append("g")
+      .attr("transform", `translate(0, ${margin.top})`)
+      .call(d3.axisTop(x).tickSize(0).tickValues([]));
+
+    // Add right stroke
+    svg
+      .append("g")
+      .attr("transform", `translate(${width - margin.left - margin.right}, 0)`)
+      .call(d3.axisRight(y).tickSize(0).tickValues([]));
 
     // Add vertical gridlines
     svg
@@ -178,36 +180,24 @@ export default function GutenbergRichterPlot() {
       .style("stroke-width", 0.5)
       .style("stroke-dasharray", "2 2");
 
-    // Add top stroke
+    // Add horizontal gridlines
     svg
-      .append("g")
-      .attr("transform", `translate(0, ${margin.top})`)
-      .call(d3.axisTop(x).tickSize(0).tickValues([]));
-
-    // Add right stroke
-    svg
-      .append("g")
-      .attr("transform", `translate(${width - margin.left - margin.right}, 0)`)
-      .call(d3.axisRight(y).tickSize(0).tickValues([]));
-
-    // // Add horizontal gridlines
-    // svg
-    //   .selectAll("line.horizontal-grid")
-    //   .data(y.ticks())
-    //   .enter()
-    //   .append("line")
-    //   .attr("class", "horizontal-grid")
-    //   .attr("x1", 0)
-    //   .attr("y1", function (d) {
-    //     return y(d);
-    //   })
-    //   .attr("x2", width)
-    //   .attr("y2", function (d) {
-    //     return y(d);
-    //   })
-    //   .style("stroke", "gray")
-    //   .style("stroke-width", 0.5)
-    //   .style("stroke-dasharray", "2 2");
+      .selectAll("line.horizontal-grid")
+      .data(y.ticks())
+      .enter()
+      .append("line")
+      .attr("class", "horizontal-grid")
+      .attr("x1", margin.left)
+      .attr("y1", function (d) {
+        return y(d);
+      })
+      .attr("x2", width - margin.right)
+      .attr("y2", function (d) {
+        return y(d);
+      })
+      .style("stroke", "gray")
+      .style("stroke-width", 0.5)
+      .style("stroke-dasharray", "2 2");
 
     // yAxes.selectAll("line").attr("stroke-opacity", 0.6);
     // xAxes.selectAll("line").attr("stroke-opacity", 0.6);
@@ -215,40 +205,20 @@ export default function GutenbergRichterPlot() {
     for (let i = 0; i < pointData.length; i++) {
       const dataSourcePointData = pointData[i];
 
-      const dataSource = dataSources.byID[dataSourcePointData.id]
+      const dataSource = dataSources.byID[dataSourcePointData.id];
 
       console.log(dataSourcePointData);
 
       svg
         .append("g")
         .selectAll("dot")
-        .data(dataSourcePointData.data)
+        .data(dataSourcePointData.mags)
         .enter()
         .append("circle")
-        .attr(
-          "cx",
-          (d) => x(d.x),
-        )
-        .attr(
-          "cy",
-          (d) => y(d.y),
-        )
+        .attr("cx", (d) => x(d))
+        .attr("cy", (d, i) => y(i + 1))
         .attr("r", 1.5)
         .style("fill", dataSource.formatting.color.single);
-      //   svg
-      //     .append("g")
-      //     .selectAll()
-      //     .data(singleDataSourceBins.bins)
-      //     .join("rect")
-      //     .attr("x", (d) => x(d.x0!))
-      //     .attr("width", (d) => x(d.x1!) - x(d.x0!))
-      //     .attr("y", (d) => y(Math.log10(d.length)))
-      //     .attr(
-      //       "height",
-      //       (d) => y(overallYbounds[0] as number) - y(Math.log10(d.length)),
-      //     )
-      //     .attr("fill", singleDataSourceBins.color)
-      //     .attr("fill-opacity", 0.4);
 
       setIsLoading(false);
     }
