@@ -34,32 +34,28 @@ export default function MapToolTip({ pickingInfo }: MapToolTipProps) {
 
   const vars_to_list = useMemo(
     () =>
-      dataSource!.metadata.data_descr
+      dataSource!.metadata.variables.required_vars
+        .concat(dataSource!.metadata.variables.added_vars)
+        .filter((variable) => variable != "t")
         .map(
-          (dataDescription: DataSourceDataDescription) =>
-            ((dataDescription.required && dataDescription.variable != "t") ||
-              dataSource?.interface.addedVars.includes(
-                dataDescription.variable
-              )) &&
-            dataDescription
-        )
-        .filter((el) => el) as DataSourceDataDescription[],
-    [dataSource]
+          (variable: string) => dataSource!.metadata.variables.by_id[variable],
+        ),
+    [dataSource],
   );
 
   const tooltipHeight = useMemo(
     () => vars_to_list.length * 18 + 16,
-    [vars_to_list.length]
+    [vars_to_list.length],
   );
 
   const maxX = useMemo(
     () => pickingInfo.viewport!.width - TOOLTIP_WIDTH,
-    [pickingInfo.viewport]
+    [pickingInfo.viewport],
   );
 
   const maxY = useMemo(
     () => pickingInfo.viewport!.height - tooltipHeight,
-    [pickingInfo.viewport, tooltipHeight]
+    [pickingInfo.viewport, tooltipHeight],
   );
 
   if (pickingInfo.object && sessionInterface.pickable) {

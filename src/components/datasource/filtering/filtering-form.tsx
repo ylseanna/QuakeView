@@ -43,9 +43,7 @@ const FilteringEditingRow = ({
 
   const theme = useTheme();
 
-  const dataDescr = dataSource.metadata.data_descr.find(
-    (dataDescription) => dataDescription?.variable == variable
-  );
+  const dataDescr = dataSource.metadata.variables.by_id[variable];
 
   const [localDomain, setLocalDomain] = useState<[number, number]>(bounds);
 
@@ -115,13 +113,13 @@ export default function FilteringForm({
   return (
     <>
       <Autocomplete
-        options={dataSource.metadata.data_descr
+        options={Object.values(dataSource.metadata.variables.by_id)
           .filter(
             (el) =>
               (el.data_type == "number" || el.data_type == "dt_timestamp") &&
               !Object.keys(dataSource.filtering).includes(el.variable) &&
               (el.required ||
-                dataSource.interface.addedVars.includes(el.variable))
+                dataSource.metadata.variables.added_vars.includes(el.variable))
           )
           .map(
             (el) =>

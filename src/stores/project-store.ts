@@ -64,12 +64,13 @@ export type ProjectActions = {
     ) => void;
     setVariableDescr: (
       id: string,
-      keyToModify: string,
-      variableToModify: keyof DataSourceDataDescription,
+      variableToModify: string,
+      keyToModify: keyof DataSourceDataDescription,
       value: never,
     ) => void;
-    setAddedVars: (id: string, value: never) => void;
+    setAddedVars: (id: string, value: string[]) => void;
     setVisible: (id: string, value: boolean) => void;
+    setLoadable: (id: string, value: boolean) => void;
   };
 };
 
@@ -160,27 +161,23 @@ export const createProjectStore = (
                 delete state.dataSources.byID[id].filtering[keyToModify];
               }
             }),
-          setVariableDescr: (id, keyToModify, variableToModify, value) =>
+          setVariableDescr: (id, variableToModify, keyToModify, value) =>
             set((state) => {
-              console.log(variableToModify);
-              const index = state.dataSources.byID[
-                id
-              ].metadata.data_descr.findIndex(
-                (dataDescr) => dataDescr.variable === keyToModify,
-              );
-              console.log(index);
-              if (index !== -1)
-                state.dataSources.byID[id].metadata.data_descr[index][
-                  variableToModify
-                ] = value;
+              state.dataSources.byID[id].metadata.variables.by_id[
+                variableToModify
+              ][keyToModify] = value;
             }),
           setAddedVars: (id, value) =>
             set((state) => {
-              state.dataSources.byID[id].interface.addedVars = value;
+              state.dataSources.byID[id].metadata.variables.added_vars = value;
             }),
           setVisible: (id, value) =>
             set((state) => {
               state.dataSources.byID[id].interface.visible = value;
+            }),
+          setLoadable: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].interface.loadable = value;
             }),
         },
       })),

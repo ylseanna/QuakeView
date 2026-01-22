@@ -1,9 +1,10 @@
-import { DataSourceDataDescription, EarthQuake } from "../datasource/types";
+import { Skeleton } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Skeleton } from "@mui/material";
-import { useDataStore } from "@/providers/data-store-provider";
+
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
+import { EarthQuake } from "../datasource/types";
 
 export default function MagnitudeDistributionPlot() {
   const { dataSources } = useProjectStore((state) => state);
@@ -47,9 +48,7 @@ export default function MagnitudeDistributionPlot() {
       if (data[dataSourceId]) {
         const dataSource = dataSources.byID[dataSourceId];
 
-        const xbounds = dataSource.metadata.data_descr.find(
-          (element: DataSourceDataDescription) => element.variable == "mag",
-        )!.bounds;
+        const xbounds = dataSource.metadata.variables.by_id["mag"].bounds;
 
         const bins = d3.bin().thresholds(50).domain([xbounds[0], xbounds[1]])(
           (data[dataSourceId].data as EarthQuake[]).map(

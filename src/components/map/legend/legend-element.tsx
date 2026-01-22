@@ -1,20 +1,57 @@
 import { Box, Grid2, Typography } from "@mui/material";
+
 import { DataSource } from "../../datasource/types";
+import CategoricalLegend from "./categorical-legend";
 // import { useTranslations } from "next-intl";
 import ColormapLegend from "./colormap-legend";
-import CategoricalLegend from "./categorical-legend";
 
 interface LegendElementProps {
   dataSource: DataSource;
+  singleColor?: boolean;
 }
 
-export default function LegendElement({ dataSource }: LegendElementProps) {
-  return dataSource.formatting.color.mapping == "linear" ? (
-    <ColormapLegend dataSource={dataSource} />
-  ) :dataSource.formatting.color.mapping == "categorical" ?  (
+export default function LegendElement({
+  dataSource,
+  singleColor,
+}: LegendElementProps) {
+  return dataSource.formatting.color.mapping == "linear" && !singleColor ? (
+    <>
+      <Typography
+        fontSize={10}
+        fontWeight="bold"
+        sx={{
+          mb: 0.25,
+          opacity: 0.8,
+          width: "100%",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {dataSource.filename}
+      </Typography>
+      <ColormapLegend dataSource={dataSource} />
+    </>
+  ) : dataSource.formatting.color.mapping == "categorical" && !singleColor ? (
+    <>
+      <Typography
+        fontSize={10}
+        fontWeight="bold"
+        sx={{
+          mb: 0.25,
+          opacity: 0.8,
+          width: "100%",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {dataSource.filename}
+      </Typography>
       <CategoricalLegend dataSource={dataSource} />
+    </>
   ) : (
-    dataSource.formatting.color.mapping == "single" && (
+    (dataSource.formatting.color.mapping == "single" || singleColor) && (
       <Grid2 container alignItems="center">
         <Grid2 size={2} display="flex">
           <Box
@@ -28,7 +65,12 @@ export default function LegendElement({ dataSource }: LegendElementProps) {
             }}
           ></Box>
         </Grid2>
-        <Grid2 size="grow" display="flex" alignItems="center" sx={{h: "12px"}}>
+        <Grid2
+          size="grow"
+          display="flex"
+          alignItems="center"
+          sx={{ h: "12px" }}
+        >
           <Typography
             fontSize={10}
             fontWeight="bold"

@@ -7,10 +7,11 @@ import { useTranslations } from "next-intl";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 interface LegendProps {
+  singleColor?: boolean;
   sx?: SxProps;
 }
 
-export default function Legend({ sx }: LegendProps) {
+export default function Legend({ singleColor, sx }: LegendProps) {
   const t = useTranslations("Common");
 
   const dataSources = useProjectStore((state) => state.dataSources);
@@ -44,25 +45,17 @@ export default function Legend({ sx }: LegendProps) {
           {dataSources &&
             dataSources.allIDs.map((id) => (
               <Grid2 size="grow" key={`LegendElement-${id}`}>
-                {dataSources.allIDs.length > 1 &&
-                  (dataSources.byID[id].formatting.color.mapping == "linear" || dataSources.byID[id].formatting.color.mapping == "categorical") && (
-                    <Typography
-                      fontSize={10}
-                      fontWeight="bold"
-                      sx={{
-                        mb: 0.25,
-                        opacity: 0.8,
-                        width: "100%",
-                        overflow: "hidden",
-                        whiteSpace: "nowrap",
-                        textOverflow: "ellipsis",
-                      }}
-                    >
-                      {dataSources.byID[id].filename}
-                    </Typography>
-                  )}
+                {/* {dataSources.allIDs.length > 1 &&
+                  (dataSources.byID[id].formatting.color.mapping == "linear" ||
+                    dataSources.byID[id].formatting.color.mapping ==
+                      "categorical") &&
+                  !singleColor && (
+                  )} */}
 
-                <LegendElement dataSource={dataSources.byID[id]} />
+                <LegendElement
+                  dataSource={dataSources.byID[id]}
+                  singleColor={singleColor}
+                />
               </Grid2>
             ))}
         </Grid2>

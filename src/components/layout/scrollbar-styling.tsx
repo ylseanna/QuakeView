@@ -3,7 +3,6 @@ export const ScrollBarStyling = {
   margin: 0,
   padding: 0,
   listStyle: "none",
-  height: "100%",
   "&::-webkit-scrollbar": {
     width: "0.4em",
   },

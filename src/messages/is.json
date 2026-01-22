@@ -37,14 +37,11 @@
     "views": "Gagnasýn",
     "visualisations": "Kort og gröf",
     "all_plots": "Öll gröf",
-    "GRplot": "GR graf",
     "distributionplot": "dreifing\n",
     "theme_dark": "dökk",
     "theme_light": "ljós",
     "theme_system": "kerfi",
-    "Navbar": {
-      "open_in_window": "Opna siða \"{page}\" í nýjum glugga"
-    }
+    "Navbar": {}
   },
   "Filtering": {
     "add_filter": "Bæta við síu",
@@ -111,5 +108,11 @@
     "show_sidebar": "Sýna hliðarvalmynd",
     "theme": "Þema",
     "debug_window": "Sýna kembuglugga"
+  },
+  "Navbar": {
+    "distribution_plot": "Stuðlarit",
+    "GR_plot": "GR graf",
+    "stem_plot": "Leggjagraf",
+    "open_in_window": "Opna siða \"{page}\" í nýjum glugga"
   }
 }

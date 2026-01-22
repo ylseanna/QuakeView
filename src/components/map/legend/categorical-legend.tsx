@@ -1,11 +1,12 @@
-import { useEffect, useRef, useState } from "react";
-import { DataSource, DataSourceDataDescription } from "../../datasource/types";
-import { useDataStore } from "@/providers/data-store-provider";
+import { Rectangle } from "mdi-material-ui";
 import { Grid2, Stack, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { Rectangle } from "mdi-material-ui";
-import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
 import * as _ from "lodash";
+import { useEffect, useRef, useState } from "react";
+
+import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
+import { useDataStore } from "@/providers/data-store-provider";
+import { DataSource, DataSourceDataDescription } from "../../datasource/types";
 
 interface LegendElementProps {
   dataSource: DataSource;
@@ -37,15 +38,16 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
 
   useEffect(() => {
     if (data) {
-      const varDataDescription = dataSource.metadata.data_descr.find(
-        (el) => el.variable == dataSource.formatting.color.categorical.variable
-      )!;
+      const varDataDescription =
+        dataSource.metadata.variables.by_id[
+          dataSource.formatting.color.categorical.variable
+        ];
 
       if (varDataDescription) {
         const colorCalc = (value: string | number) => {
           const color = ColorMapping(
             data.data.find((el) => el[varDataDescription.variable] == value)!,
-            dataSource.formatting.color
+            dataSource.formatting.color,
           );
           return `rgb(${color![0]},${color![1]},${color![2]})`;
         };
@@ -57,10 +59,10 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
         const frequencies = unique_data_elements.map((element) =>
           frequency(
             data.data.map(
-              (el) => el[dataSource.formatting.color.categorical.variable]
+              (el) => el[dataSource.formatting.color.categorical.variable],
             ),
-            element
-          )
+            element,
+          ),
         );
 
         const categories = [];
@@ -78,7 +80,7 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
         const sorted_categories = _.orderBy(
           categories,
           ["frequency", "value"],
-          ["desc", "asc"]
+          ["desc", "asc"],
         );
 
         // const nums = unique_data_elements
@@ -97,12 +99,7 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
         setVariableDataDescription(varDataDescription);
       }
     }
-  }, [
-    data,
-    dataSource.formatting.color,
-    dataSource.formatting.color.categorical.variable,
-    dataSource.metadata.data_descr,
-  ]);
+  }, [data, dataSource.formatting.color, dataSource.formatting.color.categorical.variable, dataSource.metadata.variables.by_id]);
 
   return (
     <div ref={parentRef}>

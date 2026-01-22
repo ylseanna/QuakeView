@@ -4,6 +4,7 @@ import { Box, Paper, Typography } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 import { JSONTree } from "react-json-tree";
+import { ScrollBarStyling } from "../layout/scrollbar-styling";
 
 export default function DebugWindow() {
   const { sessionInterface, GPUfiltering, dataSources } = useProjectStore(
@@ -36,20 +37,22 @@ export default function DebugWindow() {
   return (
     <Paper
       sx={{
-        position:"fixed",
+        ...ScrollBarStyling,
+        position: "fixed",
         top: 64 + 32 + 16,
         left: 0,
-        maxWidth: "25%",
-        maxHeight: "75%",
+        maxWidth: "calc(100vw - 64px)",
+        maxHeight: "calc(100vh - 64px - 32px - 48px)",
         m: "16px",
         p: "16px",
         backgroundColor: "rgb(43, 48, 59)",
+        backgroundImage: "none",
         color: "#8fa1b3",
         fontFamily: "monospace",
-        borderRadius: "16px",
         zIndex: 2000,
       }}
       elevation={6}
+      square
     >
       <Typography variant="inherit">-- Debug window --</Typography>
 
@@ -70,7 +73,12 @@ export default function DebugWindow() {
       <Box display="flex" flexDirection={"column"}>
         <span>Data loaded:</span>
         {Object.keys(data).map((key) => (
-          <div key={key}><span style={{color: "#bf616a"}}>{key}</span>{" "}<span style={{color: "#a3be8c"}}>[{data[key].data.length} items]</span></div>
+          <div key={key}>
+            <span style={{ color: "#bf616a" }}>{key}</span>{" "}
+            <span style={{ color: "#a3be8c" }}>
+              [{data[key].data.length} items]
+            </span>
+          </div>
         ))}
       </Box>
     </Paper>

@@ -1,16 +1,8 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
-import {
-  DataSource,
-  DataSourceDataDescription,
-} from "../../datasource/types";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
+
+import { DataSource } from "../../datasource/types";
 import { colormaps } from "../crameri-colormaps";
 // import { ReImg } from "reimg";
 
@@ -99,10 +91,7 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
       .attr("x", width / 2)
       .attr("y", height + margin.top + margin.bottom - 2)
       .text(
-        dataSource.metadata.data_descr.find(
-          (dataDescription: DataSourceDataDescription) =>
-            dataDescription.variable == colorFormatting.linear.variable
-        )!.alias
+        dataSource.metadata.variables.by_id[colorFormatting.linear.variable].alias
       );
   });
 

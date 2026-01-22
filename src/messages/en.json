@@ -36,15 +36,12 @@
     "view": "View",
     "views": "Views",
     "visualisations": "Visualisations",
-    "GRplot": "GR plot",
     "all_plots": "All plots",
     "distributionplot": "distribution",
     "theme_system": "System",
     "theme_light": "Light",
     "theme_dark": "Dark",
-    "Navbar": {
-      "open_in_window": "Open page \"{page}\" in new window"
-    }
+    "Navbar": {}
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -111,5 +108,11 @@
     "show_map_tools": "Show map tools",
     "show_animation_controls": "Show animation controls",
     "debug_window": "Show debug window"
+  },
+  "Navbar": {
+    "GR_plot": "GR plot",
+    "distribution_plot": "Histogram",
+    "stem_plot": "Stem plot",
+    "open_in_window": "Open page \"{page}\" in new window"
   }
 }

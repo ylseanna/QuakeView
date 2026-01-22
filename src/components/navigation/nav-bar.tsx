@@ -1,6 +1,6 @@
 import PopupState, { bindContextMenu, bindMenu } from "material-ui-popup-state";
 import { OpenInNew, Public, Settings, TableRows } from "@mui/icons-material";
-import { ChartHistogram, ChartMultiple, ChartPpf, RotateOrbit } from "mdi-material-ui";
+import { ChartHistogram, ChartMultiple, ChartPpf, RotateOrbit, ScatterPlot } from "mdi-material-ui";
 import { Box, Button, Divider, ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Stack, Toolbar, Typography, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
@@ -8,18 +8,18 @@ import { Fragment } from "react";
 import { Link, usePathname } from "@/i18n/routing";
 
 export default function NavBar() {
-  const t = useTranslations("Common");
+  const t = useTranslations();
   const pathname = usePathname();
   console.log(pathname);
 
   const NavigationSections = [
     {
       section: "import",
-      title: t("data"),
+      title: t("Common.data"),
       sections: [
         {
           segment: "/",
-          title: t("configure"),
+          title: t("Common.configure"),
           icon: <Settings />,
           enabled: true,
         },
@@ -27,17 +27,17 @@ export default function NavBar() {
     },
     {
       section: "data_overview",
-      title: t("data_overview"),
+      title: t("Common.data_overview"),
       sections: [
         {
           segment: "/overview_map",
-          title: t("overview_map"),
+          title: t("Common.overview_map"),
           icon: <Public />,
           enabled: true,
         },
         {
           segment: "/overview_table",
-          title: t("overview_table"),
+          title: t("Common.overview_table"),
           icon: <TableRows />,
           enabled: false,
         },
@@ -45,17 +45,17 @@ export default function NavBar() {
     },
     {
       section: "views",
-      title: t("views"),
+      title: t("Common.views"),
       sections: [
         {
           segment: "/3D_map",
-          title: t("3D_map"),
+          title: t("Common.3D_map"),
           icon: <RotateOrbit />,
           enabled: true,
         },
         {
           segment: "/plots",
-          title: t("all_plots"),
+          title: t("Common.all_plots"),
           icon: <ChartMultiple />,
           enabled: true,
         },
@@ -63,17 +63,23 @@ export default function NavBar() {
     },
     {
       section: "plots",
-      title: t("plots"),
+      title: t("Common.plots"),
       sections: [
         {
-          segment: "/plots/GRplot",
-          title: t("GRplot"),
+          segment: "/plots/stem_plot",
+          title: t("Navbar.stem_plot"),
+          icon: <ScatterPlot />,
+          enabled: true,
+        },
+        {
+          segment: "/plots/GR_plot",
+          title: t("Navbar.GR_plot"),
           icon: <ChartPpf />,
           enabled: true,
         },
         {
-          segment: "/plots/distributionplot",
-          title: t("distributionplot"),
+          segment: "/plots/distribution_plot",
+          title: t("Navbar.distribution_plot"),
           icon: <ChartHistogram />,
           enabled: true,
         },

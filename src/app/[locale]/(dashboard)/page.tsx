@@ -9,7 +9,7 @@ import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 export default function Page() {
   return (
     <Box sx={{ h: "100%", w: "100%", pb: 2, ...ScrollBarStyling }}>
-      <Container sx={{ pt: 2 }}>
+      <Container sx={{ pt: 2, pb: 4 }}>
         <DataSelector />
         <DataSourceBrowser />
       </Container>

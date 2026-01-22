@@ -15,122 +15,183 @@ import {
   DataSourceDataDescription,
 } from "@/components/datasource/types";
 import { useTranslations } from "next-intl";
-import { ChangeEvent, MouseEventHandler, SyntheticEvent } from "react";
+import {
+  ChangeEvent,
+  MouseEventHandler,
+  SyntheticEvent,
+  useEffect,
+} from "react";
 import { Clear } from "@mui/icons-material";
-import { DefaultVariableMappings } from "../constants";
+import { useProjectStore } from "@/providers/project-store-provider";
 
-const VariableEditingRow = ({
+function VariableEditingRow({
   dataDescription,
-  setVariableDescr,
   onRemove,
   required,
   dataSource,
 }: {
   dataDescription: DataSourceDataDescription;
   onRemove?: MouseEventHandler;
-  setVariableDescr: CallableFunction;
   required?: boolean;
   dataSource: DataSource;
-}) => (
-  <Grid2 container spacing={1} alignItems="center">
-    <Grid2 size={1.5}>
-      <TextField value={dataDescription.variable} size="small" disabled />
-    </Grid2>
-    <Grid2
-      size="grow"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <TextField
-        value={dataDescription.alias}
-        size="small"
-        fullWidth
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          if (event.target) {
+}) {
+  const setVariableDescr = useProjectStore(
+    (state) => state.dataSourceActions.setVariableDescr,
+  );
+
+  const setLoadable = useProjectStore(
+    (state) => state.dataSourceActions.setLoadable,
+  );
+
+  useEffect(() => {
+    const mappedVarCheck = dataSource.metadata.variables.required_vars
+      .map((requiredVar) => {
+        const description = dataSource.metadata.variables.by_id[requiredVar];
+
+        return description.variable != "t"
+          ? description.mapped_var
+              .map((mapped_var) =>
+                dataSource.metadata.catalog_headers.includes(mapped_var),
+              )
+              .some((check) => check)
+          : true;
+      })
+      .every((check) => check);
+
+    console.log(mappedVarCheck);
+
+    if (mappedVarCheck != dataSource.interface.loadable) {
+      setLoadable(dataSource.internal_id, mappedVarCheck)
+    }
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [dataDescription.mapped_var]);
+
+  return (
+    <Grid2 container spacing={1} alignItems="center">
+      <Grid2 size={1.5}>
+        <TextField value={dataDescription.variable} size="small" disabled />
+      </Grid2>
+      <Grid2
+        size="grow"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <TextField
+          value={dataDescription.alias}
+          size="small"
+          fullWidth
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (event.target) {
+              setVariableDescr(
+                dataSource.internal_id,
+                dataDescription.variable,
+                "alias",
+                event.target.value as never,
+              );
+            }
+          }}
+        />
+      </Grid2>
+      <Grid2
+        size={2}
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <TextField
+          value={dataDescription.unit}
+          size="small"
+          fullWidth
+          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+            if (event.target) {
+              setVariableDescr(
+                dataSource.internal_id,
+                dataDescription.variable,
+                "unit",
+                event.target.value as never,
+              );
+            }
+          }}
+        />
+      </Grid2>
+      <Grid2
+        size="grow"
+        display="flex"
+        justifyContent="center"
+        alignItems="center"
+      >
+        <Autocomplete
+          multiple
+          freeSolo
+          value={
+            required
+              ? dataSource.metadata.variables.by_id[dataDescription.variable]
+                  .mapped_var
+              : [dataDescription.variable]
+          }
+          options={dataSource.metadata.catalog_headers}
+          getOptionLabel={(option: string) => option}
+          size="small"
+          fullWidth
+          readOnly={!required}
+          disabled={!required}
+          onChange={(
+            event: SyntheticEvent,
+            newValue: string | string[] | null,
+          ) => {
             setVariableDescr(
               dataSource.internal_id,
               dataDescription.variable,
-              "alias",
-              event.target.value
+              "mapped_var",
+              newValue as never,
             );
-          }
-        }}
-      />
+          }}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              error={
+                dataDescription.mapped_var
+                  ? !dataDescription.mapped_var
+                      .map((mapped_var) =>
+                        dataSource.metadata.catalog_headers.includes(
+                          mapped_var,
+                        ),
+                      )
+                      .some((check) => check)
+                  : false
+              }
+            />
+          )}
+        />
+        {!required && onRemove && (
+          <IconButton sx={{ ml: 1 }} onClick={onRemove}>
+            <Clear />
+          </IconButton>
+        )}
+      </Grid2>
     </Grid2>
-    <Grid2 size={2} display="flex" justifyContent="center" alignItems="center">
-      <TextField
-        value={dataDescription.unit}
-        size="small"
-        fullWidth
-        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-          if (event.target) {
-            setVariableDescr(
-              dataSource.internal_id,
-              dataDescription.variable,
-              "unit",
-              event.target.value
-            );
-          }
-        }}
-      />
-    </Grid2>
-    <Grid2
-      size="grow"
-      display="flex"
-      justifyContent="center"
-      alignItems="center"
-    >
-      <Autocomplete
-        multiple
-        freeSolo
-        value={
-          required
-            ? DefaultVariableMappings[dataDescription.variable as keyof typeof DefaultVariableMappings]
-            : [dataDescription.variable]
-        }
-        options={dataSource.metadata.data_headers}
-        getOptionLabel={(option: string) => option}
-        size="small"
-        fullWidth
-        readOnly={!required}
-        disabled={!required}
-        onChange={(
-          event: SyntheticEvent,
-          newValue: string | string[] | null
-        ) => {
-          setVariableDescr(
-            dataSource.internal_id,
-            dataDescription.variable,
-            "mapped_var",
-            newValue
-          );
-        }}
-        renderInput={(params) => <TextField {...params} />}
-      />
-      {(!required && onRemove) && (
-        <IconButton sx={{ ml: 1 }} onClick={onRemove}>
-          <Clear />
-        </IconButton>
-      )}
-    </Grid2>
-  </Grid2>
-);
+  );
+}
 
 export default function DataSourceVariableForm({
   dataSource,
-  setVariableDescr,
-  setAddedVars,
 }: {
   dataSource: DataSource;
-  setVariableDescr: CallableFunction;
-  setAddedVars: CallableFunction;
 }) {
   const t = useTranslations();
 
+  const setAddedVars = useProjectStore(
+    (state) => state.dataSourceActions.setAddedVars,
+  );
+
   return (
     <>
-    <Alert severity="warning" sx={{mt:1}}>Changing the variable mappings is not implemented yet, please adjust your input catalogs as a temporary work-around</Alert>
+      <Alert severity="warning" sx={{ mt: 1 }}>
+        Changing the variable mappings is not implemented yet, please adjust
+        your input catalogs as a temporary work-around
+      </Alert>
       <Grid2 container spacing={1} direction="column">
         <Grid2 container spacing={1} alignItems="flex-end">
           <Grid2 size={1.5} sx={{ ml: 1.5 }}>
@@ -162,65 +223,65 @@ export default function DataSourceVariableForm({
             </Typography>
           </Grid2>
         </Grid2>
-        {dataSource.metadata.data_descr.map(
-          (dataDescription: DataSourceDataDescription) =>
-            dataDescription.required &&
-            dataDescription.variable != "t" && (
+        {dataSource.metadata.variables.required_vars.map(
+          (variable: string) =>
+            variable != "t" && (
               <VariableEditingRow
-                key={"EditingElement-" + dataDescription.variable}
-                setVariableDescr={setVariableDescr}
-                dataDescription={dataDescription}
+                key={"EditingElement-" + variable}
+                dataDescription={dataSource.metadata.variables.by_id[variable]}
                 dataSource={dataSource}
                 required
               />
-            )
+            ),
         )}
-        {dataSource.metadata.data_descr.map(
-          (dataDescription: DataSourceDataDescription) =>
-            !dataDescription.required &&
-            dataSource.interface.addedVars.includes(
-              dataDescription.variable
-            ) && (
-              <VariableEditingRow
-                key={"EditingElement-" + dataDescription.variable}
-                dataDescription={dataDescription}
-                setVariableDescr={setVariableDescr}
-                dataSource={dataSource}
-                onRemove={() => {
-                  setAddedVars(
-                    dataSource.internal_id,
-                    dataSource.interface.addedVars.filter(
-                      (el) => el != dataDescription.variable
-                    )
-                  );
-                }}
-              />
-            )
-        )}
+        {dataSource.metadata.variables.added_vars.map((variable: string) => (
+          <VariableEditingRow
+            key={"EditingElement-" + variable}
+            dataDescription={dataSource.metadata.variables.by_id[variable]}
+            dataSource={dataSource}
+            onRemove={() => {
+              setAddedVars(
+                dataSource.internal_id,
+                dataSource.metadata.variables.added_vars.filter(
+                  (el) => el != variable,
+                ),
+              );
+            }}
+          />
+        ))}
         <Grid2 container spacing={1} alignItems="center">
           <Grid2 size={1.5}>
             <Autocomplete
-              options={dataSource.metadata.data_descr.filter(
-                (el) =>
-                  el.required == false &&
-                  !dataSource.interface.addedVars.includes(el.variable)
-              )}
+              options={dataSource.metadata.variables.optional_vars
+                .filter(
+                  (variable) =>
+                    !dataSource.metadata.variables.added_vars.includes(
+                      variable,
+                    ),
+                )
+                .map(
+                  (variable) => dataSource.metadata.variables.by_id[variable],
+                )}
               getOptionLabel={(option: DataSourceDataDescription) =>
                 option.variable
               }
               size="small"
               fullWidth
+              clearOnBlur
+              clearOnEscape
               onChange={(
                 event: SyntheticEvent,
-                newValue: DataSourceDataDescription | null
+                newValue: DataSourceDataDescription | null,
               ) => {
-                if (dataSource.interface.addedVars) {
-                  setAddedVars(dataSource.internal_id, [
-                    ...dataSource.interface.addedVars!,
-                    newValue?.variable,
-                  ]);
-                } else {
-                  setAddedVars(dataSource.internal_id, [newValue?.variable]);
+                if (newValue != null) {
+                  if (dataSource.metadata.variables.added_vars) {
+                    setAddedVars(dataSource.internal_id, [
+                      ...dataSource.metadata.variables.added_vars!,
+                      newValue.variable,
+                    ]);
+                  } else {
+                    setAddedVars(dataSource.internal_id, [newValue.variable]);
+                  }
                 }
               }}
               renderInput={(params) => (
@@ -234,6 +295,7 @@ export default function DataSourceVariableForm({
                   </Box>
                 );
               }}
+              disableClearable
             />
           </Grid2>
           <Grid2

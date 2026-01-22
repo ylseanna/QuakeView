@@ -26,16 +26,12 @@ import { styled } from "@mui/material/styles";
 
 import {
   DataSource,
-  DataSourceDataDescription,
 } from "@/components/datasource/types";
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MuiColorInput } from "mui-color-input";
 import HistogramSlider from "../../interface-elements/histogram-slider";
-import {
-  colormaps,
-  colormaps_categorical,
-} from "../../map/crameri-colormaps";
+import { colormaps, colormaps_categorical } from "../../map/crameri-colormaps";
 import { SwapHoriz } from "@mui/icons-material";
 
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
@@ -149,7 +145,7 @@ export default function DataSourceFormattingForm({
                 setFormatting(
                   dataSource.internal_id,
                   "scale",
-                  Number(event.target.value)
+                  Number(event.target.value),
                 );
               }}
               inputProps={{
@@ -204,7 +200,7 @@ export default function DataSourceFormattingForm({
                 setFormatting(
                   dataSource.internal_id,
                   "opacity",
-                  Number(event.target.value)
+                  Number(event.target.value),
                 );
               }}
               inputProps={{
@@ -237,7 +233,7 @@ export default function DataSourceFormattingForm({
                 setFormatting(
                   dataSource.internal_id,
                   "antialiasing",
-                  event.target.checked
+                  event.target.checked,
                 );
               }}
               inputProps={{ "aria-label": "controlled" }}
@@ -259,7 +255,7 @@ export default function DataSourceFormattingForm({
             value={dataSource.formatting.color.mapping}
             onChange={(
               event: React.MouseEvent<HTMLElement>,
-              newValue: string
+              newValue: string,
             ) => {
               if (newValue !== null) {
                 setFormatting(dataSource.internal_id, "color", {
@@ -351,23 +347,24 @@ export default function DataSourceFormattingForm({
                         });
                       }}
                     >
-                      {dataSource.metadata.data_descr.map(
-                        (dataDescription: DataSourceDataDescription) =>
-                          dataDescription.data_type == "number" &&
-                          (dataDescription.required == true ||
-                            dataSource.interface.addedVars.includes(
-                              dataDescription.variable
-                            )) && (
-                            <MenuItem
-                              key={`MenuItemVariable-${dataDescription.variable}`}
-                              value={dataDescription.variable}
-                            >
-                              {dataDescription.alias
-                                ? dataDescription.alias
-                                : dataDescription.variable}
-                            </MenuItem>
-                          )
-                      )}
+                      {dataSource.metadata.variables.required_vars
+                        .concat(dataSource.metadata.variables.added_vars)
+                        .map((variable: string) => {
+                          const dataDescription =
+                            dataSource.metadata.variables.by_id[variable];
+                          if (dataDescription.data_type == "number") {
+                            return (
+                              <MenuItem
+                                key={`MenuItemVariable-${dataDescription.variable}`}
+                                value={dataDescription.variable}
+                              >
+                                {dataDescription.alias
+                                  ? dataDescription.alias
+                                  : dataDescription.variable}
+                              </MenuItem>
+                            );
+                          }
+                        })}
                     </Select>
                   </Grid2>
                 </Grid2>
@@ -477,18 +474,14 @@ export default function DataSourceFormattingForm({
                     variable={dataSource.formatting.color.linear.variable}
                     value={localValues.localLinearDomain}
                     min={
-                      dataSource.metadata.data_descr.find(
-                        (element) =>
-                          element.variable ==
-                          dataSource.formatting.color.linear.variable
-                      )!.bounds[0]
+                      dataSource.metadata.variables.by_id[
+                        dataSource.formatting.color.linear.variable
+                      ].bounds[0]
                     }
                     max={
-                      dataSource.metadata.data_descr.find(
-                        (element) =>
-                          element.variable ==
-                          dataSource.formatting.color.linear.variable
-                      )!.bounds[1]
+                      dataSource.metadata.variables.by_id[
+                        dataSource.formatting.color.linear.variable
+                      ].bounds[1]
                     }
                     onChange={(event: Event, newValue: number | number[]) => {
                       setLocalValues({
@@ -498,7 +491,7 @@ export default function DataSourceFormattingForm({
                     }}
                     onChangeCommitted={(
                       event: Event | SyntheticEvent<Element, Event>,
-                      newValue: number | number[]
+                      newValue: number | number[],
                     ) => {
                       event.preventDefault();
                       console.log(newValue);
@@ -519,11 +512,9 @@ export default function DataSourceFormattingForm({
                     <Typography fontSize={14}>
                       {"Min: " +
                         Math.round(
-                          dataSource.metadata.data_descr.find(
-                            (element) =>
-                              element.variable ==
-                              dataSource.formatting.color.linear.variable
-                          )!.bounds[0] * 100
+                          dataSource.metadata.variables.by_id[
+                            dataSource.formatting.color.linear.variable
+                          ].bounds[0] * 100,
                         ) /
                           100}
                     </Typography>
@@ -531,11 +522,9 @@ export default function DataSourceFormattingForm({
                     <Typography fontSize={14}>
                       {"Max: " +
                         Math.round(
-                          dataSource.metadata.data_descr.find(
-                            (element) =>
-                              element.variable ==
-                              dataSource.formatting.color.linear.variable
-                          )!.bounds[1] * 100
+                          dataSource.metadata.variables.by_id[
+                            dataSource.formatting.color.linear.variable
+                          ].bounds[1] * 100,
                         ) /
                           100}
                     </Typography>
@@ -579,23 +568,24 @@ export default function DataSourceFormattingForm({
                         });
                       }}
                     >
-                      {dataSource.metadata.data_descr.map(
-                        (dataDescription: DataSourceDataDescription) =>
-                          dataDescription.data_type == "number" &&
-                          (dataDescription.required == true ||
-                            dataSource.interface.addedVars.includes(
-                              dataDescription.variable
-                            )) && (
-                            <MenuItem
-                              key={`MenuItemVariable-${dataDescription.variable}`}
-                              value={dataDescription.variable}
-                            >
-                              {dataDescription.alias
-                                ? dataDescription.alias
-                                : dataDescription.variable}
-                            </MenuItem>
-                          )
-                      )}
+                      {dataSource.metadata.variables.required_vars
+                        .concat(dataSource.metadata.variables.added_vars)
+                        .map((variable: string) => {
+                          const dataDescription =
+                            dataSource.metadata.variables.by_id[variable];
+                          if (dataDescription.data_type == "number") {
+                            return (
+                              <MenuItem
+                                key={`MenuItemVariable-${dataDescription.variable}`}
+                                value={dataDescription.variable}
+                              >
+                                {dataDescription.alias
+                                  ? dataDescription.alias
+                                  : dataDescription.variable}
+                              </MenuItem>
+                            );
+                          }
+                        })}
                     </Select>
                   </Grid2>
                 </Grid2>

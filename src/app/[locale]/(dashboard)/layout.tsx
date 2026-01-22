@@ -17,30 +17,33 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
   // load data (synchronized accros app)
   const { dataSources } = useProjectStore((state) => state);
   const { data, addData } = useDataStore((state) => state);
-  const [ dataLoading, setDataLoading] = useState(false);
-  const [ debugVisible, setDebugVisible] = useState(false);
+  const [dataLoading, setDataLoading] = useState(false);
+  const [debugVisible, setDebugVisible] = useState(false);
 
-  useKeyStroke(["F3"], ()=>{
-    setDebugVisible(!debugVisible)
-  })
+  useKeyStroke(["F3"], () => {
+    setDebugVisible(!debugVisible);
+  });
 
   useEffect(() => {
     dataSources.allIDs.forEach(async (id: string) => {
       if (data) {
-        console.log(Object.keys(data));
-        console.log(id);
-        console.log(Object.keys(data).includes(id));
         if (!Object.keys(data).includes(id)) {
-          setDataLoading(true);
-          console.log(`Fetching data for ${id}`);
+          if (dataSources.byID[id].interface.loadable) {
+            setDataLoading(true);
+            console.log(`Fetching data for ${id}`);
 
-          await fetchData(dataSources.byID[id]).then((fetched_data) => {
-            console.log(fetched_data);
+            await fetchData(dataSources.byID[id]).then((fetched_data) => {
+              console.log(fetched_data);
 
-            addData(id, fetched_data, dataSources.byID[id].interface.addedVars);
+              addData(
+                id,
+                fetched_data,
+                dataSources.byID[id].metadata.variables.added_vars,
+              );
 
-            setDataLoading(false);
-          });
+              setDataLoading(false);
+            });
+          }
         }
       }
     });
@@ -48,7 +51,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
   return (
     <>
-      {debugVisible && <DebugWindow/> }
+      {debugVisible && <DebugWindow />}
       <TitleBar />
       <NavBar />
       <Box

@@ -2,7 +2,7 @@ from flask import Flask, request, Response, send_file
 from pathlib import Path
 from shapely import multipoints
 import json
-from numpy import histogram, float64, int64, isnan
+from numpy import concatenate, float64, int64, isnan
 
 
 # from obspy import UTCDateTime
@@ -71,26 +71,10 @@ def map_data():
 
         print("METADATA REQUEST", argument_dict)
 
-        # GET DATA
-        filepath = request.args.get("filepath")
-
-        df = load_to_df(filepath)
-
-        # GET EXTENT
-
-        MultiPoint = multipoints(
-            [(event["X"], event["Y"], event["Z"]) for _, event in df.iterrows()]
-        )
-
-        centroid = MultiPoint.centroid
-
-        # print(MultiPoint.centroid)
-        # print(MultiPoint.bounds)
-
         # DEFINE REQUIRED PARAMS
 
-        required_data_descr = [  # required parameters
-            {
+        required_data_descr = {  # required parameters
+            "id": {
                 "variable": "id",
                 "mapped_var": ["EventID", "evid"],
                 "alias": "Event ID",
@@ -101,7 +85,7 @@ def map_data():
                 "kde": None,
                 "required": True,
             },
-            {
+            "dt": {
                 "variable": "dt",
                 "mapped_var": ["DT", "datetime", "Datetime"],
                 "alias": "Time",
@@ -112,62 +96,120 @@ def map_data():
                 "kde": None,
                 "required": True,
             },
-            {
+            "t": {
                 "variable": "t",
                 "mapped_var": None,
                 "alias": "Time",
                 "unit": "",
                 "data_type": "dt_timestamp",
-                "bounds": [df["t"].min(), df["t"].max()],
+                "bounds": None,
                 "bins": None,
                 "kde": None,
                 "required": True,
             },
-            {
+            "lon": {
                 "variable": "lon",
                 "mapped_var": ["X", "lon", "Longitude"],
                 "alias": "Longitude",
                 "unit": "degrees",
                 "data_type": "number",
-                "bounds": [df["X"].min(), df["X"].max()],
+                "bounds": None,
                 "bins": None,
                 "kde": None,
                 "required": True,
             },
-            {
+            "lat": {
                 "variable": "lat",
                 "mapped_var": ["Y", "lat", "Latitude"],
                 "alias": "Latitude",
                 "unit": "degrees",
                 "data_type": "number",
-                "bounds": [df["Y"].min(), df["Y"].max()],
+                "bounds": None,
                 "bins": None,
                 "kde": None,
                 "required": True,
             },
-            {
+            "dep": {
                 "variable": "dep",
                 "mapped_var": ["Z", "dep", "Depth"],
                 "alias": "Depth",
                 "unit": "km",
                 "data_type": "number",
-                "bounds": [df["Z"].min(), df["Z"].max()],
+                "bounds": None,
                 "bins": None,
                 "kde": None,
                 "required": True,
             },
-            {
+            "mag": {
                 "variable": "mag",
                 "mapped_var": ["ML", "mag", "Magnitude"],
                 "alias": "Magnitude",
                 "unit": "M",
                 "data_type": "number",
-                "bounds": [df["ML"].min(), df["ML"].max()],
+                "bounds": None,
                 "bins": None,
                 "kde": None,
                 "required": True,
             },
-        ]
+        }
+
+        # LOAD FILE
+        filepath = request.args.get("filepath")
+
+        df = pd.read_csv(filepath)
+
+        # CHECK IF ALL REQUIRED FIELDS ARE SELECTED
+
+        varmap = {}
+
+        for required_variable in required_data_descr.keys():
+            if required_variable != "t":
+                # initial setting
+                varmap[required_variable] = None
+
+                for mapped_var in required_data_descr[required_variable]["mapped_var"]:
+                    if mapped_var in df.columns:
+                        varmap[required_variable] = mapped_var
+                        continue
+
+        # DATETIME CONVERSION
+        if varmap["dt"]:
+            df["datetime"] = [datetime.fromisoformat(dt) for dt in df[varmap["dt"]]]
+
+            df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
+
+            df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+
+        # DEFINE BOUNDS
+        for required_variable in required_data_descr.keys():
+            if required_variable not in ("id", "dt", "t"):
+                if varmap[required_variable]:
+                    required_data_descr[required_variable]["bounds"] = (
+                        [
+                            float(df[varmap[required_variable]].min()),
+                            float(df[varmap[required_variable]].max()),
+                        ]
+                        if df.dtypes[varmap[required_variable]]
+                        in (float, float64, int, int64)
+                        and not (
+                            isnan(float(df[varmap[required_variable]].min()))
+                            or isnan(float(df[varmap[required_variable]].max()))
+                        )
+                        else None
+                    )
+            elif required_variable == "t":
+                required_data_descr[required_variable]["bounds"] = (
+                    [
+                        float(df[required_variable].min()),
+                        float(df[required_variable].max()),
+                    ]
+                    if df.dtypes[required_variable] in (float, float64, int, int64)
+                    and not (
+                        isnan(float(df[required_variable].min()))
+                        or isnan(float(df[required_variable].max()))
+                    )
+                    else None
+                )
 
         # DEFINE OPTIONAL PARAMS
 
@@ -177,8 +219,8 @@ def map_data():
             else:
                 return "string"
 
-        optional_data_descr = [
-            {
+        optional_data_descr = {
+            column_name: {
                 "variable": column_name,
                 "alias": "",
                 "data_type": variable_mapping(df.dtypes[column_name]),
@@ -197,8 +239,30 @@ def map_data():
                 "required": False,
             }
             for column_name in df.columns
-            if column_name not in [el["mapped_var"] for el in required_data_descr]
-        ]
+            if column_name
+            not in concatenate(
+                [
+                    varDescr["mapped_var"]
+                    for varDescr in required_data_descr.values()
+                    if varDescr["mapped_var"] is not None
+                ]
+            ).tolist()
+        }
+
+        # GET EXTENT
+        if (
+            varmap["lon"] is not None
+            and varmap["lat"] is not None
+            and varmap["dep"] is not None
+        ):
+            MultiPoint = multipoints(
+                [
+                    (event[varmap["lon"]], event[varmap["lat"]], event[varmap["dep"]])
+                    for _, event in df.iterrows()
+                ]
+            )
+
+            centroid = MultiPoint.centroid
 
         # DATA OUTLINES
 
@@ -210,15 +274,20 @@ def map_data():
 
         meta_data_dict = {
             "num_events": len(df),
-            "data_headers": [
-                str(header) for header in df.columns if (header not in ("dt", "t"))
-            ],
-            "data_descr": required_data_descr + optional_data_descr,
             "extent": {
                 "automatic": True,
                 "centroid": [centroid.x, centroid.y, df["Z"].mean()],
                 "bounds": MultiPoint.bounds,
                 "polygon": MultiPoint.envelope.wkt,
+            },
+            "catalog_headers": [
+                str(header) for header in df.columns if (header not in ("dt", "t"))
+            ],
+            "variables": {
+                "by_id": optional_data_descr | required_data_descr,
+                "required_vars": list(required_data_descr.keys()),
+                "optional_vars": list(optional_data_descr.keys()),
+                "added_vars": [],
             },
         }
 

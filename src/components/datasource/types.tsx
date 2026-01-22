@@ -15,7 +15,7 @@ export type DataSource = {
   filename: string;
   filepath: string;
   name: string;
-  interface: { pickable: boolean; visible: boolean; addedVars: string[] };
+  interface: { pickable: boolean; visible: boolean; loadable: boolean;};
   filtering: DataSourceFiltering;
   formatting: DataSourceFormatting;
   metadata: DataSourceMetaData;
@@ -24,8 +24,13 @@ export type DataSource = {
 export type DataSourceMetaData = {
   num_events: number;
   extent: Extent;
-  data_headers: string[];
-  data_descr: DataSourceDataDescription[];
+  catalog_headers: string[];
+  variables: {
+    by_id: { [variable: string]: DataSourceDataDescription };
+    required_vars: string[];
+    optional_vars: string[];
+    added_vars: string[];
+  };
 };
 
 export type DataSourceDataDescription = {

@@ -111,7 +111,7 @@ export default function GutenbergRichterPlot() {
         overallYbounds[0]!,
         overallYbounds[1]! * 1.1,
       ] as Iterable<d3.NumberValue>)
-      .range([height - margin.bottom, margin.top]);
+      .range([height - margin.bottom, margin.top]).nice();
 
     // x axes
     svg
