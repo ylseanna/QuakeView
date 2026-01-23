@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceDataDescription, DataSourceFormatting } from "./../components/datasource/types";
+import { DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
 import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
@@ -52,6 +52,10 @@ export type ProjectActions = {
   dataSourceActions: {
     addDataSource: (dataSource: DataSource) => void;
     removeDataSource: (id: string) => void;
+    setMetadata: (
+      id: string,
+      value: DataSourceMetaData,
+    ) => void;
     setFormatting: (
       id: string,
       keyToModify: keyof DataSourceFormatting,
@@ -148,6 +152,10 @@ export const createProjectStore = (
                 state.dataSources.allIDs.findIndex((iid) => iid === id),
                 1,
               );
+            }),
+          setMetadata: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata = value;
             }),
           setFormatting: (id, keyToModify, value) =>
             set((state) => {

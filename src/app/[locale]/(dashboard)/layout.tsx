@@ -16,7 +16,7 @@ import DebugWindow from "@/components/interface/debug-window";
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   // load data (synchronized accros app)
   const { dataSources } = useProjectStore((state) => state);
-  const { data, addData } = useDataStore((state) => state);
+  const { data, addData, removeData } = useDataStore((state) => state);
   const [dataLoading, setDataLoading] = useState(false);
   const [debugVisible, setDebugVisible] = useState(false);
 
@@ -45,9 +45,34 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
             });
           }
         }
+        if (data[id]) {
+          if (dataSources.byID[id].interface.loadable) {
+            if (
+              dataSources.byID[id].metadata.variables.added_vars.length !=
+              data[id].addedVars.length
+            ) {
+              setDataLoading(true);
+              console.log(`Fetching data for ${id}`);
+
+              await fetchData(dataSources.byID[id]).then((fetched_data) => {
+                console.log(fetched_data);
+
+                addData(
+                  id,
+                  fetched_data,
+                  dataSources.byID[id].metadata.variables.added_vars,
+                );
+
+                setDataLoading(false);
+              });
+            }
+          } else {
+            removeData(id);
+          }
+        }
       }
     });
-  }, [data, addData, dataSources]);
+  }, [data, addData, dataSources, removeData]);
 
   return (
     <>

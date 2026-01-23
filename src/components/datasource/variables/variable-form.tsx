@@ -7,7 +7,6 @@ import {
   IconButton,
   TextField,
   Typography,
-  Alert,
 } from "@mui/material";
 
 import {
@@ -23,6 +22,11 @@ import {
 } from "react";
 import { Clear } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { updatedMetaDataUrl } from "../data-source-query";
+
+export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
+  return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
+};
 
 function VariableEditingRow({
   dataDescription,
@@ -43,6 +47,53 @@ function VariableEditingRow({
     (state) => state.dataSourceActions.setLoadable,
   );
 
+  const setMetadata = useProjectStore(
+    (state) => state.dataSourceActions.setMetadata,
+  );
+
+  const setFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setFormatting,
+  );
+
+  const updateMetaData = async (dataSource: DataSource) => {
+    // update bounds and metadata after setting mapped variables
+
+    // fetch updated metadata
+    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
+
+    // set metadata
+    setMetadata(dataSource.internal_id, updatedMetadata);
+
+    // colormapBounds
+    const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
+      (variable: string) => {
+        const obj: { [variable: string]: [number, number] } = {};
+        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
+        return obj;
+      },
+    );
+
+    console.log(colormapsBounds);
+
+    const updatedColorFormatting = {
+      ...dataSource.formatting.color,
+      linear: {
+        ...dataSource.formatting.color.linear,
+        domain: Object.assign({}, ...colormapsBounds),
+      },
+    };
+
+    console.log(updatedColorFormatting);
+
+    // updatedColorFormatting.linear.domain = ;
+
+    setFormatting(
+      dataSource.internal_id,
+      "color",
+      updatedColorFormatting as never,
+    );
+  };
+
   useEffect(() => {
     const mappedVarCheck = dataSource.metadata.variables.required_vars
       .map((requiredVar) => {
@@ -61,7 +112,8 @@ function VariableEditingRow({
     console.log(mappedVarCheck);
 
     if (mappedVarCheck != dataSource.interface.loadable) {
-      setLoadable(dataSource.internal_id, mappedVarCheck)
+      updateMetaData(dataSource);
+      setLoadable(dataSource.internal_id, mappedVarCheck);
     }
 
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -188,10 +240,6 @@ export default function DataSourceVariableForm({
 
   return (
     <>
-      <Alert severity="warning" sx={{ mt: 1 }}>
-        Changing the variable mappings is not implemented yet, please adjust
-        your input catalogs as a temporary work-around
-      </Alert>
       <Grid2 container spacing={1} direction="column">
         <Grid2 container spacing={1} alignItems="flex-end">
           <Grid2 size={1.5} sx={{ ml: 1.5 }}>

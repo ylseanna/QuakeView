@@ -40,6 +40,7 @@ import {
 import FilteringForm from "../filtering/filtering-form";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
+import { useEffect, useState } from "react";
 
 interface DataTabProps {
   id: string;
@@ -62,6 +63,33 @@ export default function DataTab({ id }: DataTabProps) {
     (state) => state.dataSourceActions.setFiltering,
   );
   const theme = useTheme();
+
+  const [allDomainsPresent, setAllDomainsPresent] = useState(false);
+
+  useEffect(() => {
+    const all_domains_present = dataSource.metadata.variables.required_vars
+      .concat(dataSource.metadata.variables.added_vars)
+      .map((variable) => {
+        if (
+          Object.keys(dataSource.formatting.color.linear.domain).includes(
+            variable,
+          )
+        ) {
+          return variable == "dt" || variable == "id"
+            ? true
+            : dataSource.formatting.color.linear.domain[variable] != null;
+        } else {
+          return false;
+        }
+      });
+
+    console.log(all_domains_present);
+
+    setAllDomainsPresent(all_domains_present.every((el) => el));
+  }, [
+    dataSource.formatting.color.linear.domain,
+    dataSource.metadata.variables,
+  ]);
 
   return (
     <Accordion>
@@ -160,15 +188,13 @@ export default function DataTab({ id }: DataTabProps) {
               </SubAccordionSummary>
             </Box>
             <SubAccordionDetails>
-              <DataSourceVariableForm
-                dataSource={dataSource}
-              />
+              <DataSourceVariableForm dataSource={dataSource} />
             </SubAccordionDetails>
           </SubAccordion>
 
           <SubAccordion
             sx={{ borderBottom: "0px!important" }}
-            disabled={!dataSource.interface.loadable}
+            disabled={!(dataSource.interface.loadable && allDomainsPresent)}
           >
             <Box sx={{ display: "flex" }}>
               <SubAccordionSummary
@@ -182,7 +208,7 @@ export default function DataTab({ id }: DataTabProps) {
               </SubAccordionSummary>
             </Box>
             <SubAccordionDetails>
-              {dataSource.interface.loadable && (
+              {dataSource.interface.loadable && allDomainsPresent && (
                 <DataSourceFormattingForm
                   dataSource={dataSource}
                   setFormatting={setFormatting}

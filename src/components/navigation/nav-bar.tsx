@@ -10,7 +10,6 @@ import { Link, usePathname } from "@/i18n/routing";
 export default function NavBar() {
   const t = useTranslations();
   const pathname = usePathname();
-  console.log(pathname);
 
   const NavigationSections = [
     {
