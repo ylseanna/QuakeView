@@ -96,10 +96,11 @@
   },
   "Variables": {
     "alias": "Display name",
-    "mapping": "Mapped variable(s)",
+    "mapping": "Mapped column name(s)",
     "unit": "Unit",
     "variable": "Variable",
-    "variables": "Variables"
+    "variables": "Variables",
+    "mapping_warning": "Please fill in a correct column to variable mapping"
   },
   "Titlebar": {
     "language": "Language",

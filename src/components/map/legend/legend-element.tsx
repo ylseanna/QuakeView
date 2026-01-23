@@ -1,4 +1,4 @@
-import { Box, Grid2, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
 
 import { DataSource } from "../../datasource/types";
 import CategoricalLegend from "./categorical-legend";
@@ -52,8 +52,8 @@ export default function LegendElement({
     </>
   ) : (
     (dataSource.formatting.color.mapping == "single" || singleColor) && (
-      <Grid2 container alignItems="center">
-        <Grid2 size={2} display="flex">
+      <Grid container alignItems="center">
+        <Grid size={2} display="flex">
           <Box
             sx={{
               display: "inline-block",
@@ -64,8 +64,8 @@ export default function LegendElement({
               opacity: dataSource.formatting.opacity,
             }}
           ></Box>
-        </Grid2>
-        <Grid2
+        </Grid>
+        <Grid
           size="grow"
           display="flex"
           alignItems="center"
@@ -85,8 +85,8 @@ export default function LegendElement({
           >
             {dataSource.filename}
           </Typography>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     )
   );
 }

@@ -6,7 +6,7 @@ import {
   Box,
   Checkbox,
   Divider,
-  Grid2,
+  Grid,
   Input,
   MenuItem,
   Paper,
@@ -24,9 +24,7 @@ import {
 } from "@mui/material";
 import { styled } from "@mui/material/styles";
 
-import {
-  DataSource,
-} from "@/components/datasource/types";
+import { DataSource } from "@/components/datasource/types";
 import { ChangeEvent, SyntheticEvent, useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MuiColorInput } from "mui-color-input";
@@ -102,9 +100,9 @@ export default function DataSourceFormattingForm({
 
   return (
     <>
-      <Grid2 container spacing={1} direction="column" sx={{ mt: 1 }}>
-        <Grid2 container spacing={2} alignItems="center">
-          <Grid2 size={2.5}>
+      <Grid container spacing={1} direction="column" sx={{ mt: 1 }}>
+        <Grid container spacing={2} alignItems="center">
+          <Grid size={2.5}>
             <Tooltip
               title={t("scale_descr")}
               placement="left"
@@ -112,8 +110,8 @@ export default function DataSourceFormattingForm({
             >
               <Typography variant="formlabel">{t("scale")}</Typography>
             </Tooltip>
-          </Grid2>
-          <Grid2
+          </Grid>
+          <Grid
             size="grow"
             display="flex"
             justifyContent="center"
@@ -131,8 +129,8 @@ export default function DataSourceFormattingForm({
               valueLabelDisplay="auto"
               size="small"
             />
-          </Grid2>
-          <Grid2
+          </Grid>
+          <Grid
             size={2}
             display="flex"
             justifyContent="center"
@@ -156,10 +154,10 @@ export default function DataSourceFormattingForm({
                 "aria-labelledby": "input-slider",
               }}
             />
-          </Grid2>
-        </Grid2>
-        <Grid2 container spacing={2} sx={{ alignItems: "center" }}>
-          <Grid2 size={2.5}>
+          </Grid>
+        </Grid>
+        <Grid container spacing={2} sx={{ alignItems: "center" }}>
+          <Grid size={2.5}>
             <Tooltip
               title={t("opacity_descr")}
               placement="left"
@@ -167,8 +165,8 @@ export default function DataSourceFormattingForm({
             >
               <Typography variant="formlabel">{t("opacity")}</Typography>
             </Tooltip>
-          </Grid2>
-          <Grid2
+          </Grid>
+          <Grid
             size="grow"
             display="flex"
             justifyContent="center"
@@ -186,8 +184,8 @@ export default function DataSourceFormattingForm({
               valueLabelDisplay="auto"
               size="small"
             />
-          </Grid2>
-          <Grid2
+          </Grid>
+          <Grid
             size={2}
             display="flex"
             justifyContent="center"
@@ -211,10 +209,10 @@ export default function DataSourceFormattingForm({
                 "aria-labelledby": "input-slider",
               }}
             />
-          </Grid2>
-        </Grid2>
-        <Grid2 container direction="row" sx={{ m: 0 }}>
-          <Grid2 size={3}>
+          </Grid>
+        </Grid>
+        <Grid container direction="row" sx={{ m: 0 }}>
+          <Grid size={3}>
             <NoMaxWidthTooltip
               title={t("antialiasing_descr")}
               placement="left"
@@ -224,8 +222,8 @@ export default function DataSourceFormattingForm({
                 {t("antialiasing")}
               </Typography>
             </NoMaxWidthTooltip>
-          </Grid2>
-          <Grid2>
+          </Grid>
+          <Grid>
             <Switch
               checked={dataSource.formatting.antialiasing}
               size="small"
@@ -238,16 +236,16 @@ export default function DataSourceFormattingForm({
               }}
               inputProps={{ "aria-label": "controlled" }}
             />
-          </Grid2>
-        </Grid2>
-      </Grid2>
+          </Grid>
+        </Grid>
+      </Grid>
       <Divider sx={{ mt: 2, mb: 2 }} />
-      <Grid2 container spacing={1} direction="column" sx={{ mt: 1 }}>
+      <Grid container spacing={1} direction="column" sx={{ mt: 1 }}>
         <Typography variant="formheader">{t("colour")}</Typography>
-        <Grid2 container alignItems="center">
-          <Grid2 size="grow">
+        <Grid container alignItems="center">
+          <Grid size="grow">
             <Typography variant="formlabel">{t("mapping")}</Typography>
-          </Grid2>
+          </Grid>
 
           <ToggleButtonGroup
             size="small"
@@ -272,17 +270,12 @@ export default function DataSourceFormattingForm({
               {t("cmapping.categorical")}
             </ToggleButton>
           </ToggleButtonGroup>
-        </Grid2>
+        </Grid>
         <Paper variant="outlined" sx={{ p: 2 }}>
-          <Grid2 container direction="column" spacing={2}>
+          <Grid container direction="column" spacing={2}>
             {dataSource.formatting.color.mapping == "single" ? (
-              <Grid2
-                container
-                direction="row"
-                alignItems="center"
-                sx={{ m: 0 }}
-              >
-                <Grid2 size={2}>
+              <Grid container direction="row" alignItems="center" sx={{ m: 0 }}>
+                <Grid size={2}>
                   <NoMaxWidthTooltip
                     title={t("antialiasing_descr")}
                     placement="left"
@@ -292,8 +285,8 @@ export default function DataSourceFormattingForm({
                       {t("color")}
                     </Typography>
                   </NoMaxWidthTooltip>
-                </Grid2>
-                <Grid2 size="grow">
+                </Grid>
+                <Grid size="grow">
                   <MuiColorInput
                     size="small"
                     variant="outlined"
@@ -308,17 +301,17 @@ export default function DataSourceFormattingForm({
                       });
                     }}
                   />
-                </Grid2>
-              </Grid2>
+                </Grid>
+              </Grid>
             ) : dataSource.formatting.color.mapping == "linear" ? (
-              <Grid2 container direction="column">
-                <Grid2
+              <Grid container direction="column">
+                <Grid
                   container
                   direction="row"
                   alignItems="center"
                   sx={{ m: 0 }}
                 >
-                  <Grid2 size={3}>
+                  <Grid size={3}>
                     <Tooltip
                       title={t("parameter_descr")}
                       placement="left"
@@ -328,9 +321,9 @@ export default function DataSourceFormattingForm({
                         {t("parameter")}
                       </Typography>
                     </Tooltip>
-                  </Grid2>
+                  </Grid>
                   <Divider sx={{ mt: 1, mb: 1 }} />
-                  <Grid2 size="grow">
+                  <Grid size="grow">
                     <Select
                       value={dataSource.formatting.color.linear.variable}
                       displayEmpty
@@ -366,17 +359,17 @@ export default function DataSourceFormattingForm({
                           }
                         })}
                     </Select>
-                  </Grid2>
-                </Grid2>
+                  </Grid>
+                </Grid>
 
-                <Grid2
+                <Grid
                   container
                   direction="row"
                   alignItems="center"
                   sx={{ m: 0 }}
                   spacing={1}
                 >
-                  <Grid2 size="grow">
+                  <Grid size="grow">
                     <Autocomplete
                       value={dataSource.formatting.color.linear.cmap}
                       options={Object.keys(colormaps)}
@@ -451,7 +444,7 @@ export default function DataSourceFormattingForm({
                         />
                       )}
                     ></Autocomplete>
-                  </Grid2>
+                  </Grid>
                   <Checkbox
                     checked={dataSource.formatting.color.linear.inverted}
                     icon={<SwapHoriz />}
@@ -466,8 +459,8 @@ export default function DataSourceFormattingForm({
                       });
                     }}
                   />
-                </Grid2>
-                <Grid2 direction="column" alignItems="center" sx={{ m: 0 }}>
+                </Grid>
+                <Grid direction="column" alignItems="center" sx={{ m: 0 }}>
                   <HistogramSlider
                     id={`formatting-chart-${dataSource.internal_id}`}
                     dataSource={dataSource}
@@ -508,7 +501,7 @@ export default function DataSourceFormattingForm({
                       });
                     }}
                   />
-                  <Grid2 container sx={{ mt: 0.2 }}>
+                  <Grid container sx={{ mt: 0.2 }}>
                     <Typography fontSize={14}>
                       {"Min: " +
                         Math.round(
@@ -518,7 +511,7 @@ export default function DataSourceFormattingForm({
                         ) /
                           100}
                     </Typography>
-                    <Grid2 size="grow"></Grid2>
+                    <Grid size="grow"></Grid>
                     <Typography fontSize={14}>
                       {"Max: " +
                         Math.round(
@@ -528,18 +521,18 @@ export default function DataSourceFormattingForm({
                         ) /
                           100}
                     </Typography>
-                  </Grid2>
-                </Grid2>
-              </Grid2>
+                  </Grid>
+                </Grid>
+              </Grid>
             ) : dataSource.formatting.color.mapping == "categorical" ? (
-              <Grid2 container direction="column">
-                <Grid2
+              <Grid container direction="column">
+                <Grid
                   container
                   direction="row"
                   alignItems="center"
                   sx={{ m: 0 }}
                 >
-                  <Grid2 size={3}>
+                  <Grid size={3}>
                     <Tooltip
                       title={t("parameter_descr")}
                       placement="left"
@@ -549,9 +542,9 @@ export default function DataSourceFormattingForm({
                         {t("parameter")}
                       </Typography>
                     </Tooltip>
-                  </Grid2>
+                  </Grid>
                   <Divider sx={{ mt: 1, mb: 1 }} />
-                  <Grid2 size="grow">
+                  <Grid size="grow">
                     <Select
                       value={dataSource.formatting.color.categorical.variable}
                       displayEmpty
@@ -587,17 +580,17 @@ export default function DataSourceFormattingForm({
                           }
                         })}
                     </Select>
-                  </Grid2>
-                </Grid2>
+                  </Grid>
+                </Grid>
 
-                <Grid2
+                <Grid
                   container
                   direction="row"
                   alignItems="center"
                   sx={{ m: 0 }}
                   spacing={1}
                 >
-                  <Grid2 size="grow">
+                  <Grid size="grow">
                     <Autocomplete
                       value={dataSource.formatting.color.categorical.cmap}
                       options={Object.keys(colormaps_categorical)}
@@ -672,7 +665,7 @@ export default function DataSourceFormattingForm({
                         />
                       )}
                     ></Autocomplete>
-                  </Grid2>
+                  </Grid>
                   <Checkbox
                     checked={dataSource.formatting.color.categorical.inverted}
                     icon={<SwapHoriz />}
@@ -687,14 +680,14 @@ export default function DataSourceFormattingForm({
                       });
                     }}
                   />
-                </Grid2>
-              </Grid2>
+                </Grid>
+              </Grid>
             ) : (
               ""
             )}
-          </Grid2>
+          </Grid>
         </Paper>
-      </Grid2>
+      </Grid>
     </>
   );
 }

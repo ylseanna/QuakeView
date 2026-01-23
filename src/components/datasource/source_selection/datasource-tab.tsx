@@ -14,7 +14,7 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Grid2,
+  Grid,
   IconButton,
   Paper,
   Tooltip,
@@ -103,13 +103,13 @@ export default function DataTab({ id }: DataTabProps) {
           {dataSource.interface.loadable ? (
             <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
           ) : (
-            <Warning sx={{ mr: 1, color: theme.palette.error.main }} />
+            <Warning sx={{ mr: 1, color: theme.palette.warning.main }} />
           )}
           <Typography
             sx={
               dataSource.interface.loadable
                 ? {}
-                : { color: theme.palette.error.main }
+                : { color: theme.palette.warning.main }
             }
           >
             {dataSource.filename}
@@ -131,42 +131,42 @@ export default function DataTab({ id }: DataTabProps) {
       </Box>
       <AccordionDetails>
         <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Grid2 container columns={8}>
-            <Grid2 size={2}>
+          <Grid container columns={8}>
+            <Grid size={2}>
               <Typography noWrap>
                 <b>{t("Sources.filename")}:</b>
               </Typography>
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Typography>{dataSource.filename}</Typography>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
               <Typography noWrap>
                 <b>{t("Sources.filepath")}:</b>
               </Typography>
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Typography>{dataSource.filepath}</Typography>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
               <Typography noWrap>
                 <b>{t("Sources.num_events")}:</b>
               </Typography>
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Typography>{String(dataSource.metadata.num_events)}</Typography>
-            </Grid2>
-            <Grid2 size={2}>
+            </Grid>
+            <Grid size={2}>
               <Typography noWrap>
                 <b>{t("Sources.column_headers")}:</b>
               </Typography>
-            </Grid2>
-            <Grid2 size={6}>
+            </Grid>
+            <Grid size={6}>
               <Typography>
                 {dataSource.metadata.catalog_headers.join(", ")}
               </Typography>
-            </Grid2>
-          </Grid2>
+            </Grid>
+          </Grid>
         </Paper>
 
         <Paper variant="outlined" sx={{ overflow: "hidden" }}>
@@ -175,15 +175,39 @@ export default function DataTab({ id }: DataTabProps) {
               {t("Sources.options")}
             </Typography>
           </Box>
-          <SubAccordion>
+          <SubAccordion
+            slotProps={{
+              root: {
+                sx: {
+                  outline: !dataSource.interface.loadable
+                    ? `1px solid ${theme.palette.error.main}`
+                    : "0",
+                  borderLeft: !dataSource.interface.loadable
+                    ? `1px solid ${theme.palette.error.main}`
+                    : "0",
+                  borderRight: !dataSource.interface.loadable
+                    ? `1px solid ${theme.palette.error.main}`
+                    : "0",
+                },
+              },
+            }}
+          >
             <Box sx={{ display: "flex" }}>
               <SubAccordionSummary
                 expandIcon={<ExpandMore />}
                 aria-controls="panel1a-content"
                 id="panel2a-header"
-                sx={{ flexGrow: 1 }}
+                sx={{
+                  flexGrow: 1,
+                }}
               >
-                <Numbers sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
+                <Numbers
+                  sx={{
+                    opacity: 0.6,
+                    mr: 1,
+                    ml: -0.5,
+                  }}
+                />
                 <Typography>{t("Variables.variables")}</Typography>
               </SubAccordionSummary>
             </Box>

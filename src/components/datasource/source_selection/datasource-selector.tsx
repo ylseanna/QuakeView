@@ -5,7 +5,7 @@ import {
   Button,
   ButtonGroup,
   Divider,
-  Grid2,
+  Grid,
   // LinearProgress,
   Paper,
   TextField,
@@ -44,8 +44,8 @@ export default function DataSelector() {
       </Typography>
       <Divider></Divider>
 
-      <Grid2 container sx={{ m: 2 }}>
-        <Grid2>
+      <Grid container sx={{ m: 2 }}>
+        <Grid>
           {/* <MuiFileInput
             size="small"
             onChange={(newValue) => {
@@ -99,9 +99,9 @@ export default function DataSelector() {
             <Folder sx={{ mr: 2 }} />
             Choose file
           </Button>
-        </Grid2>
+        </Grid>
         <Divider flexItem orientation="vertical" sx={{ mr: 2, ml: 2 }} />
-        <Grid2 size="grow">
+        <Grid size="grow">
           <ButtonGroup
             sx={{ width: "calc(100%)" }}
             size="small"
@@ -125,8 +125,8 @@ export default function DataSelector() {
               )}
             />
           </ButtonGroup>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Paper>
   );
 }

@@ -96,10 +96,11 @@
   },
   "Variables": {
     "alias": "Læsilegt nafn",
-    "mapping": "Tengd(ar) breyta/ur",
+    "mapping": "(Möguleg) tengd dálkahausanöfn",
     "unit": "Eining",
     "variable": "Breyta",
-    "variables": "Breytur"
+    "variables": "Breytur",
+    "mapping_warning": "Fyllstu út dálkahausanafn sem er tengt við breytan"
   },
   "Titlebar": {
     "language": "Tungumál",

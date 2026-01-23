@@ -1,6 +1,6 @@
-import "./globals.css";
-
 import { Viewport } from "next";
+
+import "./globals.css";
 
 export const metadata = {
   title: "Earthquake Visualisation Web App",
@@ -25,8 +25,7 @@ import { routing } from "@/i18n/routing";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { DataStoreProvider } from "@/providers/data-store-provider";
-import { ThemeProvider } from "@mui/material";
-import InitColorSchemeScript from '@mui/material/InitColorSchemeScript';
+import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
 
 declare module "@mui/material/styles" {
@@ -79,10 +78,9 @@ export default async function LocaleLayout({
   return (
     <html lang={locale} suppressHydrationWarning>
       <body>
-        <InitColorSchemeScript attribute="class" />
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <ThemeProvider theme={theme}>
+            <ThemeProvider {...{ theme: theme, forceThemeRerender: true }}>
               <ProjectStoreProvider>
                 <DataStoreProvider>{children}</DataStoreProvider>
               </ProjectStoreProvider>

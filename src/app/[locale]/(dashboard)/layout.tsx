@@ -30,28 +30,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
         if (!Object.keys(data).includes(id)) {
           if (dataSources.byID[id].interface.loadable) {
             setDataLoading(true);
-            console.log(`Fetching data for ${id}`);
-
-            await fetchData(dataSources.byID[id]).then((fetched_data) => {
-              console.log(fetched_data);
-
-              addData(
-                id,
-                fetched_data,
-                dataSources.byID[id].metadata.variables.added_vars,
-              );
-
-              setDataLoading(false);
-            });
-          }
-        }
-        if (data[id]) {
-          if (dataSources.byID[id].interface.loadable) {
-            if (
-              dataSources.byID[id].metadata.variables.added_vars.length !=
-              data[id].addedVars.length
-            ) {
-              setDataLoading(true);
+            setTimeout(async () => {
               console.log(`Fetching data for ${id}`);
 
               await fetchData(dataSources.byID[id]).then((fetched_data) => {
@@ -61,10 +40,38 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
                   id,
                   fetched_data,
                   dataSources.byID[id].metadata.variables.added_vars,
+                  dataSources.byID[id].filtering,
                 );
 
                 setDataLoading(false);
               });
+            }, 500);
+          }
+        }
+        if (data[id]) {
+          if (dataSources.byID[id].interface.loadable) {
+            if (
+              dataSources.byID[id].metadata.variables.added_vars.length !=
+                data[id].addedVars.length ||
+              dataSources.byID[id].filtering != data[id].filters
+            ) {
+              setDataLoading(true);
+              setTimeout(async () => {
+                console.log(`Fetching data for ${id}`);
+
+                await fetchData(dataSources.byID[id]).then((fetched_data) => {
+                  console.log(fetched_data);
+
+                  addData(
+                    id,
+                    fetched_data,
+                    dataSources.byID[id].metadata.variables.added_vars,
+                    dataSources.byID[id].filtering,
+                  );
+
+                  setDataLoading(false);
+                });
+              }, 500);
             }
           } else {
             removeData(id);

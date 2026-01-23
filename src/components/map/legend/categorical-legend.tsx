@@ -1,5 +1,5 @@
 import { Rectangle } from "mdi-material-ui";
-import { Grid2, Stack, Typography } from "@mui/material";
+import { Grid, Stack, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
 import * as _ from "lodash";
 import { useEffect, useRef, useState } from "react";
@@ -121,9 +121,9 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
           },
         }}
       >
-        <Grid2 className="headrow" container direction="row">
-          <Grid2 size={2}></Grid2>
-          <Grid2 size="grow">
+        <Grid className="headrow" container direction="row">
+          <Grid size={2}></Grid>
+          <Grid size="grow">
             <Typography
               sx={{
                 textOverflow: "ellipses",
@@ -135,33 +135,33 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
                 ? variableDataDescription.alias
                 : variableDataDescription.variable}
             </Typography>
-          </Grid2>
-          <Grid2 size="auto" sx={{ fontWeight: "bold", fontSize: 12 }}>
+          </Grid>
+          <Grid size="auto" sx={{ fontWeight: "bold", fontSize: 12 }}>
             <Typography>#</Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
         {categories &&
           categories.slice(0, 64).map((category) => (
-            <Grid2
+            <Grid
               container
               key={"Index-" + category.value}
               alignItems="center"
               direction="row"
             >
-              <Grid2 size={2}>
+              <Grid size={2}>
                 <Rectangle sx={{ color: category.color }} />
-              </Grid2>
-              <Grid2 size="grow" alignItems="end">
+              </Grid>
+              <Grid size="grow" alignItems="end">
                 <Typography>{category.value}</Typography>
-              </Grid2>
-              <Grid2 size="auto">
+              </Grid>
+              <Grid size="auto">
                 <Typography>{category.frequency}</Typography>
-              </Grid2>
-            </Grid2>
+              </Grid>
+            </Grid>
           ))}
-        <Grid2 container direction="row" alignItems="center" sx={{ mt: 1 }}>
-          <Grid2 size={2}></Grid2>
-          <Grid2
+        <Grid container direction="row" alignItems="center" sx={{ mt: 1 }}>
+          <Grid size={2}></Grid>
+          <Grid
             display={"flex"}
             size="grow"
             sx={{ justifyContent: "flex-end", mr: 1 }}
@@ -169,13 +169,13 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
             <Typography sx={{ fontSize: 12 }}>
               {t("legend_remaining")}:
             </Typography>
-          </Grid2>
-          <Grid2 size="auto">
+          </Grid>
+          <Grid size="auto">
             <Typography sx={{ fontSize: 12 }}>
               {categories.slice(64).length}
             </Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
       </Stack>
     </div>
   );

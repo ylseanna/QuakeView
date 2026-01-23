@@ -338,7 +338,7 @@ def map_data():
     if mode == "data_query" or mode is None:
         argument_dict = request.args.to_dict()
 
-        print("DATA REQUEST", argument_dict)
+        print("DATA REQUEST\n", argument_dict)
 
         return Response(
             json.dumps(generate_event_dict()),
@@ -398,6 +398,19 @@ def generate_event_dict():
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
+    # OPTIONAL FILTERING
+
+    if "filtering" in request.args.to_dict():
+        print("FILTERING:")
+        filtering = json.loads(request.args.get("filtering"))
+
+        for variable in filtering.keys():
+            print(f"{filtering[variable][0]} < {variable} < {filtering[variable][1]}")
+            df = df[
+                (df[varmap[variable]] > filtering[variable][0])
+                & (df[varmap[variable]] < filtering[variable][1])
+            ]
+
     # CONVERT TO JSON
     event_dict = []
     for index, row in df.iterrows():
@@ -416,8 +429,6 @@ def generate_event_dict():
                 event_row[var] = row[var]
 
         event_dict.append(event_row)
-
-    print(event_dict[:10])
 
     return event_dict
 

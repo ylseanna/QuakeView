@@ -26,7 +26,7 @@ export default function Page() {
     useShallow((state) => ({
       overViewState: state.sessionInterface.overViewState,
       setOverViewState: state.interfaceActions.setOverViewState,
-    }))
+    })),
   );
 
   const onMapLoad = () => {
@@ -55,7 +55,7 @@ export default function Page() {
           ]}
           style={{
             width: "100%",
-            height: "calc(100vh - 64px - 30px)",
+            height: "calc(100vh - 80px - 32px)",
             position: "absolute",
           }}
           maxPitch={0}

@@ -3,7 +3,7 @@
 import {
   Autocomplete,
   Box,
-  Grid2,
+  Grid,
   IconButton,
   TextField,
   Typography,
@@ -39,6 +39,8 @@ function VariableEditingRow({
   required?: boolean;
   dataSource: DataSource;
 }) {
+  const t = useTranslations();
+
   const setVariableDescr = useProjectStore(
     (state) => state.dataSourceActions.setVariableDescr,
   );
@@ -120,12 +122,12 @@ function VariableEditingRow({
   }, [dataDescription.mapped_var]);
 
   return (
-    <Grid2 container spacing={1} alignItems="center">
-      <Grid2 size={1.5}>
+    <Grid container spacing={1} alignItems="flex-start">
+      <Grid size={1.5}>
         <TextField value={dataDescription.variable} size="small" disabled />
-      </Grid2>
-      <Grid2
-        size="grow"
+      </Grid>
+      <Grid
+        size={2.5}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -145,9 +147,9 @@ function VariableEditingRow({
             }
           }}
         />
-      </Grid2>
-      <Grid2
-        size={2}
+      </Grid>
+      <Grid
+        size={1.5}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -167,8 +169,8 @@ function VariableEditingRow({
             }
           }}
         />
-      </Grid2>
-      <Grid2
+      </Grid>
+      <Grid
         size="grow"
         display="flex"
         justifyContent="center"
@@ -187,12 +189,14 @@ function VariableEditingRow({
           getOptionLabel={(option: string) => option}
           size="small"
           fullWidth
+          limitTags={5}
           readOnly={!required}
           disabled={!required}
           onChange={(
             event: SyntheticEvent,
             newValue: string | string[] | null,
           ) => {
+            setLoadable(dataSource.internal_id, false);
             setVariableDescr(
               dataSource.internal_id,
               dataDescription.variable,
@@ -214,6 +218,19 @@ function VariableEditingRow({
                       .some((check) => check)
                   : false
               }
+              helperText={
+                dataDescription.mapped_var ? (
+                  !dataDescription.mapped_var
+                    .map((mapped_var) =>
+                      dataSource.metadata.catalog_headers.includes(mapped_var),
+                    )
+                    .some((check) => check) ? (
+                    <span>{t("Variables.mapping_warning")}</span>
+                  ) : undefined
+                ) : (
+                  <span>{t("Variables.mapping_warning")}</span>
+                )
+              }
             />
           )}
         />
@@ -222,8 +239,8 @@ function VariableEditingRow({
             <Clear />
           </IconButton>
         )}
-      </Grid2>
-    </Grid2>
+      </Grid>
+    </Grid>
   );
 }
 
@@ -240,37 +257,37 @@ export default function DataSourceVariableForm({
 
   return (
     <>
-      <Grid2 container spacing={1} direction="column">
-        <Grid2 container spacing={1} alignItems="flex-end">
-          <Grid2 size={1.5} sx={{ ml: 1.5 }}>
+      <Grid container spacing={1} direction="column">
+        <Grid container spacing={1} alignItems="flex-end">
+          <Grid size={1.5} sx={{ ml: 1.5 }}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
               {t("Variables.variable")}
             </Typography>
-          </Grid2>
-          <Grid2 size="grow">
+          </Grid>
+          <Grid size={2.5}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
               {t("Variables.alias")}
             </Typography>
-          </Grid2>
-          <Grid2 size={2}>
+          </Grid>
+          <Grid size={1.5}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
               {t("Variables.unit")}
             </Typography>
-          </Grid2>
-          <Grid2 size="grow">
+          </Grid>
+          <Grid size="grow">
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
               {t("Variables.mapping")}
             </Typography>
-          </Grid2>
-        </Grid2>
+          </Grid>
+        </Grid>
         {dataSource.metadata.variables.required_vars.map(
           (variable: string) =>
             variable != "t" && (
@@ -297,8 +314,8 @@ export default function DataSourceVariableForm({
             }}
           />
         ))}
-        <Grid2 container spacing={1} alignItems="center">
-          <Grid2 size={1.5}>
+        <Grid container spacing={1} alignItems="center">
+          <Grid size={1.5}>
             <Autocomplete
               options={dataSource.metadata.variables.optional_vars
                 .filter(
@@ -345,15 +362,15 @@ export default function DataSourceVariableForm({
               }}
               disableClearable
             />
-          </Grid2>
-          <Grid2
+          </Grid>
+          <Grid
             size="grow"
             display="flex"
             justifyContent="center"
             alignItems="center"
-          ></Grid2>
-        </Grid2>
-      </Grid2>
+          ></Grid>
+        </Grid>
+      </Grid>
     </>
   );
 }

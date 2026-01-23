@@ -4,7 +4,7 @@ import { Close, ExpandMore, Numbers } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
-  Grid2,
+  Grid,
   IconButton,
   TextField,
   Tooltip,
@@ -87,7 +87,6 @@ const FilteringEditingRow = ({
           max={dataDescr!.bounds[1]}
           onChange={(event: Event, newValue: number | number[]) => {
             setLocalDomain(newValue as [number, number]);
-            setFiltering(dataSource.internal_id, variable, newValue);
           }}
           onChangeCommitted={(
             event: Event | SyntheticEvent<Element, Event>,
@@ -116,7 +115,7 @@ export default function FilteringForm({
         options={Object.values(dataSource.metadata.variables.by_id)
           .filter(
             (el) =>
-              (el.data_type == "number" || el.data_type == "dt_timestamp") &&
+              (el.data_type == "number" ) && // || el.data_type == "dt_timestamp"
               !Object.keys(dataSource.filtering).includes(el.variable) &&
               (el.required ||
                 dataSource.metadata.variables.added_vars.includes(el.variable))
@@ -154,7 +153,7 @@ export default function FilteringForm({
         }}
         sx={{ mt: 1 }}
       />
-      <Grid2 container direction="column" spacing={1} sx={{ mt: 1 }}>
+      <Grid container direction="column" spacing={1} sx={{ mt: 1 }}>
         {Object.entries(dataSource.filtering).map(([variable, bounds]) => (
           <FilteringEditingRow
             key={"FilteringOption-" + variable + "-" + dataSource.internal_id}
@@ -164,7 +163,7 @@ export default function FilteringForm({
             dataSource={dataSource}
           />
         ))}
-      </Grid2>
+      </Grid>
     </>
   );
 }
