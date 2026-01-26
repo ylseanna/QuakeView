@@ -26,6 +26,7 @@ import {
   Tooltip,
   Typography,
   useTheme,
+  Grid,
 } from "@mui/material";
 
 // import {
@@ -33,7 +34,7 @@ import {
 //   DataSourceDataDescription,
 //   DataSourceFormatting,
 // } from "@/components/datasource/types";
-import { useFormatter, useTranslations, useNow } from "next-intl";
+import { useFormatter, useTranslations } from "next-intl";
 // import { Dispatch, SetStateAction, useCallback } from "react";
 import DataSourceFormattingForm from "../formatting/formatting-form";
 
@@ -99,8 +100,6 @@ export default function DataTab({ id }: DataTabProps) {
     dataSource.metadata.variables,
   ]);
 
-  const now = useNow();
-
   return (
     <Accordion>
       <Box sx={{ display: "flex" }}>
@@ -122,8 +121,7 @@ export default function DataTab({ id }: DataTabProps) {
                 : { color: theme.palette.warning.main }
             }
           >
-            {dataSource.filename}{" "}
-            {format.dateTime(now)}
+            {dataSource.filename}
           </Typography>
         </AccordionSummary>
         <Tooltip title={t("Sources.remove_data_source")}>
@@ -229,11 +227,32 @@ export default function DataTab({ id }: DataTabProps) {
                 <Typography className="row-header" noWrap>
                   <b>{t("Sources.column_headers")}:</b>
                 </Typography>
-                <Typography>
-                  {dataSource.metadata.catalog_headers.join(", ")}
-                </Typography>
               </Stack>
             </Stack>
+            <Grid
+              container
+              sx={{
+                display: "flex",
+                width: "100%",
+                m: 2,
+                "--Grid-borderWidth": "1px",
+                borderTop: "var(--Grid-borderWidth) solid",
+                borderLeft: "var(--Grid-borderWidth) solid",
+                borderColor: "divider",
+                "& > div": {
+                  p:1,
+                  borderRight: "var(--Grid-borderWidth) solid",
+                  borderBottom: "var(--Grid-borderWidth) solid",
+                  borderColor: "divider",
+                },
+              }}
+            >
+              {dataSource.metadata.catalog_headers.map((header, index) => (
+                <Grid key={index} size="auto">
+                  {header}
+                </Grid>
+              ))}
+            </Grid>
           </Stack>
         </Paper>
 

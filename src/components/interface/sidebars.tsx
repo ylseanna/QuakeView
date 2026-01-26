@@ -4,7 +4,7 @@
 import {
   Box,
   Checkbox,
-  Grid2,
+  Grid,
   IconButton,
   Paper,
   Tooltip,
@@ -147,7 +147,7 @@ export default function Sidebars() {
             title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
             placement="left"
           >
-            <IconButton onClick={toggleFilteringSidebar} disabled>
+            <IconButton onClick={toggleFilteringSidebar}>
               <FilterAlt sx={{ color: "var(--theme-palette-text-primary)" }} />
             </IconButton>
           </Tooltip>
@@ -159,7 +159,7 @@ export default function Sidebars() {
                 p: 2,
               }}
             >
-              <Grid2
+              <Grid
                 container
                 direction={"column"}
                 alignItems="end"
@@ -167,7 +167,7 @@ export default function Sidebars() {
               >
                 {dataSources &&
                   dataSources.allIDs.map((id) => (
-                    <Grid2
+                    <Grid
                       size="grow"
                       key={id}
                       direction="row"
@@ -190,9 +190,9 @@ export default function Sidebars() {
                         }}
                         size="small"
                       />
-                    </Grid2>
+                    </Grid>
                   ))}
-              </Grid2>
+              </Grid>
             </Paper>
           )}
         </Paper>
