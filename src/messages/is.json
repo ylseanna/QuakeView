@@ -86,7 +86,9 @@
     "options": "Stillingar",
     "remove_data_source": "Fjarlægja gagnaheimild",
     "upload_files": "Flytja upp",
-    "summary": "Samantekt"
+    "summary": "Samantekt",
+    "name": "Nafn",
+    "earthquake_catalog": "Jarðskjálftaskrá"
   },
   "Table": {
     "dep": "Dýpi (km)",

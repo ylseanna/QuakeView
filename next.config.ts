@@ -11,7 +11,7 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 
 const basePath = "";
-const defaultLocale = "en";
+const defaultLocale = "en-US";
 
 module.exports = withBundleAnalyzer(
   withNextIntl({

@@ -86,7 +86,9 @@
     "options": "Options",
     "remove_data_source": "Remove data source",
     "summary": "Summary",
-    "upload_files": "Upload files"
+    "upload_files": "Upload files",
+    "name": "Name",
+    "earthquake_catalog": "Earthquake catalog file"
   },
   "Table": {
     "dep": "Depth (km)",

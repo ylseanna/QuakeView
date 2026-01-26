@@ -28,6 +28,7 @@ import { DataStoreProvider } from "@/providers/data-store-provider";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
 
+
 declare module "@mui/material/styles" {
   interface TypographyVariants {
     formlabel: React.CSSProperties;

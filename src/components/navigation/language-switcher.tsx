@@ -6,6 +6,7 @@ import { useLocale } from "next-intl";
 
 import { SxTopNavButton } from "./title-bar";
 
+
 export default function LanguageSwitcher() {
   const locale = useLocale();
   const pathname = usePathname();
@@ -13,8 +14,10 @@ export default function LanguageSwitcher() {
 
   // Change locale programmatically to prevent page from reloading
   function changeLocale(locale: string) {
+    console.log(locale);
     router.push(pathname, { locale: locale });
   }
+
   return (
     <div id="lngSwitcher">
       {locale === "is" ? (
@@ -22,10 +25,10 @@ export default function LanguageSwitcher() {
           <Link
             className="link"
             href={pathname}
-            locale="en"
+            locale="en-US"
             onClick={(event) => {
               event.preventDefault();
-              changeLocale("en");
+              changeLocale("en-US");
             }}
           >
             <Button

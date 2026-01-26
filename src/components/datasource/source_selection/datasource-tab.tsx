@@ -3,8 +3,11 @@
 import {
   Close,
   ColorLens,
+  Edit,
+  EditOff,
   ExpandMore,
   FilterAlt,
+  Folder,
   Numbers,
   ScatterPlot,
   Warning,
@@ -14,9 +17,12 @@ import {
   AccordionDetails,
   AccordionSummary,
   Box,
-  Grid,
+  ClickAwayListener,
+  Divider,
   IconButton,
   Paper,
+  Stack,
+  TextField,
   Tooltip,
   Typography,
   useTheme,
@@ -27,7 +33,7 @@ import {
 //   DataSourceDataDescription,
 //   DataSourceFormatting,
 // } from "@/components/datasource/types";
-import { useTranslations } from "next-intl";
+import { useFormatter, useTranslations, useNow } from "next-intl";
 // import { Dispatch, SetStateAction, useCallback } from "react";
 import DataSourceFormattingForm from "../formatting/formatting-form";
 
@@ -48,6 +54,7 @@ interface DataTabProps {
 
 export default function DataTab({ id }: DataTabProps) {
   const t = useTranslations();
+  const format = useFormatter();
 
   const dataSource = useProjectStore((state) => state.dataSources.byID[id]);
   const removeDataSource = useProjectStore(
@@ -65,6 +72,7 @@ export default function DataTab({ id }: DataTabProps) {
   const theme = useTheme();
 
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
+  const [amEditingName, setAmEditingName] = useState(false);
 
   useEffect(() => {
     const all_domains_present = dataSource.metadata.variables.required_vars
@@ -91,6 +99,8 @@ export default function DataTab({ id }: DataTabProps) {
     dataSource.metadata.variables,
   ]);
 
+  const now = useNow();
+
   return (
     <Accordion>
       <Box sx={{ display: "flex" }}>
@@ -112,7 +122,8 @@ export default function DataTab({ id }: DataTabProps) {
                 : { color: theme.palette.warning.main }
             }
           >
-            {dataSource.filename}
+            {dataSource.filename}{" "}
+            {format.dateTime(now)}
           </Typography>
         </AccordionSummary>
         <Tooltip title={t("Sources.remove_data_source")}>
@@ -130,43 +141,100 @@ export default function DataTab({ id }: DataTabProps) {
         </Tooltip>
       </Box>
       <AccordionDetails>
-        <Paper variant="outlined" sx={{ p: 2, mb: 2 }}>
-          <Grid container columns={8}>
-            <Grid size={2}>
-              <Typography noWrap>
-                <b>{t("Sources.filename")}:</b>
+        <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
+          <Stack
+            sx={{
+              ".full-row": {
+                ml: 2,
+                mr: 2,
+                flexDirection: "row",
+                justifyContent: "space-between",
+                ".first-bit": {
+                  minHeight: "36px",
+                  alignItems: "center",
+                  ".row-header": {
+                    minWidth: "200px",
+                  },
+                },
+              },
+            }}
+          >
+            <Stack className="full-row">
+              <Typography variant="h6" sx={{ my: 1 }}>
+                {t("Sources.earthquake_catalog")}
               </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>{dataSource.filename}</Typography>
-            </Grid>
-            <Grid size={2}>
-              <Typography noWrap>
-                <b>{t("Sources.filepath")}:</b>
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>{dataSource.filepath}</Typography>
-            </Grid>
-            <Grid size={2}>
-              <Typography noWrap>
-                <b>{t("Sources.num_events")}:</b>
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>{String(dataSource.metadata.num_events)}</Typography>
-            </Grid>
-            <Grid size={2}>
-              <Typography noWrap>
-                <b>{t("Sources.column_headers")}:</b>
-              </Typography>
-            </Grid>
-            <Grid size={6}>
-              <Typography>
-                {dataSource.metadata.catalog_headers.join(", ")}
-              </Typography>
-            </Grid>
-          </Grid>
+            </Stack>
+            <ClickAwayListener
+              onClickAway={() => {
+                setAmEditingName(false);
+              }}
+            >
+              <Stack className="full-row">
+                <Stack className="first-bit" direction="row">
+                  <Typography className="row-header" noWrap>
+                    <b>{t("Sources.name")}:</b>
+                  </Typography>
+
+                  {dataSource.name != dataSource.filename || amEditingName ? (
+                    <TextField
+                      sx={{ marginBottom: "-4px" }}
+                      size="small"
+                      variant="standard"
+                      value={dataSource.name}
+                      fullWidth
+                    />
+                  ) : (
+                    <Typography
+                      onClick={() => {
+                        setAmEditingName(true);
+                      }}
+                    >
+                      {dataSource.name}
+                    </Typography>
+                  )}
+                </Stack>
+                <IconButton
+                  onClick={() => {
+                    setAmEditingName(!amEditingName);
+                  }}
+                >
+                  {amEditingName ? <EditOff /> : <Edit />}
+                </IconButton>
+              </Stack>
+            </ClickAwayListener>
+            <Stack className="full-row">
+              <Stack className="first-bit" direction="row">
+                <Typography className="row-header" noWrap>
+                  <b>{t("Sources.filepath")}:</b>
+                </Typography>
+                <Typography>{dataSource.filepath}</Typography>
+              </Stack>
+              <IconButton>
+                <Folder />
+              </IconButton>
+            </Stack>
+            <Stack className="full-row" direction="row">
+              <Stack className="first-bit" direction="row">
+                <Typography className="row-header" noWrap>
+                  <b>{t("Sources.num_events")}:</b>
+                </Typography>
+                <Typography>
+                  {format.number(dataSource.metadata.num_events)}
+                </Typography>
+              </Stack>
+            </Stack>
+            <Divider sx={{ my: 1, mx: 2 }} />
+            <Stack className="full-row" direction="row">
+              <Stack className="first-bit" direction="row">
+                <Typography className="row-header" noWrap>
+                  <b>{t("Sources.column_headers")}:</b>
+                </Typography>
+                <Typography>
+                  {dataSource.metadata.catalog_headers.join(", ")}
+                </Typography>
+              </Stack>
+            </Stack>
+          </Stack>
         </Paper>
 
         <Paper variant="outlined" sx={{ overflow: "hidden" }}>

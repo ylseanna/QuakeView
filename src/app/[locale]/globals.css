@@ -30,6 +30,7 @@ html {
   position: "absolute";
   top: 0;
   overflow: hidden;
+  user-select: none;
 }
 
 /* D3 overrides */
