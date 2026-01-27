@@ -100,5 +100,16 @@ export const theme: ThemeOptions = createTheme({
         },
       },
     },
+    MuiFormControl: {
+      styleOverrides:{root: {
+        height: '40px',
+      }},
+    },
+    MuiInputBase: {
+      styleOverrides:{root: {
+        height: '40px',
+      }},
+    },
   },
+
 });

@@ -121,6 +121,14 @@ function VariableEditingRow({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [dataDescription.mapped_var]);
 
+  const SharedTextFieldProps = {
+    sx: {
+      inputProps: {
+        sx: {minHeight: "40px"}
+      }
+    },
+  };
+
   return (
     <Grid container spacing={1} alignItems="flex-start">
       <Grid size={1.5}>
@@ -136,6 +144,7 @@ function VariableEditingRow({
           value={dataDescription.alias}
           size="small"
           fullWidth
+          {...SharedTextFieldProps}
           onChange={(event: ChangeEvent<HTMLInputElement>) => {
             if (event.target) {
               setVariableDescr(
@@ -219,17 +228,21 @@ function VariableEditingRow({
                   : false
               }
               helperText={
-                dataDescription.mapped_var ? (
-                  !dataDescription.mapped_var
-                    .map((mapped_var) =>
-                      dataSource.metadata.catalog_headers.includes(mapped_var),
-                    )
-                    .some((check) => check) ? (
+                required ? (
+                  dataDescription.mapped_var ? (
+                    !dataDescription.mapped_var
+                      .map((mapped_var) =>
+                        dataSource.metadata.catalog_headers.includes(
+                          mapped_var,
+                        ),
+                      )
+                      .some((check) => check) ? (
+                      <span>{t("Variables.mapping_warning")}</span>
+                    ) : undefined
+                  ) : (
                     <span>{t("Variables.mapping_warning")}</span>
-                  ) : undefined
-                ) : (
-                  <span>{t("Variables.mapping_warning")}</span>
-                )
+                  )
+                ) : undefined
               }
             />
           )}
