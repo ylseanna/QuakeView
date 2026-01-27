@@ -24,8 +24,7 @@ jobs:
       - run: npm ci --omit=dev # or yarn install
 
       - name: Setup esbuild
-
-      - run: npm install @esbuild/win32-x64
+        run: npm install @esbuild/win32-x64
 
       - run: npm list
 
