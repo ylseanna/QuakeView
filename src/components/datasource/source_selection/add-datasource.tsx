@@ -1,37 +1,30 @@
 import path from "path";
-import {
-  DataSource,
-  DataSourceDataDescription,
-  DataSourceFormatting,
-  DataSourceMetaData,
-} from "../types";
+
+import { DataSource, DataSourceFormatting, DataSourceMetaData } from "../types";
 
 export const getInitDataSource = async (filepath: string) => {
   const initDataSource = await fetch(
-    `/api/map_data?mode=metadata_query&filepath=${encodeURIComponent(filepath)}`
+    `/api/map_data?mode=metadata_query&filepath=${encodeURIComponent(filepath)}`,
   )
     .then((res) => res.json())
     .then((metadata: DataSourceMetaData) => {
       const internal_id = crypto.randomUUID();
 
-      console.log(metadata.data_descr)
-
-      const colormapsBounds = metadata.data_descr!.map(
-        (dataDescr: DataSourceDataDescription) => {
+      const colormapsBounds = Object.keys(metadata.variables.by_id).map(
+        (variable: string) => {
           const obj: { [variable: string]: [number, number] } = {};
-          obj[dataDescr.variable] = dataDescr.bounds;
+          obj[variable] = metadata.variables.by_id[variable].bounds;
           return obj;
-        }
+        },
       );
 
-      const initDataSource =  {
+      const initDataSource = {
         internal_id: internal_id,
         filepath: filepath,
         filename: path.basename(filepath),
         name: path.basename(filepath),
-        interface: { pickable: false, visible: true, addedVars: [] },
-        filtering: {
-        },
+        interface: { pickable: false, visible: true, loadable: false },
+        filtering: {},
         formatting: {
           scale: 15,
           opacity: 100,
@@ -56,8 +49,8 @@ export const getInitDataSource = async (filepath: string) => {
         metadata: metadata,
       } as DataSource;
 
-      return initDataSource
+      return initDataSource;
     });
 
-    return initDataSource
+  return initDataSource;
 };

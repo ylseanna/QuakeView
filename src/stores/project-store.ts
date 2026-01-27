@@ -1,15 +1,13 @@
-import {
-  DataSourceDataDescription,
-  DataSourceFormatting,
-} from "./../components/datasource/types";
-import { createStore } from "zustand/vanilla";
-import { persist } from "zustand/middleware";
 import { immer } from "zustand/middleware/immer";
+import { ViewState } from "react-map-gl/maplibre";
+import { persist } from "zustand/middleware";
+import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
+
+import { DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
 import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
-  count: number;
   sessionInterface: SessionInterface;
   GPUfiltering: GPU_filtering;
   dataSources: {
@@ -19,6 +17,7 @@ export type ProjectState = {
 };
 
 export type SessionInterface = {
+  overViewState: ViewState;
   pickable: boolean;
   animation: {
     tapered: boolean;
@@ -35,11 +34,8 @@ export type GPU_filtering = {
 };
 
 export type ProjectActions = {
-  countActions: {
-    decrementCount: () => void;
-    incrementCount: () => void;
-  };
   interfaceActions: {
+    setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
     animation: {
       setTapered: (value: boolean) => void;
@@ -56,32 +52,49 @@ export type ProjectActions = {
   dataSourceActions: {
     addDataSource: (dataSource: DataSource) => void;
     removeDataSource: (id: string) => void;
+    setMetadata: (
+      id: string,
+      value: DataSourceMetaData,
+    ) => void;
     setFormatting: (
       id: string,
       keyToModify: keyof DataSourceFormatting,
-      value: never
+      value: never,
     ) => void;
     setFiltering: (
       id: string,
       variableToModify: string,
-      value: [number, number] | null
+      value: [number, number] | null,
     ) => void;
     setVariableDescr: (
       id: string,
-      keyToModify: string,
-      variableToModify: keyof DataSourceDataDescription,
-      value: never
+      variableToModify: string,
+      keyToModify: keyof DataSourceDataDescription,
+      value: never,
     ) => void;
-    setAddedVars: (id: string, value: never) => void;
+    setAddedVars: (id: string, value: string[]) => void;
     setVisible: (id: string, value: boolean) => void;
+    setLoadable: (id: string, value: boolean) => void;
   };
 };
 
 export type ProjectStore = ProjectState & ProjectActions;
 
 export const defaultInitState: ProjectState = {
-  count: 0,
   sessionInterface: {
+    overViewState: {
+      longitude: -19,
+      latitude: 65,
+      zoom: 6,
+      pitch: 0,
+      bearing: 0,
+      padding: {
+        top: 0,
+        bottom: 0,
+        left: 0,
+        right: 0,
+      },
+    },
     pickable: false,
     animation: { tapered: false, speed: { multiplier: 1, unit: "day" } },
   },
@@ -90,17 +103,17 @@ export const defaultInitState: ProjectState = {
 };
 
 export const createProjectStore = (
-  initState: ProjectState = defaultInitState
+  initState: ProjectState = defaultInitState,
 ) => {
   return createStore<ProjectStore>()(
     persist(
       immer((set) => ({
         ...initState,
-        countActions: {
-          decrementCount: () => set((state) => ({ count: state.count - 1 })),
-          incrementCount: () => set((state) => ({ count: state.count + 1 })),
-        },
         interfaceActions: {
+          setOverViewState: (value) =>
+            set((state) => {
+              state.sessionInterface.overViewState = value;
+            }),
           setPickable: (value) =>
             set((state) => {
               state.sessionInterface.pickable = value;
@@ -137,8 +150,12 @@ export const createProjectStore = (
               delete state.dataSources.byID[id];
               state.dataSources.allIDs.splice(
                 state.dataSources.allIDs.findIndex((iid) => iid === id),
-                1
+                1,
               );
+            }),
+          setMetadata: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata = value;
             }),
           setFormatting: (id, keyToModify, value) =>
             set((state) => {
@@ -152,27 +169,23 @@ export const createProjectStore = (
                 delete state.dataSources.byID[id].filtering[keyToModify];
               }
             }),
-          setVariableDescr: (id, keyToModify, variableToModify, value) =>
+          setVariableDescr: (id, variableToModify, keyToModify, value) =>
             set((state) => {
-              console.log(variableToModify);
-              const index = state.dataSources.byID[
-                id
-              ].metadata.data_descr.findIndex(
-                (dataDescr) => dataDescr.variable === keyToModify
-              );
-              console.log(index);
-              if (index !== -1)
-                state.dataSources.byID[id].metadata.data_descr[index][
-                  variableToModify
-                ] = value;
+              state.dataSources.byID[id].metadata.variables.by_id[
+                variableToModify
+              ][keyToModify] = value;
             }),
           setAddedVars: (id, value) =>
             set((state) => {
-              state.dataSources.byID[id].interface.addedVars = value;
+              state.dataSources.byID[id].metadata.variables.added_vars = value;
             }),
           setVisible: (id, value) =>
             set((state) => {
               state.dataSources.byID[id].interface.visible = value;
+            }),
+          setLoadable: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].interface.loadable = value;
             }),
         },
       })),
@@ -181,7 +194,7 @@ export const createProjectStore = (
         merge: (persistedState, currentState) => {
           return merge({}, currentState, persistedState);
         },
-      }
-    )
+      },
+    ),
   );
 };

@@ -1,22 +1,59 @@
-import { Box, Grid2, Typography } from "@mui/material";
+import { Box, Grid, Typography } from "@mui/material";
+
 import { DataSource } from "../../datasource/types";
+import CategoricalLegend from "./categorical-legend";
 // import { useTranslations } from "next-intl";
 import ColormapLegend from "./colormap-legend";
-import CategoricalLegend from "./categorical-legend";
 
 interface LegendElementProps {
   dataSource: DataSource;
+  singleColor?: boolean;
 }
 
-export default function LegendElement({ dataSource }: LegendElementProps) {
-  return dataSource.formatting.color.mapping == "linear" ? (
-    <ColormapLegend dataSource={dataSource} />
-  ) :dataSource.formatting.color.mapping == "categorical" ?  (
+export default function LegendElement({
+  dataSource,
+  singleColor,
+}: LegendElementProps) {
+  return dataSource.formatting.color.mapping == "linear" && !singleColor ? (
+    <>
+      <Typography
+        fontSize={10}
+        fontWeight="bold"
+        sx={{
+          mb: 0.25,
+          opacity: 0.8,
+          width: "100%",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {dataSource.filename}
+      </Typography>
+      <ColormapLegend dataSource={dataSource} />
+    </>
+  ) : dataSource.formatting.color.mapping == "categorical" && !singleColor ? (
+    <>
+      <Typography
+        fontSize={10}
+        fontWeight="bold"
+        sx={{
+          mb: 0.25,
+          opacity: 0.8,
+          width: "100%",
+          overflow: "hidden",
+          whiteSpace: "nowrap",
+          textOverflow: "ellipsis",
+        }}
+      >
+        {dataSource.filename}
+      </Typography>
       <CategoricalLegend dataSource={dataSource} />
+    </>
   ) : (
-    dataSource.formatting.color.mapping == "single" && (
-      <Grid2 container alignItems="center">
-        <Grid2 size={2} display="flex">
+    (dataSource.formatting.color.mapping == "single" || singleColor) && (
+      <Grid container alignItems="center">
+        <Grid size={2} display="flex">
           <Box
             sx={{
               display: "inline-block",
@@ -27,8 +64,13 @@ export default function LegendElement({ dataSource }: LegendElementProps) {
               opacity: dataSource.formatting.opacity,
             }}
           ></Box>
-        </Grid2>
-        <Grid2 size="grow" display="flex" alignItems="center" sx={{h: "12px"}}>
+        </Grid>
+        <Grid
+          size="grow"
+          display="flex"
+          alignItems="center"
+          sx={{ h: "12px" }}
+        >
           <Typography
             fontSize={10}
             fontWeight="bold"
@@ -43,8 +85,8 @@ export default function LegendElement({ dataSource }: LegendElementProps) {
           >
             {dataSource.filename}
           </Typography>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     )
   );
 }

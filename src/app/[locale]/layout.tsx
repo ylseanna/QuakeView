@@ -1,6 +1,6 @@
-import "./globals.css";
-
 import { Viewport } from "next";
+
+import "./globals.css";
 
 export const metadata = {
   title: "Earthquake Visualisation Web App",
@@ -14,36 +14,33 @@ export const viewport: Viewport = {
 import "@fontsource-variable/archivo";
 import "@fontsource-variable/ibm-plex-sans";
 
-
-import { Suspense, ReactNode } from "react";
-
-import LinearProgress from "@mui/material/LinearProgress";
-
 import { theme } from "./theme";
 
-import { NextAppProvider } from "@toolpad/core/nextjs";
-import { getTranslations } from "next-intl/server";
 import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
 import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
-import { AppTheme } from "@toolpad/core";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { DataStoreProvider } from "@/providers/data-store-provider";
+import { ThemeProvider } from "@mui/material/styles";
+import { ReactNode } from "react";
+
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
     formlabel: React.CSSProperties;
     formheader: React.CSSProperties;
+    navsectionheader: React.CSSProperties;
   }
 
   // allow configuration using `createTheme()`
   interface TypographyVariantsOptions {
     formlabel?: React.CSSProperties;
     formheader?: React.CSSProperties;
+    navsectionheader?: React.CSSProperties;
   }
 }
 
@@ -52,6 +49,7 @@ declare module "@mui/material/Typography" {
   interface TypographyPropsVariantOverrides {
     formlabel: true;
     formheader: true;
+    navsectionheader: true;
   }
 }
 
@@ -76,13 +74,6 @@ export default async function LocaleLayout({
     notFound();
   }
 
-  const t = await getTranslations("Common");
-
-  const BRANDING = await {
-    title: t("app_title"),
-    logo: "",
-  };
-
   const messages = await getMessages();
 
   return (
@@ -90,17 +81,11 @@ export default async function LocaleLayout({
       <body>
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
-            <Suspense fallback={<LinearProgress />}>
-              <NextAppProvider
-                theme={theme as AppTheme}
-                branding={BRANDING}
-                // router={router}
-              >
-                <ProjectStoreProvider>
-                  <DataStoreProvider>{children}</DataStoreProvider>
-                </ProjectStoreProvider>
-              </NextAppProvider>
-            </Suspense>
+            <ThemeProvider {...{ theme: theme, forceThemeRerender: true }}>
+              <ProjectStoreProvider>
+                <DataStoreProvider>{children}</DataStoreProvider>
+              </ProjectStoreProvider>
+            </ThemeProvider>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>
       </body>

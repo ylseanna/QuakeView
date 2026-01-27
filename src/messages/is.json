@@ -19,6 +19,9 @@
     "app_title": "Jarðskjálftaskrár",
     "configure": "Samskipa",
     "data": "Gögn",
+    "data_overview": "Gagnayfirlit",
+    "file": "Setur",
+    "help": "Hjálp",
     "information": "Upplýsingar",
     "input": "Inntak",
     "legend": "Skýring",
@@ -30,7 +33,15 @@
     "plots": "Gröf",
     "sources": "Gagnaheimildir",
     "timeline": "Tímalína",
-    "visualisations": "Kort og gröf"
+    "view": "Skoða",
+    "views": "Gagnasýn",
+    "visualisations": "Kort og gröf",
+    "all_plots": "Öll gröf",
+    "distributionplot": "dreifing\n",
+    "theme_dark": "dökk",
+    "theme_light": "ljós",
+    "theme_system": "kerfi",
+    "Navbar": {}
   },
   "Filtering": {
     "add_filter": "Bæta við síu",
@@ -74,7 +85,10 @@
     "num_events": "Fjöldi skjálftar",
     "options": "Stillingar",
     "remove_data_source": "Fjarlægja gagnaheimild",
-    "upload_files": "Flytja upp"
+    "upload_files": "Flytja upp",
+    "summary": "Samantekt",
+    "name": "Nafn",
+    "earthquake_catalog": "Jarðskjálftaskrá"
   },
   "Table": {
     "dep": "Dýpi (km)",
@@ -84,9 +98,24 @@
   },
   "Variables": {
     "alias": "Læsilegt nafn",
-    "mapping": "Tengd(ar) breyta/ur",
+    "mapping": "(Möguleg) tengd dálkahausanöfn",
     "unit": "Eining",
     "variable": "Breyta",
-    "variables": "Breytur"
+    "variables": "Breytur",
+    "mapping_warning": "Fyllstu út dálkahausanafn sem er tengt við breytan"
+  },
+  "Titlebar": {
+    "language": "Tungumál",
+    "show_animation_controls": "Sýna myndlífgunnarstýring",
+    "show_map_tools": "Sýna kortstýring",
+    "show_sidebar": "Sýna hliðarvalmynd",
+    "theme": "Þema",
+    "debug_window": "Sýna kembuglugga"
+  },
+  "Navbar": {
+    "distribution_plot": "Stuðlarit",
+    "GR_plot": "GR graf",
+    "stem_plot": "Leggjagraf",
+    "open_in_window": "Opna siða \"{page}\" í nýjum glugga"
   }
 }

@@ -3,7 +3,7 @@
 import { PickingInfo } from "@deck.gl/core";
 // import { useTranslations } from "next-intl";
 import { EarthQuake, DataSourceDataDescription } from "../datasource/types";
-import { Grid2, Paper, SxProps, Typography } from "@mui/material";
+import { Grid, Paper, SxProps, Typography } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useMemo } from "react";
 
@@ -34,32 +34,28 @@ export default function MapToolTip({ pickingInfo }: MapToolTipProps) {
 
   const vars_to_list = useMemo(
     () =>
-      dataSource!.metadata.data_descr
+      dataSource!.metadata.variables.required_vars
+        .concat(dataSource!.metadata.variables.added_vars)
+        .filter((variable) => variable != "t")
         .map(
-          (dataDescription: DataSourceDataDescription) =>
-            ((dataDescription.required && dataDescription.variable != "t") ||
-              dataSource?.interface.addedVars.includes(
-                dataDescription.variable
-              )) &&
-            dataDescription
-        )
-        .filter((el) => el) as DataSourceDataDescription[],
-    [dataSource]
+          (variable: string) => dataSource!.metadata.variables.by_id[variable],
+        ),
+    [dataSource],
   );
 
   const tooltipHeight = useMemo(
     () => vars_to_list.length * 18 + 16,
-    [vars_to_list.length]
+    [vars_to_list.length],
   );
 
   const maxX = useMemo(
     () => pickingInfo.viewport!.width - TOOLTIP_WIDTH,
-    [pickingInfo.viewport]
+    [pickingInfo.viewport],
   );
 
   const maxY = useMemo(
     () => pickingInfo.viewport!.height - tooltipHeight,
-    [pickingInfo.viewport, tooltipHeight]
+    [pickingInfo.viewport, tooltipHeight],
   );
 
   if (pickingInfo.object && sessionInterface.pickable) {
@@ -72,15 +68,15 @@ export default function MapToolTip({ pickingInfo }: MapToolTipProps) {
           top: pickingInfo.y < maxY ? pickingInfo.y + 8 : maxY,
         }}
       >
-        <Grid2 container direction="column">
+        <Grid container direction="column">
           {pickingInfo.object &&
             vars_to_list.map((dataDescription: DataSourceDataDescription) => {
               return (
-                <Grid2
+                <Grid
                   key={`ToolTipVariable-${dataDescription.variable}`}
                   container
                 >
-                  <Grid2 size={4}>
+                  <Grid size={4}>
                     <Typography
                       noWrap
                       sx={{
@@ -95,8 +91,8 @@ export default function MapToolTip({ pickingInfo }: MapToolTipProps) {
                         ? dataDescription.alias
                         : dataDescription.variable}
                     </Typography>
-                  </Grid2>
-                  <Grid2 size={"grow"}>
+                  </Grid>
+                  <Grid size={"grow"}>
                     <Typography
                       noWrap
                       sx={{
@@ -132,11 +128,11 @@ export default function MapToolTip({ pickingInfo }: MapToolTipProps) {
                         <i>{pickingInfo.object![dataDescription.variable]}</i>
                       )}{" "}
                     </Typography>
-                  </Grid2>
-                </Grid2>
+                  </Grid>
+                </Grid>
               );
             })}
-        </Grid2>
+        </Grid>
       </Paper>
     );
   }

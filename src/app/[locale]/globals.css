@@ -18,16 +18,29 @@
 
 body {
   color: rgb(var(--foreground-rgb));
+  height: 100%;
+  position: "absolute";
+  top: 0;
+  overflow: hidden;
 }
 
 html {
   font-size: 14px;
+  height: 100%;
+  position: "absolute";
+  top: 0;
+  overflow: hidden;
+  user-select: none;
 }
 
 /* D3 overrides */
 
 .draggableArea {
   app-region: drag;
+}
+
+.noDragArea {
+  app-region: no-drag;
 }
 
 /* #deckgl-wrapper {

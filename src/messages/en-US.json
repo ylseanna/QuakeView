@@ -19,6 +19,9 @@
     "app_title": "Earthquake Catalogues",
     "configure": "Configure",
     "data": "Data",
+    "data_overview": "Data overview",
+    "file": "File",
+    "help": "Help",
     "information": "Information",
     "input": "Input",
     "legend": "Legend",
@@ -30,7 +33,15 @@
     "plots": "Plots",
     "sources": "Sources",
     "timeline": "Timeline",
-    "visualisations": "Visualisations"
+    "view": "View",
+    "views": "Views",
+    "visualisations": "Visualisations",
+    "all_plots": "All plots",
+    "distributionplot": "distribution",
+    "theme_system": "System",
+    "theme_light": "Light",
+    "theme_dark": "Dark",
+    "Navbar": {}
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -75,7 +86,9 @@
     "options": "Options",
     "remove_data_source": "Remove data source",
     "summary": "Summary",
-    "upload_files": "Upload files"
+    "upload_files": "Upload files",
+    "name": "Name",
+    "earthquake_catalog": "Earthquake catalog file"
   },
   "Table": {
     "dep": "Depth (km)",
@@ -85,9 +98,24 @@
   },
   "Variables": {
     "alias": "Display name",
-    "mapping": "Mapped variable(s)",
+    "mapping": "Mapped column name(s)",
     "unit": "Unit",
     "variable": "Variable",
-    "variables": "Variables"
+    "variables": "Variables",
+    "mapping_warning": "Please fill in a correct column to variable mapping"
+  },
+  "Titlebar": {
+    "language": "Language",
+    "theme": "Theme",
+    "show_sidebar": "Show sidebar controls",
+    "show_map_tools": "Show map tools",
+    "show_animation_controls": "Show animation controls",
+    "debug_window": "Show debug window"
+  },
+  "Navbar": {
+    "GR_plot": "GR plot",
+    "distribution_plot": "Histogram",
+    "stem_plot": "Stem plot",
+    "open_in_window": "Open page \"{page}\" in new window"
   }
 }

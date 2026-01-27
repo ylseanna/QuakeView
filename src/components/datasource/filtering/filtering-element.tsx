@@ -22,7 +22,7 @@ export default function FilteringElement({
   single?: boolean;
 }) {
   return !single ? (
-    <SubAccordion>
+    <SubAccordion disabled={!dataSource.interface.loadable}>
       <Box sx={{ display: "flex" }}>
         <SubAccordionSummary
           expandIcon={<ExpandMore />}
@@ -35,13 +35,17 @@ export default function FilteringElement({
         </SubAccordionSummary>
       </Box>
       <SubAccordionDetails>
-        <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+        {dataSource.interface.loadable && (
+          <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+        )}
       </SubAccordionDetails>
     </SubAccordion>
   ) : (
     <>
       <SubAccordionDetails>
-        <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+        {dataSource.interface.loadable && (
+          <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+        )}
       </SubAccordionDetails>
       <Divider />
     </>

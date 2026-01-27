@@ -1,6 +1,6 @@
 import { Box, Paper, Slide, useTheme } from "@mui/material";
 import { RefObject, useEffect, useState } from "react";
-import TimelineSlider from "../../d3/timeline-slider-canvas";
+import TimelineSlider from "../../interface-elements/timeline-slider-canvas";
 
 export default function BottomBar({
   drawerOpen,

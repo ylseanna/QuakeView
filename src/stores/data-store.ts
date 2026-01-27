@@ -1,13 +1,14 @@
-import { EarthQuake } from "../components/datasource/types";
-import { createStore } from "zustand/vanilla";
 import { immer } from "zustand/middleware/immer";
+import { createStore } from "zustand/vanilla";
+
+import { DataSourceFiltering, EarthQuake } from "../components/datasource/types";
 
 export type DataState = {
-  data: { [id: string]: { data: EarthQuake[]; addedVars: string[] } };
+  data: { [id: string]: { data: EarthQuake[]; addedVars: string[]; filters: DataSourceFiltering } };
 };
 
 export type DataActions = {
-  addData: (id: string, addedData: EarthQuake[], addedVars: string[]) => void;
+  addData: (id: string, addedData: EarthQuake[], addedVars: string[], addedFilters: DataSourceFiltering) => void;
   removeData: (id: string) => void;
 };
 
@@ -19,9 +20,9 @@ export const createDataStore = (initState: DataState = defaultInitState) => {
   return createStore<DataStore>()(
     immer((set) => ({
       ...initState,
-      addData: (id, addedData, addedVars) =>
+      addData: (id, addedData, addedVars, addedFilters) =>
         set((state) => {
-          state.data[id] = { data: addedData, addedVars: addedVars };
+          state.data[id] = { data: addedData, addedVars: addedVars, filters: addedFilters };
         }),
       removeData: (id) =>
         set((state) => {

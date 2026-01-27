@@ -4,7 +4,7 @@ import { Close, ExpandMore, Numbers } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
-  Grid2,
+  Grid,
   IconButton,
   TextField,
   Tooltip,
@@ -20,7 +20,7 @@ import {
 } from "../../layout/accordion";
 import { SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
-import HistogramSlider from "../../d3/histogram-slider";
+import HistogramSlider from "../../interface-elements/histogram-slider";
 
 type FilteringOption = {
   variable: string;
@@ -43,9 +43,7 @@ const FilteringEditingRow = ({
 
   const theme = useTheme();
 
-  const dataDescr = dataSource.metadata.data_descr.find(
-    (dataDescription) => dataDescription?.variable == variable
-  );
+  const dataDescr = dataSource.metadata.variables.by_id[variable];
 
   const [localDomain, setLocalDomain] = useState<[number, number]>(bounds);
 
@@ -89,7 +87,6 @@ const FilteringEditingRow = ({
           max={dataDescr!.bounds[1]}
           onChange={(event: Event, newValue: number | number[]) => {
             setLocalDomain(newValue as [number, number]);
-            setFiltering(dataSource.internal_id, variable, newValue);
           }}
           onChangeCommitted={(
             event: Event | SyntheticEvent<Element, Event>,
@@ -115,13 +112,13 @@ export default function FilteringForm({
   return (
     <>
       <Autocomplete
-        options={dataSource.metadata.data_descr
+        options={Object.values(dataSource.metadata.variables.by_id)
           .filter(
             (el) =>
-              (el.data_type == "number" || el.data_type == "dt_timestamp") &&
+              (el.data_type == "number" ) && // || el.data_type == "dt_timestamp"
               !Object.keys(dataSource.filtering).includes(el.variable) &&
               (el.required ||
-                dataSource.interface.addedVars.includes(el.variable))
+                dataSource.metadata.variables.added_vars.includes(el.variable))
           )
           .map(
             (el) =>
@@ -156,7 +153,7 @@ export default function FilteringForm({
         }}
         sx={{ mt: 1 }}
       />
-      <Grid2 container direction="column" spacing={1} sx={{ mt: 1 }}>
+      <Grid container direction="column" spacing={1} sx={{ mt: 1 }}>
         {Object.entries(dataSource.filtering).map(([variable, bounds]) => (
           <FilteringEditingRow
             key={"FilteringOption-" + variable + "-" + dataSource.internal_id}
@@ -166,7 +163,7 @@ export default function FilteringForm({
             dataSource={dataSource}
           />
         ))}
-      </Grid2>
+      </Grid>
     </>
   );
 }

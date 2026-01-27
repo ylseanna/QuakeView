@@ -5,21 +5,18 @@ import { is } from "@electron-toolkit/utils";
 import { join } from "path";
 import { execFile, exec } from "child_process";
 
-import log from "electron-log/main";
 import next from "next";
 import { createServer, IncomingMessage, ServerResponse } from "http";
 import { parse } from "url";
 
-log.initialize();
-
-log.info("Log from the main process");
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
     // Init
     webPreferences: {
-      preload: join(__dirname, "preload.js"),
+      preload: join(__dirname, "..", "preload", "preload.mjs"),
       nodeIntegration: true,
+      contextIsolation: true
     },
     show: false,
 
@@ -119,12 +116,7 @@ const closeFlaskServer = () => {
 };
 
 const startNextJSServer = async () => {
-  log.info("Starting Next server");
   // Use server-side rendering for both dev and production builds
-
-  log.info(`Searching for Next server in ${join(app.getAppPath(), "app")}`);
-
-  log.info("Starting Next server");
   const nextApp = next({
     dev: is.dev,
     dir: join(app.getAppPath(), "app"),

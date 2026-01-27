@@ -5,7 +5,7 @@ import {
   Button,
   ButtonGroup,
   Divider,
-  Grid2,
+  Grid,
   // LinearProgress,
   Paper,
   TextField,
@@ -24,19 +24,19 @@ export default function DataSelector() {
   // const [isLoading, setIsLoading] = useState(false);
 
   const [selectedDataSource, setSelectedDataSource] = useState<string | null>(
-    null
+    null,
   );
 
   const addDataSource = useProjectStore(
-    (state) => state.dataSourceActions.addDataSource
+    (state) => state.dataSourceActions.addDataSource,
   );
 
   const setTimeFilteringGPU = useProjectStore(
-    (state) => state.GPUfilteringActions.setTimeFiltering
+    (state) => state.GPUfilteringActions.setTimeFiltering,
   );
 
   return (
-    <Paper sx={{ mb: 3 }}>
+    <Paper sx={{ mb: 3, display: "flex", flexDirection: "column" }}>
       {/* {isLoading && <LinearProgress />} */}
 
       <Typography sx={{ m: 2 }} variant="h6">
@@ -44,8 +44,8 @@ export default function DataSelector() {
       </Typography>
       <Divider></Divider>
 
-      <Grid2 container sx={{ m: 2 }}>
-        <Grid2>
+      <Grid container sx={{ m: 2 }}>
+        <Grid>
           {/* <MuiFileInput
             size="small"
             onChange={(newValue) => {
@@ -67,8 +67,30 @@ export default function DataSelector() {
             disableElevation
             onClick={async () => {
               const filePath = await window.electronAPI.openFile();
+
               const initDataSource = await getInitDataSource(filePath);
+
+              initDataSource.interface.loadable =
+                initDataSource.metadata.variables.required_vars // for every required variable
+                  .filter((variable) => variable != "t") // exclude t
+                  .map((variable) => {
+                    // get all mapped vars
+                    return initDataSource.metadata.variables.by_id[
+                      variable
+                    ].mapped_var
+                      .map(
+                        // check if the mapped vars are contained in the catalog headers
+                        (mapped_var) =>
+                          initDataSource.metadata.catalog_headers.includes(
+                            mapped_var,
+                          ),
+                      )
+                      .some((variableContainsCheck) => variableContainsCheck); // return true if at least one of the mapped variables is in the catalog headers
+                  })
+                  .every((mappedVarConsistent) => mappedVarConsistent); // return true if all required variables have a mapped variable, else disable loading until changed by user
+
               console.log(initDataSource);
+
               addDataSource(initDataSource);
               setTimeFilteringGPU([0, 2147483647 * 1000]);
             }}
@@ -77,9 +99,9 @@ export default function DataSelector() {
             <Folder sx={{ mr: 2 }} />
             Choose file
           </Button>
-        </Grid2>
+        </Grid>
         <Divider flexItem orientation="vertical" sx={{ mr: 2, ml: 2 }} />
-        <Grid2 size="grow">
+        <Grid size="grow">
           <ButtonGroup
             sx={{ width: "calc(100%)" }}
             size="small"
@@ -103,8 +125,8 @@ export default function DataSelector() {
               )}
             />
           </ButtonGroup>
-        </Grid2>
-      </Grid2>
+        </Grid>
+      </Grid>
     </Paper>
   );
 }

@@ -11,7 +11,7 @@ const withNextIntl = createNextIntlPlugin();
 /** @type {import('next').NextConfig} */
 
 const basePath = "";
-const defaultLocale = "en";
+const defaultLocale = "en-US";
 
 module.exports = withBundleAnalyzer(
   withNextIntl({
@@ -24,6 +24,9 @@ module.exports = withBundleAnalyzer(
     },
     transpilePackages: ["mui-file-input"],
     devIndicators: false,
+    experimental: {
+      optimizePackageImports: ["@mui/material", "@mui/icons-material" ],
+    },
     // Redirect basePath to path with locale due to next-intl not supporting basePath
     async redirects() {
       return [
@@ -43,5 +46,5 @@ module.exports = withBundleAnalyzer(
         },
       ];
     },
-  })
+  }),
 );

@@ -114,34 +114,26 @@ export default function TimelineSlider() {
   const t_min = Math.min(
     ...dataSources.allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.data_descr.find(
-          (el) => el.variable == "t"
-        )!.bounds[0]
+        dataSources.byID[id].metadata.variables.by_id["t"]!.bounds[0]
     )
   );
   const t_max = Math.max(
     ...dataSources.allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.data_descr.find(
-          (el) => el.variable == "t"
-        )!.bounds[1]
+        dataSources.byID[id].metadata.variables.by_id["t"]!.bounds[1]
     )
   );
 
   const m_min = Math.min(
     ...dataSources.allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.data_descr.find(
-          (el) => el.variable == "mag"
-        )!.bounds[0]
+        dataSources.byID[id].metadata.variables.by_id["mag"]!.bounds[0]
     )
   );
   const m_max = Math.max(
     ...dataSources.allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.data_descr.find(
-          (el) => el.variable == "mag"
-        )!.bounds[1]
+        dataSources.byID[id].metadata.variables.by_id["mag"]!.bounds[1]
     )
   );
 
