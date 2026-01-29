@@ -1,24 +1,23 @@
+import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
 import { ScatterplotLayer } from "@deck.gl/layers";
-import { DataSource, EarthQuake } from "@/components/datasource/types";
-import {
-  DataFilterExtension,
-  DataFilterExtensionProps,
-} from "@deck.gl/extensions";
 import { Color } from "@deck.gl/core";
+
 import { ColorMapping } from "../datasource/formatting/color-mapping";
+import { DataSource, EarthQuake } from "@/components/datasource/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 
-export function generateDataSourceLayers(
+export function generateDataSourceMapLayers(
   layer_type: "1D" | "3D",
   dataSource: DataSource,
   data: EarthQuake[],
   sessionInterface: SessionInterface,
   filtering: GPU_filtering,
-  positionOffset: number = 0
+  positionOffset: number = 0,
 ) {
-  console.log(filtering)
+  console.log(filtering);
+
   return new ScatterplotLayer<EarthQuake, DataFilterExtensionProps>({
-    id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listening to a color state update and forcing a rerender
+    id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
     // stroked: true,
     visible: dataSource.interface.visible,
@@ -65,5 +64,62 @@ export function generateDataSourceLayers(
       filtering.t as [number, number],
     ],
     extensions: [new DataFilterExtension({ filterSize: 2, fp64: true })],
+  });
+}
+
+export function generateDataSourcePlotLayers(
+  // layer_type: "1D" | "3D",
+  dataSource: DataSource,
+  data: EarthQuake[],
+  // sessionInterface: SessionInterface,
+  scaleX: d3.ScaleLinear<number, number, never>,
+  scaleY: d3.ScaleLinear<number, number, never>,
+  // filtering: GPU_filtering,
+) {
+  // console.log(filtering);
+
+  return new ScatterplotLayer<EarthQuake, DataFilterExtensionProps>({
+    id: `plotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+    data: data,
+    getRadius: 0.1,
+    radiusScale: dataSource.formatting.scale,
+    getPosition: (d: EarthQuake) => [
+      scaleX(d.t),
+      scaleY(d.mag),
+    ],
+    getFillColor: (d: EarthQuake) =>
+      ColorMapping(d, dataSource.formatting.color) as Color,
+    autoHighlight: true,
+    highlightColor: [255, 255, 255, 140],
+    colorFormat: "RGB",
+    opacity: dataSource.formatting.opacity / 100,
+    stroked: false,
+    getLineColor: [255, 255, 255, 0.5 * 255],
+    lineWidthUnits: "pixels",
+    billboard: true,
+    antialiasing: dataSource.formatting.antialiasing,
+    pickable: dataSource.interface.pickable,
+    transitions: {
+      getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
+    },
+    // getFilterValue: (d: EarthQuake) => [d.mag, d.t],
+    // filterSoftRange: [
+    //  GPUfiltering.mag as [number, number],
+    //   [
+    //     sessionInterface.animation.tapered
+    //       ? (GPUfiltering.t[1] as number)
+    //       : (GPUfiltering.t[0] as number),
+    //     GPUfiltering.t[1] as number,
+    //   ],
+    // ],
+    // filterTransformSize: true,
+    // filterTransformColor: false,
+    // filterRange: [
+    //   GPUfiltering.mag as [number, number],
+    //   GPUfiltering.t as [number, number],
+    // ],
+    // extensions: [
+    //   new DataFilterExtension({ filterSize: 2, fp64: true }),
+    // ],
   });
 }

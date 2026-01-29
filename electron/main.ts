@@ -1,14 +1,19 @@
-import { app, BrowserWindow, dialog, ipcMain } from "electron";
 import { is } from "@electron-toolkit/utils";
+import { exec, execFile } from "child_process";
+import { app, BrowserWindow, dialog, ipcMain } from "electron";
+import { createServer, IncomingMessage, ServerResponse } from "http";
+import next from "next";
 // import { getPort } from "get-port-please";
 // import { startServer } from "next/dist/server/lib/start-server";
 import { join } from "path";
-import { execFile, exec } from "child_process";
-
-import next from "next";
-import { createServer, IncomingMessage, ServerResponse } from "http";
 import { parse } from "url";
 
+
+console.log("Starting Electron app");
+
+if (!is.dev) {
+  app.commandLine.appendSwitch("no-sandbox");
+}
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
@@ -16,7 +21,7 @@ const createWindow = () => {
     webPreferences: {
       preload: join(__dirname, "..", "preload", "preload.mjs"),
       nodeIntegration: true,
-      contextIsolation: true
+      contextIsolation: true,
     },
     show: false,
 
@@ -53,12 +58,14 @@ const createWindow = () => {
   // };
 
   if (!is.dev) {
+    console.log("Production mode detected");
     // is opened externally if in dev mode
     startFlaskServer();
     startNextJSServer().then(() => {
       mainWindow.loadURL("http://localhost:8090/");
     });
   } else {
+    console.log("Development mode detected");
     mainWindow.loadURL("http://localhost:8090/");
   }
 
@@ -67,11 +74,13 @@ const createWindow = () => {
 };
 
 const startFlaskServer = () => {
-  let backend = join(app.getAppPath(), "app", "flask", "app")
+  let backend = join(app.getAppPath(), "..", "..", "app", "flask", "app");
 
   if (process.platform == "win32") {
-    backend = join(app.getAppPath(), "app", "flask", "app.exe")
+    backend = join(app.getAppPath(), "..", "..", "app", "flask", "app.exe");
   }
+
+  console.log("Starting flask server: " + backend + ", port 8100");
 
   const execfile = execFile;
   execfile(
@@ -89,11 +98,12 @@ const startFlaskServer = () => {
       if (stderr) {
         console.log(stderr);
       }
-    }
+    },
   );
 };
 
 const closeFlaskServer = () => {
+  console.log("Killing flask server");
   if (process.platform == "win32") {
     exec("taskkill /f /t /im app.exe", (err, stdout, stderr) => {
       if (err) {
@@ -116,10 +126,13 @@ const closeFlaskServer = () => {
 };
 
 const startNextJSServer = async () => {
+  const frontend = join(app.getAppPath(), "..", "..", "app");
+
+  console.log("Starting next server: " + frontend + ", port 8100");
   // Use server-side rendering for both dev and production builds
   const nextApp = next({
     dev: is.dev,
-    dir: join(app.getAppPath(), "app"),
+    dir: frontend,
     port: 8090,
   });
   const requestHandler = nextApp.getRequestHandler();

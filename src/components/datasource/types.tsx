@@ -3,6 +3,8 @@ import { colormaps_categorical } from "../map/crameri-colormaps";
 
 export type EarthQuake = {
   id: string;
+  dt: string;
+  t: number;
   mag: number;
   dep: number;
   lon: number;

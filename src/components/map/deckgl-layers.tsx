@@ -8,7 +8,7 @@ import { MapboxOverlay } from "@deck.gl/mapbox";
 import { useControl } from "react-map-gl";
 import { EarthQuake } from "@/components/datasource/types";
 
-import { generateDataSourceLayers } from "./generate-datasource-layers";
+import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
@@ -34,7 +34,7 @@ export default function DeckGLlayers() {
   const layers = useMemo(() => {
     const layers_to_set = dataSources.allIDs.map((id) => {
       if (data[id]) {
-        const layer = generateDataSourceLayers(
+        const layer = generateDataSourceMapLayers(
           "1D",
           dataSources.byID[id],
           data[id].data,

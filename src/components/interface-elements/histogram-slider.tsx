@@ -1,8 +1,9 @@
-import { DataSource, EarthQuake } from "../datasource/types";
+import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
-import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
+
 import { useDataStore } from "@/providers/data-store-provider";
+import { DataSource, EarthQuake } from "../datasource/types";
 
 export default function HistogramSlider({
   id,
@@ -18,12 +19,12 @@ export default function HistogramSlider({
   id?: string;
   dataSource: DataSource;
   variable: string;
-  value: SliderOwnProps["value"];
-  min: SliderOwnProps["max"];
-  max: SliderOwnProps["max"];
-  marks?: SliderOwnProps["marks"];
-  onChange: SliderOwnProps["onChange"];
-  onChangeCommitted: SliderOwnProps["onChangeCommitted"];
+  value: SliderOwnProps<[number, number]>["value"];
+  min: SliderOwnProps<number>["max"];
+  max: SliderOwnProps<number>["max"];
+  marks?: SliderOwnProps<number | number[]>["marks"];
+  onChange: SliderOwnProps<number | number[]>["onChange"];
+  onChangeCommitted: SliderOwnProps<number | number[]>["onChangeCommitted"];
 }) {
   const { data } = useDataStore((state) => state);
 

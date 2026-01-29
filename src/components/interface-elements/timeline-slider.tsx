@@ -1,8 +1,8 @@
-import { DataSource, EarthQuake } from "../datasource/types";
+import { Box, Skeleton, Slider, Typography } from "@mui/material";
 import { Dispatch, SetStateAction, useEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { Box, Skeleton, Slider, Typography } from "@mui/material";
+import { DataSource, EarthQuake } from "../datasource/types";
 
 type D3Earthquake = EarthQuake & { date: Date };
 
@@ -16,10 +16,10 @@ export default function TimelineSlider({
   const setFiltering = (
     id: string,
     variableToModify: string,
-    value: [number, number] | null
+    value: [number, number] | null,
   ) => {
     const indexToModify = dataSources?.findIndex(
-      (dataSource) => dataSource.internal_id === id
+      (dataSource) => dataSource.internal_id === id,
     );
 
     const modifiedDataSource = dataSources[indexToModify];
@@ -65,32 +65,24 @@ export default function TimelineSlider({
 
   const t_min = Math.min(
     ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "t")!
-          .bounds[0]
-    )
+      (dataSource) => dataSource.metadata.variables.by_id["t"].bounds[0],
+    ),
   );
   const t_max = Math.max(
     ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "t")!
-          .bounds[1]
-    )
+      (dataSource) => dataSource.metadata.variables.by_id["t"].bounds[1],
+    ),
   );
 
   const m_min = Math.min(
     ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "mag")!
-          .bounds[0]
-    )
+      (dataSource) => dataSource.metadata.variables.by_id["mag"].bounds[0],
+    ),
   );
   const m_max = Math.max(
     ...dataSources.map(
-      (dataSource) =>
-        dataSource.metadata.data_descr.find((el) => el.variable == "mag")!
-          .bounds[1]
-    )
+      (dataSource) => dataSource.metadata.variables.by_id["mag"].bounds[1],
+    ),
   );
 
   useEffect(() => {
@@ -98,8 +90,7 @@ export default function TimelineSlider({
 
     d3.select("#timeline-graph").select("svg").remove();
 
-    const container = d3
-      .select("#timeline-graph")
+    const container = d3.select("#timeline-graph");
 
     // append the svg object to the body of the page
     const svg = container
@@ -118,7 +109,7 @@ export default function TimelineSlider({
       .append("g")
       .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
       .call(
-        d3.axisBottom(x)
+        d3.axisBottom(x),
         // .tickFormat(() => "")
       );
 
@@ -133,13 +124,13 @@ export default function TimelineSlider({
       .append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .call(
-        d3.axisLeft(y)
+        d3.axisLeft(y),
         // .tickFormat(() => "")
       );
     yAxes.selectAll("line").attr("stroke-opacity", 0.6);
 
     d3.json(
-      `http://${process.env.NEXT_PUBLIC_HOST}${process.env.NEXT_PUBLIC_APP_BASE_PATH}/api/plot_data?mode=timeline_plot&filename=${dataSource.filename}`
+      `http://${process.env.NEXT_PUBLIC_HOST}${process.env.NEXT_PUBLIC_APP_BASE_PATH}/api/plot_data?mode=timeline_plot&filename=${dataSource.filename}`,
     )
       .then((data) => {
         if (!data) {
@@ -241,7 +232,7 @@ export default function TimelineSlider({
           setFiltering(
             dataSources[0].internal_id,
             "t",
-            newValue as [number, number]
+            newValue as [number, number],
           );
         }}
         size="small"
