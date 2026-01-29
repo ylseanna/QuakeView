@@ -1,7 +1,7 @@
 // import { DataFilterExtension } from "@deck.gl/extensions";
 import DeckGL from "@deck.gl/react";
 /* eslint-disable react-hooks/exhaustive-deps */
-import { Box, Skeleton } from "@mui/material";
+import { Box } from "@mui/material";
 import { OrthographicView, PickingInfo } from "deck.gl";
 import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
@@ -28,7 +28,7 @@ export default function StemPlot() {
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  const [isLoading, setIsLoading] = useState(true);
+  // const [isLoading, setIsLoading] = useState(true);
   // const [layers, setLayers] = useState<LayersList>([]);
 
   // graph specific data
@@ -146,7 +146,7 @@ export default function StemPlot() {
       .attr("transform", `translate(${width - margin.left - margin.right}, 0)`)
       .call(d3.axisRight(scaleY.current).tickSize(0).tickValues([]));
 
-    setIsLoading(true);
+    // setIsLoading(true);
   }, [
     height,
     margin.bottom,
@@ -223,32 +223,30 @@ export default function StemPlot() {
   // }, [data, dataSources.allIDs]);
 
   const layers = useMemo(() => {
-    const layers_to_set = dataSources.allIDs.map((id) => {
-      if (data[id]) {
-        const layer = generateDataSourcePlotLayers(
-          dataSources.byID[id],
-          data[id].data,
-          scaleX.current!,
-          scaleY.current!,
-        );
+    if (scaleX.current && scaleY.current) {
+      const layers_to_set = dataSources.allIDs.map((id) => {
+        if (data[id]) {
+          const layer = generateDataSourcePlotLayers(
+            dataSources.byID[id],
+            data[id].data,
+            scaleX.current!,
+            scaleY.current!,
+          );
 
-        layer.onHover = (info: PickingInfo<EarthQuake>) => {
-          setHoverInfo(info);
-          return true;
-        };
+          layer.onHover = (info: PickingInfo<EarthQuake>) => {
+            setHoverInfo(info);
+            return true;
+          };
 
-        return layer;
-      }
-    });
+          return layer;
+        }
+      });
 
-    console.log(layers_to_set);
+      console.log(layers_to_set);
 
-    return layers_to_set;
-  }, [
-    dataSources.allIDs,
-    dataSources.byID,
-    data,
-  ]);
+      return layers_to_set;
+    }
+  }, [dataSources.allIDs, dataSources.byID, data, scaleX, scaleY]);
 
   // set bounds
   useEffect(() => {
@@ -318,7 +316,7 @@ export default function StemPlot() {
       }}
     >
       <Box ref={parentRef} id="chart-stem-plot" sx={{ position: "relative" }}>
-        {isLoading && (
+        {/* {isLoading && (
           <Skeleton
             sx={{
               position: "absolute",
@@ -333,7 +331,7 @@ export default function StemPlot() {
               margin.bottom
             }
           />
-        )}
+        )} */}
         <DeckGL
           style={{
             // position: "absolute",
@@ -366,9 +364,7 @@ export default function StemPlot() {
           }}
           layers={layers}
         />
-        {hoverInfo && (
-                <MapToolTip pickingInfo={hoverInfo}/>
-              )}{" "}
+        {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}{" "}
       </Box>
     </Box>
   );
