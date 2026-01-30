@@ -11,13 +11,21 @@ import { generateDataSourcePlotLayers } from "../map/generate-datasource-layers"
 import { useDataStore } from "@/providers/data-store-provider";
 import { EarthQuake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
+import { ControllerOptions } from "../map/types";
 interface Bounds {
-  x: [number, number];
+  x: [Date, Date];
   y: [number, number];
+}
+
+interface ViewStateMonitor {
+  pixelPosition: [number, number];
+  coordPosition: [Date, number];
+  zoom: [number, number];
 }
 
 export default function StemPlot() {
   // TOOLTIP
+  const sessionInterface = useProjectStore((state) => state.sessionInterface);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
@@ -32,25 +40,46 @@ export default function StemPlot() {
   // const [layers, setLayers] = useState<LayersList>([]);
 
   // graph specific data
-  const [bounds, setBounds] = useState<Bounds>({ x: [0, 1], y: [0, 1] });
+  const [viewStateMonitor, setViewStateMonitor] = useState<ViewStateMonitor>({
+    pixelPosition: [0, 0],
+    coordPosition: [new Date(1970, 1, 1), 0],
+    zoom: [0, 0],
+  });
+  const [bounds, setBounds] = useState<Bounds>({
+    x: [new Date(1970, 1, 1), new Date(2025, 1, 1)],
+    y: [0, 1],
+  });
 
   // graph constants
-  const margin = { top: 2, right: 10, bottom: 40, left: 26 },
-    height_to_width_ratio = 0.3,
-    width = dimensions.width,
-    height = dimensions.width * height_to_width_ratio;
+  const margin = { top: 16, right: 16, bottom: 40, left: 56 },
+    height_to_width_ratio = 0.2;
+
+  const graphWidth = useMemo(
+    () => dimensions.width - margin.left - margin.right,
+    [dimensions],
+  );
+  const graphHeight = useMemo(
+    () => dimensions.width * height_to_width_ratio - margin.top - margin.bottom,
+    [dimensions],
+  );
 
   // graph elements (store statically in component)
   // svg element
   const SVG =
     useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
   // scales
-  const scaleX = useRef<d3.ScaleLinear<number, number, never>>(null),
+  const scaleX = useRef<d3.ScaleTime<number, number, never>>(null),
     scaleY = useRef<d3.ScaleLinear<number, number, never>>(null);
+  const viewPortScaleX = useRef<d3.ScaleTime<number, number, never>>(null),
+    viewPortScaleY = useRef<d3.ScaleLinear<number, number, never>>(null);
   // axes
   const xAxes =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
     yAxes =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
+  const xAxesGrid =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
+    yAxesGrid =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
 
   useLayoutEffect(() => {
@@ -60,10 +89,14 @@ export default function StemPlot() {
         height: parentRef.current.offsetHeight,
       });
     }
+    console.log(dimensions);
   }, []);
 
   // init graph
   useEffect(() => {
+    const width = dimensions.width,
+      height = dimensions.width * height_to_width_ratio;
+
     d3.select("#chart-stem-plot").select("svg").remove();
     // d3.select("#chart-stem-plot").select("canvas").remove();
     // set the dimensions and margins of the graph
@@ -74,8 +107,8 @@ export default function StemPlot() {
       .append("svg")
       .attr("width", width)
       .attr("height", height)
-      .append("g")
-      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+      .append("g");
+    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     // const canvas = d3
     //   .select("#chart-stem-plot")
@@ -87,16 +120,14 @@ export default function StemPlot() {
     //   .attr("height", height - (margin.top + margin.bottom) - 1);
 
     scaleX.current = d3
-      .scaleLinear()
+      .scaleUtc()
       .domain([bounds.x[0], bounds.x[1]] as Iterable<d3.NumberValue>)
-      .range([margin.left, width - margin.right - margin.left])
-      .nice();
+      .range([margin.left, width - margin.right]);
 
     scaleY.current = d3
       .scaleLinear()
       .domain([bounds.y[0], bounds.y[1]] as Iterable<d3.NumberValue>)
-      .range([height - margin.bottom, margin.top])
-      .nice();
+      .range([height - margin.bottom, margin.top]);
 
     // x axes
     xAxes.current = SVG.current
@@ -108,8 +139,8 @@ export default function StemPlot() {
     // x axes label
     SVG.current
       .append("text")
-      .attr("x", (width - margin.left - margin.right) / 2)
-      .attr("y", height - margin.top - 4)
+      .attr("x", graphWidth / 2)
+      .attr("y", height - 4)
       .attr("dx", margin.left)
       .attr("font-size", "1rem")
       .attr("text-anchor", "middle")
@@ -128,7 +159,7 @@ export default function StemPlot() {
       .attr("class", "axis-label")
       .attr("transform", "rotate(-90)")
       .attr("x", -(margin.top + height / 2))
-      .attr("y", -margin.left) // Relative to the y axis.
+      .attr("y", 0) // Relative to the y axis.
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
       .attr("dy", "1rem")
@@ -143,19 +174,37 @@ export default function StemPlot() {
     // Add right stroke
     SVG.current
       .append("g")
-      .attr("transform", `translate(${width - margin.left - margin.right}, 0)`)
+      .attr("transform", `translate(${width - margin.right}, 0)`)
       .call(d3.axisRight(scaleY.current).tickSize(0).tickValues([]));
 
+    // Add vertical gridlines
+    xAxesGrid.current = SVG.current!.append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .style("stroke", "gray")
+      .style("stroke-width", 0.5)
+      .style("stroke-dasharray", "2 2")
+      .call(
+        d3
+          .axisBottom(scaleX.current)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
+
+    // Add horizontal gridlines
+    yAxesGrid.current = SVG.current!.append("g")
+      .attr("transform", `translate(${margin.left}, 0)`)
+      .style("stroke", "gray")
+      .style("stroke-width", 0.5)
+      .style("stroke-dasharray", "2 2")
+      .call(
+        d3
+          .axisLeft(scaleY.current)
+          .tickFormat(() => "")
+          .tickSize(-graphWidth),
+      );
+
     // setIsLoading(true);
-  }, [
-    height,
-    margin.bottom,
-    margin.left,
-    margin.right,
-    margin.top,
-    width,
-    data,
-  ]);
+  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
 
   // // set layers
   // useEffect(() => {
@@ -216,7 +265,6 @@ export default function StemPlot() {
   //       ];
 
   //       // setLayers(layers);
-
   //       setIsLoading(false);
   //     }
   //   });
@@ -225,12 +273,29 @@ export default function StemPlot() {
   const layers = useMemo(() => {
     if (scaleX.current && scaleY.current) {
       const layers_to_set = dataSources.allIDs.map((id) => {
+        viewPortScaleX.current = d3
+          .scaleUtc()
+          .domain(
+            dataSources.byID[id].metadata.variables.by_id["t"]
+              .bounds as Iterable<d3.NumberValue>,
+          )
+          .range([margin.left, graphWidth + margin.left]);
+
+        viewPortScaleY.current = d3
+          .scaleLinear()
+          .domain(
+            dataSources.byID[id].metadata.variables.by_id["mag"]
+              .bounds as Iterable<d3.NumberValue>,
+          )
+          .range([graphHeight + margin.top, margin.top]);
+
         if (data[id]) {
           const layer = generateDataSourcePlotLayers(
             dataSources.byID[id],
             data[id].data,
-            scaleX.current!,
-            scaleY.current!,
+            sessionInterface,
+            viewPortScaleX.current,
+            viewPortScaleY.current,
           );
 
           layer.onHover = (info: PickingInfo<EarthQuake>) => {
@@ -246,7 +311,14 @@ export default function StemPlot() {
 
       return layers_to_set;
     }
-  }, [dataSources.allIDs, dataSources.byID, data, scaleX, scaleY]);
+  }, [
+    dataSources.allIDs,
+    dataSources.byID,
+    data,
+    scaleX,
+    scaleY,
+    sessionInterface,
+  ]);
 
   // set bounds
   useEffect(() => {
@@ -254,57 +326,77 @@ export default function StemPlot() {
       const dataSource = dataSources.byID[dataSourceID];
 
       setBounds({
-        x: dataSource.metadata.variables.by_id["t"].bounds,
+        x: [
+          new Date(dataSource.metadata.variables.by_id["t"].bounds[0]),
+          new Date(dataSource.metadata.variables.by_id["t"].bounds[1]),
+        ],
         y: dataSource.metadata.variables.by_id["mag"].bounds,
       });
     });
   }, [data, dataSources.allIDs]);
 
+  // set bounds based on ViewState
+  useEffect(() => {
+    if (viewPortScaleX.current && viewPortScaleY.current) {
+      const newXBounds = [
+        viewPortScaleX.current.invert(
+          viewStateMonitor.pixelPosition[0] -
+            (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0]),
+        ),
+        viewPortScaleX.current.invert(
+          viewStateMonitor.pixelPosition[0] +
+            (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0]),
+        ),
+      ] as [Date, Date];
+
+      const newYBounds = [
+        viewPortScaleY.current.invert(
+          viewStateMonitor.pixelPosition[1] + graphHeight * 0.5,
+        ),
+        viewPortScaleY.current.invert(
+          viewStateMonitor.pixelPosition[1] - graphHeight * 0.5,
+        ),
+      ] as [number, number];
+
+      setBounds({
+        x: newXBounds,
+        y: newYBounds,
+      });
+    }
+  }, [viewStateMonitor]);
+
   // update bounds in DOM
   useEffect(() => {
     // update domains on scales
-    scaleX.current!.domain(bounds.x).nice();
-    scaleY.current!.domain(bounds.y).nice();
+    scaleX.current!.domain(bounds.x);
+    scaleY.current!.domain(bounds.y);
 
-    // update axes with scales
-    xAxes.current?.transition().call(d3.axisBottom(scaleX.current!));
-    yAxes.current?.transition().call(d3.axisLeft(scaleY.current!));
+    // update X axes and grid
+    xAxes.current
+      ?.transition()
+      .duration(10)
+      .call(d3.axisBottom(scaleX.current!));
+    xAxesGrid.current
+      ?.transition()
+      .duration(10)
+      .call(
+        d3
+          .axisBottom(scaleX.current!)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
 
-    // Add vertical gridlines
-    SVG.current!.selectAll("line.vertical-grid")
-      .data(scaleX.current!.ticks())
-      .enter()
-      .append("line")
-      .attr("class", "vertical-grid")
-      .attr("x1", function (d) {
-        return scaleX.current!(d);
-      })
-      .attr("y1", margin.top)
-      .attr("x2", function (d) {
-        return scaleX.current!(d);
-      })
-      .attr("y2", height - margin.bottom)
-      .style("stroke", "gray")
-      .style("stroke-width", 0.5)
-      .style("stroke-dasharray", "2 2");
-
-    // Add horizontal gridlines
-    SVG.current!.selectAll("line.horizontal-grid")
-      .data(scaleY.current!.ticks())
-      .enter()
-      .append("line")
-      .attr("class", "horizontal-grid")
-      .attr("x1", margin.left)
-      .attr("y1", function (d) {
-        return scaleY.current!(d);
-      })
-      .attr("x2", width - margin.right - margin.left)
-      .attr("y2", function (d) {
-        return scaleY.current!(d);
-      })
-      .style("stroke", "gray")
-      .style("stroke-width", 0.5)
-      .style("stroke-dasharray", "2 2");
+    // update Y axes and grid
+    yAxes.current?.transition().duration(10).call(d3.axisLeft(scaleY.current!));
+    yAxesGrid.current
+      ?.transition()
+      .duration(10)
+      .call(
+        d3
+          .axisLeft(scaleY.current!)
+          .tickFormat(() => "")
+          .tickSize(-graphWidth),
+      );
   }, [bounds]);
 
   return (
@@ -312,7 +404,7 @@ export default function StemPlot() {
       style={{
         position: "relative",
         display: "block",
-        minHeight: `calc(${height_to_width_ratio}* ${width}px)`,
+        minHeight: `calc(${height_to_width_ratio} * ${dimensions.width}px)`,
       }}
     >
       <Box ref={parentRef} id="chart-stem-plot" sx={{ position: "relative" }}>
@@ -334,37 +426,61 @@ export default function StemPlot() {
         )} */}
         <DeckGL
           style={{
-            // position: "absolute",
-            top: 2 * margin.top + "px",
-            left: 2 * margin.left + "px",
+            position: "absolute",
+            width: graphWidth + "px",
+            height: graphHeight + "px",
+            top: margin.top + "px",
+            left: margin.left + "px",
+            cursor: sessionInterface.pickable ? "crosshair" : "auto",
           }}
           views={
             new OrthographicView({
-              width: dimensions.width - margin.left * 2 - margin.right,
-              height:
-                dimensions.width * height_to_width_ratio -
-                margin.top -
-                margin.bottom,
+              width: graphWidth,
+              height: graphHeight,
             })
           }
-          controller={{
-            zoomAxis: "X",
-            bounds: [bounds.x[0], bounds.x[1], bounds.y[0], bounds.y[1]],
-          }}
+          controller={
+            {
+              zoomAxis: "X",
+            } as ControllerOptions
+          }
           initialViewState={{
             target: [
-              0.5 * dimensions.width - margin.left * 2 - margin.right,
-              0.5 * dimensions.width * height_to_width_ratio -
-                margin.top -
-                margin.bottom,
-              0,
+              0.5 * graphWidth + margin.left,
+              0.5 * graphHeight + margin.top,
             ],
             zoom: [0, 0],
             minZoom: 0,
           }}
+          onViewStateChange={({ viewState }) => {
+            if (viewState) {
+              setViewStateMonitor({
+                pixelPosition: [viewState.target![0], viewState.target![1]],
+                coordPosition: [
+                  viewPortScaleX.current!.invert(viewState.target![0]),
+                  viewPortScaleY.current!.invert(viewState.target![1]),
+                ],
+                zoom: viewState.zoom as [number, number],
+              });
+            }
+          }}
           layers={layers}
-        />
-        {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}{" "}
+        >
+          {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
+        </DeckGL>
+        <Box sx={{ position: "fixed" }}>
+          <span>
+            {viewStateMonitor.pixelPosition[0]},{" "}
+            {viewStateMonitor.pixelPosition[1]}
+          </span>
+          <br />
+          <span>
+            {viewStateMonitor.coordPosition[0].toISOString()},{" "}
+            {viewStateMonitor.coordPosition[1]}
+          </span>
+          <br />
+          <span>{viewStateMonitor.zoom[0]}</span>
+        </Box>
       </Box>
     </Box>
   );

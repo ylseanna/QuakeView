@@ -71,8 +71,8 @@ export function generateDataSourcePlotLayers(
   // layer_type: "1D" | "3D",
   dataSource: DataSource,
   data: EarthQuake[],
-  // sessionInterface: SessionInterface,
-  scaleX: d3.ScaleLinear<number, number, never>,
+  sessionInterface: SessionInterface,
+  scaleX: d3.ScaleTime<number, number, never>,
   scaleY: d3.ScaleLinear<number, number, never>,
   // filtering: GPU_filtering,
 ) {
@@ -98,7 +98,7 @@ export function generateDataSourcePlotLayers(
     lineWidthUnits: "pixels",
     billboard: true,
     antialiasing: dataSource.formatting.antialiasing,
-    pickable: dataSource.interface.pickable,
+    pickable: sessionInterface.pickable,
     transitions: {
       getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
     },

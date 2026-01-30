@@ -14,7 +14,7 @@ import {
   PickingInfo,
 } from "@deck.gl/core";
 import { Button, LinearProgress } from "@mui/material";
-import { generateDataSourceLayers } from "./generate-datasource-layers";
+import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
@@ -69,7 +69,7 @@ export default function ThreeDDeckGLView({
   const layers = useMemo(() => {
     const layers_to_set = dataSources.allIDs.map((id) => {
       if (data[id]) {
-        const layer = generateDataSourceLayers(
+        const layer = generateDataSourceMapLayers(
           "3D",
           dataSources.byID[id],
           data[id].data,

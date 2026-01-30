@@ -6,17 +6,19 @@ import Sidebars from "@/components/interface/sidebars";
 import Legend from "@/components/map/legend/legend";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import StemPlot from "@/components/plots/stem-plot";
+import Toolbar from "@/components/interface/toolbar";
 
 export default function Page() {
   return (
     <Box sx={{h: "100%", w: "100%", pb: 2, ...ScrollBarStyling}}>
       <Legend singleColor/>
       <Sidebars />
-      <Container sx={{ mt: 2, mb: 2 }}>
-        <Paper sx={{ p: 4 }}>
+      <Toolbar/>
+      <Box  sx={{ mt: 2, mb: 2, maxWidth: "100%" }}>
+        <Paper sx={{ p: 2 }}>
           <StemPlot />
         </Paper>
-      </Container>
+      </Box>
     </Box>
   );
 }
