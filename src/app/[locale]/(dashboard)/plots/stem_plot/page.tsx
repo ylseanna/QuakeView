@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Container, Paper, Box } from "@mui/material";
+import { Paper, Box } from "@mui/material";
 import Sidebars from "@/components/interface/sidebars";
 import Legend from "@/components/map/legend/legend";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
@@ -14,7 +14,7 @@ export default function Page() {
       <Legend singleColor/>
       <Sidebars />
       <Toolbar/>
-      <Box  sx={{ mt: 2, mb: 2, maxWidth: "100%" }}>
+      <Box  sx={{ m: 2, maxWidth: "100%" }}>
         <Paper sx={{ p: 2 }}>
           <StemPlot />
         </Paper>

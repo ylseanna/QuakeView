@@ -414,21 +414,22 @@ def generate_event_dict():
     # CONVERT TO JSON
     event_dict = []
     for index, row in df.iterrows():
-        event_row = {
-            "id": row[varmap["id"]],
-            "t": row["t"],
-            "dt": row["dt"],
-            "mag": row[varmap["mag"]],
-            "dep": row[varmap["dep"]],
-            "lon": row[varmap["lon"]],
-            "lat": row[varmap["lat"]],
-        }
+        if not isnan(row[varmap["mag"]]):
+            event_row = {
+                "id": row[varmap["id"]],
+                "t": row["t"],
+                "dt": row["dt"],
+                "mag": row[varmap["mag"]],
+                "dep": row[varmap["dep"]],
+                "lon": row[varmap["lon"]],
+                "lat": row[varmap["lat"]],
+            }
 
-        for var in vars:
-            if var not in ("id", "t", "dt", "mag", "dep", "lon", "lat"):
-                event_row[var] = row[var]
+            for var in vars:
+                if var not in ("id", "t", "dt", "mag", "dep", "lon", "lat"):
+                    event_row[var] = row[var]
 
-        event_dict.append(event_row)
+            event_dict.append(event_row)
 
     return event_dict
 

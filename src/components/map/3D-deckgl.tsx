@@ -47,7 +47,7 @@ export default function ThreeDDeckGLView({
       maxPitch: 180,
       position: [0, 0, 0],
     }),
-    [extent]
+    [extent],
   );
 
   const mapContainer = useRef<HTMLElement>(null);
@@ -75,7 +75,7 @@ export default function ThreeDDeckGLView({
           data[id].data,
           sessionInterface,
           GPUfiltering,
-          positionOffset
+          positionOffset,
         );
 
         layer.onHover = (info: PickingInfo<EarthQuake>) => {
@@ -161,27 +161,6 @@ export default function ThreeDDeckGLView({
   //   []
   // );
 
-  // const checkLayerLoad = useCallback(() => {
-  //   if (layers) {
-  //     const layerloading = layers
-  //       .map((layer) => layer.isLoaded)
-  //       .reduce(
-  //         (accumulator: boolean, currentValue: boolean) =>
-  //           accumulator && currentValue
-  //       );
-
-  //     if (!layerloading) {
-  //       if (!IsLoading) {
-  //         setIsLoading(true);
-  //       }
-  //     } else {
-  //       if (IsLoading) {
-  //         setIsLoading(false);
-  //       }
-  //     }
-  //   }
-  // }, [layers, IsLoading, setIsLoading]);
-
   return (
     <>
       <DeckGL
@@ -200,8 +179,6 @@ export default function ThreeDDeckGLView({
           backgroundColor: "var(--mui-palette-background-default)",
         }}
         onLoad={onMapLoad}
-        // onBeforeRender={checkLayerLoad}
-        // onAfterRender={checkLayerLoad}
       >
         {IsLoading && <LinearProgress variant="query" />}
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}

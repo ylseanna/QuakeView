@@ -1,13 +1,12 @@
-// import { DataFilterExtension } from "@deck.gl/extensions";
-import DeckGL from "@deck.gl/react";
 /* eslint-disable react-hooks/exhaustive-deps */
+import DeckGL from "@deck.gl/react";
 import { Box } from "@mui/material";
 import { OrthographicView, PickingInfo } from "deck.gl";
-import { useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { generateDataSourcePlotLayers } from "../map/generate-datasource-layers";
+import { StemPlotLayers } from "../map/generate-datasource-layers";
 import { useDataStore } from "@/providers/data-store-provider";
 import { EarthQuake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
@@ -15,6 +14,10 @@ import { ControllerOptions } from "../map/types";
 interface Bounds {
   x: [Date, Date];
   y: [number, number];
+}
+interface ViewPortBounds {
+  pixel: { x: [number, number]; y: [number, number] };
+  coord: { x: [Date, Date]; y: [number, number] };
 }
 
 interface ViewStateMonitor {
@@ -30,14 +33,11 @@ export default function StemPlot() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  // const { GPUfiltering } = useProjectStore((state) => state);
   const { data } = useDataStore((state) => state);
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-  // const [isLoading, setIsLoading] = useState(true);
-  // const [layers, setLayers] = useState<LayersList>([]);
 
   // graph specific data
   const [viewStateMonitor, setViewStateMonitor] = useState<ViewStateMonitor>({
@@ -63,6 +63,11 @@ export default function StemPlot() {
     [dimensions],
   );
 
+  const [viewPortBounds, setViewPortBounds] = useState<ViewPortBounds>({
+    pixel: { x: [0, graphWidth], y: [0, graphHeight] },
+    coord: { x: [new Date(1970, 1, 1), new Date(2025, 1, 1)], y: [0, 1] },
+  });
+
   // graph elements (store statically in component)
   // svg element
   const SVG =
@@ -82,15 +87,17 @@ export default function StemPlot() {
     yAxesGrid =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
 
-  useLayoutEffect(() => {
-    if (parentRef.current) {
-      setDimensions({
-        width: parentRef.current.offsetWidth,
-        height: parentRef.current.offsetHeight,
+  useEffect(() => {
+    if (parentRef) {
+      const observer = new ResizeObserver((entries) => {
+        setDimensions({
+          width: entries[0].contentRect.width,
+          height: entries[0].contentRect.height,
+        });
       });
+      observer.observe(parentRef.current as Element);
     }
-    console.log(dimensions);
-  }, []);
+  }, [parentRef]);
 
   // init graph
   useEffect(() => {
@@ -98,26 +105,13 @@ export default function StemPlot() {
       height = dimensions.width * height_to_width_ratio;
 
     d3.select("#chart-stem-plot").select("svg").remove();
-    // d3.select("#chart-stem-plot").select("canvas").remove();
-    // set the dimensions and margins of the graph
 
-    // append the svg object to the body of the page
     SVG.current = d3
       .select("#chart-stem-plot")
       .append("svg")
       .attr("width", width)
       .attr("height", height)
       .append("g");
-    // .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-    // const canvas = d3
-    //   .select("#chart-stem-plot")
-    //   .append("canvas")
-    //   .style("position", "absolute")
-    //   .style("top", 2 * margin.top + 1 + "px")
-    //   .style("left", 2 * margin.left + 1 + "px")
-    //   .attr("width", width - (2 * margin.left + margin.right) - 1)
-    //   .attr("height", height - (margin.top + margin.bottom) - 1);
 
     scaleX.current = d3
       .scaleUtc()
@@ -206,120 +200,6 @@ export default function StemPlot() {
     // setIsLoading(true);
   }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
 
-  // // set layers
-  // useEffect(() => {
-  //   dataSources.allIDs.map((dataSourceID) => {
-  //     if (data[dataSourceID]) {
-  //       // const platform = Stardust.platform("webgl-2d", canvas, width, height);
-
-  //       setIsLoading(true);
-
-  //       const dataSourceData = data[dataSourceID].data;
-  //       const dataSource = dataSources.byID[dataSourceID];
-
-  //       const layers = [
-  //         new ScatterplotLayer({
-  //           id: `plotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
-  //           data: dataSourceData,
-  //           getRadius: 0.1,
-  //           radiusScale: dataSource.formatting.scale,
-  //           getPosition: (d: EarthQuake) => [
-  //             scaleX.current!(d.t),
-  //             scaleY.current!(d.mag),
-  //           ],
-  //           getFillColor: (d: EarthQuake) =>
-  //             ColorMapping(d, dataSource.formatting.color) as Color,
-  //           autoHighlight: true,
-  //           highlightColor: [255, 255, 255, 140],
-  //           colorFormat: "RGB",
-  //           opacity: dataSource.formatting.opacity / 100,
-  //           stroked: false,
-  //           getLineColor: [255, 255, 255, 0.5 * 255],
-  //           lineWidthUnits: "pixels",
-  //           billboard: true,
-  //           antialiasing: dataSource.formatting.antialiasing,
-  //           pickable: dataSource.interface.pickable,
-  //           transitions: {
-  //             getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-  //           },
-  //           // getFilterValue: (d: EarthQuake) => [d.mag, d.t],
-  //           // filterSoftRange: [
-  //           //  GPUfiltering.mag as [number, number],
-  //           //   [
-  //           //     sessionInterface.animation.tapered
-  //           //       ? (GPUfiltering.t[1] as number)
-  //           //       : (GPUfiltering.t[0] as number),
-  //           //     GPUfiltering.t[1] as number,
-  //           //   ],
-  //           // ],
-  //           // filterTransformSize: true,
-  //           // filterTransformColor: false,
-  //           // filterRange: [
-  //           //   GPUfiltering.mag as [number, number],
-  //           //   GPUfiltering.t as [number, number],
-  //           // ],
-  //           // extensions: [
-  //           //   new DataFilterExtension({ filterSize: 2, fp64: true }),
-  //           // ],
-  //         }),
-  //       ];
-
-  //       // setLayers(layers);
-  //       setIsLoading(false);
-  //     }
-  //   });
-  // }, [data, dataSources.allIDs]);
-
-  const layers = useMemo(() => {
-    if (scaleX.current && scaleY.current) {
-      const layers_to_set = dataSources.allIDs.map((id) => {
-        viewPortScaleX.current = d3
-          .scaleUtc()
-          .domain(
-            dataSources.byID[id].metadata.variables.by_id["t"]
-              .bounds as Iterable<d3.NumberValue>,
-          )
-          .range([margin.left, graphWidth + margin.left]);
-
-        viewPortScaleY.current = d3
-          .scaleLinear()
-          .domain(
-            dataSources.byID[id].metadata.variables.by_id["mag"]
-              .bounds as Iterable<d3.NumberValue>,
-          )
-          .range([graphHeight + margin.top, margin.top]);
-
-        if (data[id]) {
-          const layer = generateDataSourcePlotLayers(
-            dataSources.byID[id],
-            data[id].data,
-            sessionInterface,
-            viewPortScaleX.current,
-            viewPortScaleY.current,
-          );
-
-          layer.onHover = (info: PickingInfo<EarthQuake>) => {
-            setHoverInfo(info);
-            return true;
-          };
-
-          return layer;
-        }
-      });
-
-      console.log(layers_to_set);
-
-      return layers_to_set;
-    }
-  }, [
-    dataSources.allIDs,
-    dataSources.byID,
-    data,
-    scaleX,
-    scaleY,
-    sessionInterface,
-  ]);
-
   // set bounds
   useEffect(() => {
     dataSources.allIDs.map((dataSourceID) => {
@@ -333,7 +213,7 @@ export default function StemPlot() {
         y: dataSource.metadata.variables.by_id["mag"].bounds,
       });
     });
-  }, [data, dataSources.allIDs]);
+  }, [data, dataSources.allIDs, parentRef]);
 
   // set bounds based on ViewState
   useEffect(() => {
@@ -371,33 +251,146 @@ export default function StemPlot() {
     scaleX.current!.domain(bounds.x);
     scaleY.current!.domain(bounds.y);
 
-    // update X axes and grid
-    xAxes.current
-      ?.transition()
-      .duration(10)
-      .call(d3.axisBottom(scaleX.current!));
-    xAxesGrid.current
-      ?.transition()
-      .duration(10)
-      .call(
-        d3
-          .axisBottom(scaleX.current!)
-          .tickFormat(() => "")
-          .tickSize(-graphHeight),
+    if (
+      !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
+      !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
+      !(viewStateMonitor.zoom[0] == 0)
+    ) {
+      // update X axes and grid
+      xAxes.current
+        ?.transition()
+        .duration(10)
+        .call(d3.axisBottom(scaleX.current!));
+      xAxesGrid.current
+        ?.transition()
+        .duration(10)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .tickFormat(() => "")
+            .tickSize(-graphHeight),
+        );
+    }
+
+    if (
+      !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
+      !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
+      !(viewStateMonitor.zoom[0] == 0)
+    ) {
+      // update Y axes and grid
+      yAxes.current
+        ?.transition()
+        .duration(10)
+        .call(d3.axisLeft(scaleY.current!).ticks(4));
+      yAxesGrid.current
+        ?.transition()
+        .duration(10)
+        .call(
+          d3
+            .axisLeft(scaleY.current!)
+            .tickFormat(() => "")
+            .tickSize(-graphWidth),
+        );
+    }
+  }, [bounds, dimensions]);
+
+  const layers = useMemo(() => {
+    if (scaleX.current && scaleY.current) {
+      const minX = Math.min(
+        ...dataSources.allIDs.map(
+          (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[0],
+        ),
+      );
+      const maxX = Math.max(
+        ...dataSources.allIDs.map(
+          (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[1],
+        ),
       );
 
-    // update Y axes and grid
-    yAxes.current?.transition().duration(10).call(d3.axisLeft(scaleY.current!));
-    yAxesGrid.current
-      ?.transition()
-      .duration(10)
-      .call(
-        d3
-          .axisLeft(scaleY.current!)
-          .tickFormat(() => "")
-          .tickSize(-graphWidth),
+      const minY = Math.min(
+        ...dataSources.allIDs.map(
+          (id) =>
+            dataSources.byID[id].metadata.variables.by_id["mag"].bounds[0],
+        ),
       );
-  }, [bounds]);
+      const maxY = Math.max(
+        ...dataSources.allIDs.map(
+          (id) =>
+            dataSources.byID[id].metadata.variables.by_id["mag"].bounds[1],
+        ),
+      );
+
+      viewPortScaleX.current = d3
+        .scaleUtc()
+        .domain([minX, maxX] as Iterable<d3.NumberValue>)
+        .range([margin.left, graphWidth + margin.left]);
+
+      viewPortScaleY.current = d3
+        .scaleLinear()
+        .domain([minY, maxY] as Iterable<d3.NumberValue>)
+        .range([graphHeight + margin.top, margin.top]);
+
+      // const ViewPortPadding = 36;
+
+      const viewPortXbounds = [
+        viewPortScaleX.current!(new Date(minX)), // - ViewPortPadding,
+        viewPortScaleX.current!(new Date(maxX)), // ViewPortPadding,
+      ] as [number, number];
+
+      const viewPortYbounds = [
+        viewPortScaleY.current!(minY), //- ViewPortPadding,
+        viewPortScaleY.current!(maxY), // + 0.25 * ViewPortPadding,
+      ] as [number, number];
+
+      setViewPortBounds({
+        pixel: {
+          x: viewPortXbounds,
+          y: viewPortYbounds,
+        },
+        coord: {
+          x: [
+            viewPortScaleX.current!.invert(viewPortXbounds[0]),
+            viewPortScaleX.current!.invert(viewPortXbounds[1]),
+          ],
+          y: [
+            viewPortScaleY.current!.invert(viewPortYbounds[0]),
+            viewPortScaleY.current!.invert(viewPortYbounds[1]),
+          ],
+        },
+      });
+
+      console.log(viewPortBounds);
+
+      const layers_to_set = dataSources.allIDs.map((id) => {
+        if (data[id]) {
+          const layer = StemPlotLayers(
+            dataSources.byID[id],
+            data[id].data,
+            sessionInterface,
+            viewPortScaleX.current!,
+            viewPortScaleY.current!,
+            viewPortScaleY.current!(minY),
+          );
+
+          layer[0].onHover = (info: PickingInfo<EarthQuake>) => {
+            setHoverInfo(info);
+            return true;
+          };
+
+          return layer;
+        }
+      });
+      return layers_to_set;
+    }
+  }, [
+    dimensions,
+    dataSources.allIDs,
+    dataSources.byID,
+    data,
+    scaleX,
+    scaleY,
+    sessionInterface,
+  ]);
 
   return (
     <Box
@@ -408,22 +401,6 @@ export default function StemPlot() {
       }}
     >
       <Box ref={parentRef} id="chart-stem-plot" sx={{ position: "relative" }}>
-        {/* {isLoading && (
-          <Skeleton
-            sx={{
-              position: "absolute",
-              top: 2 * margin.top + "px",
-              left: 2 * margin.left + "px",
-            }}
-            variant="rectangular"
-            width={dimensions.width - margin.left * 2 - margin.right}
-            height={
-              dimensions.width * height_to_width_ratio -
-              margin.top -
-              margin.bottom
-            }
-          />
-        )} */}
         <DeckGL
           style={{
             position: "absolute",
@@ -441,7 +418,9 @@ export default function StemPlot() {
           }
           controller={
             {
+              scrollZoom: { speed: 0.003 },
               zoomAxis: "X",
+              keyboard: { moveSpeed: -50 },
             } as ControllerOptions
           }
           initialViewState={{
@@ -462,25 +441,38 @@ export default function StemPlot() {
                 ],
                 zoom: viewState.zoom as [number, number],
               });
+
+              return {
+                ...viewState,
+                target: [
+                  viewState.target![0] -
+                    (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0]) <
+                  viewPortBounds.pixel.x[0]
+                    ? viewPortBounds.pixel.x[0] +
+                      (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0])
+                    : viewState.target![0] +
+                          (graphWidth * 0.5) /
+                            Math.pow(2, viewStateMonitor.zoom[0]) >
+                        viewPortBounds.pixel.x[1]
+                      ? viewPortBounds.pixel.x[1] -
+                        (graphWidth * 0.5) /
+                          Math.pow(2, viewStateMonitor.zoom[0])
+                      : viewState.target![0],
+                  viewState.target![1] - graphHeight * 0.5 <
+                  viewPortBounds.pixel.y[0]
+                    ? viewPortBounds.pixel.y[0] - graphHeight * 0.5
+                    : viewState.target![1] + graphHeight * 0.5 >
+                        viewPortBounds.pixel.y[1]
+                      ? viewPortBounds.pixel.y[1] + graphHeight * 0.5
+                      : viewState.target![1],
+                ],
+              };
             }
           }}
           layers={layers}
         >
           {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
         </DeckGL>
-        <Box sx={{ position: "fixed" }}>
-          <span>
-            {viewStateMonitor.pixelPosition[0]},{" "}
-            {viewStateMonitor.pixelPosition[1]}
-          </span>
-          <br />
-          <span>
-            {viewStateMonitor.coordPosition[0].toISOString()},{" "}
-            {viewStateMonitor.coordPosition[1]}
-          </span>
-          <br />
-          <span>{viewStateMonitor.zoom[0]}</span>
-        </Box>
       </Box>
     </Box>
   );
