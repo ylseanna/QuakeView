@@ -54,7 +54,7 @@ export default function DataSourceFormattingElement({
           sx={{ flexGrow: 1 }}
         >
           <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-          <Typography>{dataSource.filename}</Typography>
+          <Typography sx={{textOverflow: "clip", wordBreak: "unset", width:"calc(100% - 200px)"}}>{dataSource.name}</Typography>
         </SubAccordionSummary>
       </Box>
       <SubAccordionDetails>

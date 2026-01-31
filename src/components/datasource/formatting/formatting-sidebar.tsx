@@ -1,10 +1,11 @@
 import { Drawer, Typography } from "@mui/material";
-import DataSourceFormattingElement from "./formatting-element";
-import { useRef } from "react";
-import { useTranslations } from "next-intl";
-import { useProjectStore } from "@/providers/project-store-provider";
-import { Box } from "@mui/material";
 import { useTheme } from "@mui/material";
+import { useTranslations } from "next-intl";
+import { useRef } from "react";
+
+import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import { useProjectStore } from "@/providers/project-store-provider";
+import DataSourceFormattingElement from "./formatting-element";
 
 interface FormattingProps {
   setFormatting: CallableFunction;
@@ -44,10 +45,13 @@ export default function FormattingSidebar({
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
             zIndex: theme.zIndex.appBar - 100,
+            overflowX: "hidden",
+            ...ScrollBarStyling,
+            top: "calc(80px + 32px)",
           },
         }}
       >
-        <Box sx={{ display: "box", height: "calc(80px + 32px)" }} />
+        {/* <Box sx={{ display: "box", height: "calc(80px + 32px)" }} /> */}
         <Typography sx={sxtextbox}>
           <b>{t("formatting")}</b>
         </Typography>

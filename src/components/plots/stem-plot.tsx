@@ -372,10 +372,12 @@ export default function StemPlot() {
             viewPortScaleY.current!(minY),
           );
 
-          layer[0].onHover = (info: PickingInfo<EarthQuake>) => {
+          layer[1].onHover = (info: PickingInfo<EarthQuake>) => {
             setHoverInfo(info);
             return true;
           };
+
+          console.log(layer);
 
           return layer;
         }
@@ -446,22 +448,22 @@ export default function StemPlot() {
                 ...viewState,
                 target: [
                   viewState.target![0] -
-                    (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0]) <
+                    (graphWidth * 0.5) /
+                      Math.pow(2, (viewState.zoom! as [number, number])[0]) <=
                   viewPortBounds.pixel.x[0]
                     ? viewPortBounds.pixel.x[0] +
-                      (graphWidth * 0.5) / Math.pow(2, viewStateMonitor.zoom[0])
+                      (graphWidth * 0.5) / Math.pow(2, (viewState.zoom! as [number, number])[0])
                     : viewState.target![0] +
                           (graphWidth * 0.5) /
-                            Math.pow(2, viewStateMonitor.zoom[0]) >
+                            Math.pow(2, (viewState.zoom! as [number, number])[0]) >=
                         viewPortBounds.pixel.x[1]
                       ? viewPortBounds.pixel.x[1] -
-                        (graphWidth * 0.5) /
-                          Math.pow(2, viewStateMonitor.zoom[0])
+                        (graphWidth * 0.5) / Math.pow(2, (viewState.zoom! as [number, number])[0])
                       : viewState.target![0],
-                  viewState.target![1] - graphHeight * 0.5 <
+                  viewState.target![1] - graphHeight * 0.5 <=
                   viewPortBounds.pixel.y[0]
                     ? viewPortBounds.pixel.y[0] - graphHeight * 0.5
-                    : viewState.target![1] + graphHeight * 0.5 >
+                    : viewState.target![1] + graphHeight * 0.5 >=
                         viewPortBounds.pixel.y[1]
                       ? viewPortBounds.pixel.y[1] + graphHeight * 0.5
                       : viewState.target![1],
