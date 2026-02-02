@@ -88,7 +88,8 @@
     "summary": "Summary",
     "upload_files": "Upload files",
     "name": "Name",
-    "earthquake_catalog": "Earthquake catalog file"
+    "earthquake_catalog": "Earthquake catalog file",
+    "variable_mapping": "Edit variable mappings"
   },
   "Table": {
     "dep": "Depth (km)",

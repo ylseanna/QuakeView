@@ -8,7 +8,7 @@ import {
   ExpandMore,
   FilterAlt,
   Folder,
-  Numbers,
+  // Numbers,
   ScatterPlot,
   Warning,
 } from "@mui/icons-material";
@@ -240,7 +240,7 @@ export default function DataTab({ id }: DataTabProps) {
                 borderLeft: "var(--Grid-borderWidth) solid",
                 borderColor: "divider",
                 "& > div": {
-                  p:1,
+                  p: 1,
                   borderRight: "var(--Grid-borderWidth) solid",
                   borderBottom: "var(--Grid-borderWidth) solid",
                   borderColor: "divider",
@@ -262,7 +262,7 @@ export default function DataTab({ id }: DataTabProps) {
               {t("Sources.options")}
             </Typography>
           </Box>
-          <SubAccordion
+          {/* <SubAccordion
             slotProps={{
               root: {
                 sx: {
@@ -297,11 +297,14 @@ export default function DataTab({ id }: DataTabProps) {
                 />
                 <Typography>{t("Variables.variables")}</Typography>
               </SubAccordionSummary>
-            </Box>
-            <SubAccordionDetails>
-              <DataSourceVariableForm dataSource={dataSource} />
-            </SubAccordionDetails>
-          </SubAccordion>
+            </Box>*/}
+          <SubAccordionDetails>
+            <Typography sx={{ fontWeight: "bold" }}>
+              {t("Sources.variable_mapping")}
+            </Typography>
+            <DataSourceVariableForm dataSource={dataSource} />
+          </SubAccordionDetails>
+          {/*  </SubAccordion> */}
 
           <SubAccordion
             sx={{ borderBottom: "0px!important" }}
