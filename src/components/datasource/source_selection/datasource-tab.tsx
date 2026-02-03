@@ -8,7 +8,6 @@ import {
   ExpandMore,
   FilterAlt,
   Folder,
-  // Numbers,
   ScatterPlot,
   Warning,
 } from "@mui/icons-material";
@@ -23,10 +22,11 @@ import {
   Paper,
   Stack,
   TextField,
+  ToggleButton,
+  ToggleButtonGroup,
   Tooltip,
   Typography,
   useTheme,
-  Grid,
 } from "@mui/material";
 
 // import {
@@ -38,7 +38,9 @@ import { useFormatter, useTranslations } from "next-intl";
 // import { Dispatch, SetStateAction, useCallback } from "react";
 import DataSourceFormattingForm from "../formatting/formatting-form";
 
-import DataSourceVariableForm from "../variables/variable-form";
+import DataSourceVariableForm, {
+  fetchUpdatedMetadata,
+} from "../variables/variable-form";
 import {
   SubAccordion,
   SubAccordionDetails,
@@ -48,10 +50,19 @@ import FilteringForm from "../filtering/filtering-form";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 import { useEffect, useState } from "react";
+import { DataGrid } from "@mui/x-data-grid/DataGrid";
+import { DataSource } from "../types";
 
 interface DataTabProps {
   id: string;
 }
+
+const sxButton = {
+  padding: "4px 8px 4px 8px",
+  textTransform: "capitalize",
+  lineHeight: 1,
+  h: 3,
+};
 
 export default function DataTab({ id }: DataTabProps) {
   const t = useTranslations();
@@ -70,10 +81,57 @@ export default function DataTab({ id }: DataTabProps) {
   const setFiltering = useProjectStore(
     (state) => state.dataSourceActions.setFiltering,
   );
+
+  const setMetadata = useProjectStore(
+    (state) => state.dataSourceActions.setMetadata,
+  );
+
+  const updateMetaData = async (dataSource: DataSource, sep: string) => {
+    // update bounds and metadata after setting mapped variables
+
+    // fetch updated metadata
+    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
+
+    const metadata = { ...updatedMetadata, sep: sep };
+
+    // set metadata
+    setMetadata(dataSource.internal_id, metadata);
+
+    // colormapBounds
+    const colormapsBounds = Object.keys(metadata.variables.by_id).map(
+      (variable: string) => {
+        const obj: { [variable: string]: [number, number] } = {};
+        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
+        return obj;
+      },
+    );
+
+    console.log(colormapsBounds);
+
+    const updatedColorFormatting = {
+      ...dataSource.formatting.color,
+      linear: {
+        ...dataSource.formatting.color.linear,
+        domain: Object.assign({}, ...colormapsBounds),
+      },
+    };
+
+    console.log(updatedColorFormatting);
+
+    // updatedColorFormatting.linear.domain = ;
+
+    setFormatting(
+      dataSource.internal_id,
+      "color",
+      updatedColorFormatting as never,
+    );
+  };
+
   const theme = useTheme();
 
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
   const [amEditingName, setAmEditingName] = useState(false);
+  const [previewType, setPreviewType] = useState("raw");
 
   useEffect(() => {
     const all_domains_present = dataSource.metadata.variables.required_vars
@@ -222,37 +280,81 @@ export default function DataTab({ id }: DataTabProps) {
               </Stack>
             </Stack>
             <Divider sx={{ my: 1, mx: 2 }} />
-            <Stack className="full-row" direction="row">
+            <Stack className="full-row" direction="row" sx={{ mb: -1 }}>
               <Stack className="first-bit" direction="row">
                 <Typography className="row-header" noWrap>
-                  <b>{t("Sources.column_headers")}:</b>
+                  <b>{t("Sources.data_preview")}</b>
                 </Typography>
               </Stack>
+              <ToggleButtonGroup
+                size="small"
+                color="primary"
+                value={previewType}
+                exclusive
+                onChange={(event) =>
+                  setPreviewType((event.target as HTMLInputElement).value)
+                }
+                aria-label="mode"
+              >
+                <ToggleButton value="raw" sx={sxButton}>
+                  {t("Source.raw_preview_option")}
+                </ToggleButton>
+                <ToggleButton value="parsed" sx={sxButton}>
+                  {t("Source.parsed_preview_option")}
+                </ToggleButton>
+              </ToggleButtonGroup>
             </Stack>
-            <Grid
-              container
-              sx={{
-                display: "flex",
-                width: "100%",
-                m: 2,
-                "--Grid-borderWidth": "1px",
-                borderTop: "var(--Grid-borderWidth) solid",
-                borderLeft: "var(--Grid-borderWidth) solid",
-                borderColor: "divider",
-                "& > div": {
-                  p: 1,
-                  borderRight: "var(--Grid-borderWidth) solid",
-                  borderBottom: "var(--Grid-borderWidth) solid",
-                  borderColor: "divider",
-                },
-              }}
-            >
-              {dataSource.metadata.catalog_headers.map((header, index) => (
-                <Grid key={index} size="auto">
-                  {header}
-                </Grid>
-              ))}
-            </Grid>
+            {previewType == "raw" ? (
+              <Paper variant="outlined" sx={{ m: 2, px: 3, pt: 2, pb: 1 }}>
+                {dataSource.metadata.preview.raw.map((line, index) => (
+                  <Stack key={"rawPreviewCatalogLine" + index} direction="row">
+                    <Typography
+                      variant="rawtext"
+                      sx={{
+                        minWidth: "1.7rem",
+                        opacity: 0.6,
+                        justifyContent: "center",
+                      }}
+                    >
+                      {index != 0 ? index : "#"}
+                    </Typography>
+                    <Typography noWrap variant="rawtext">
+                      {line}
+                    </Typography>
+                  </Stack>
+                ))}
+                <Stack key={"rawPreviewCatalogFinalLine"} direction="row">
+                  <Typography
+                    variant="rawtext"
+                    sx={{
+                      minWidth: "1.7rem",
+                      opacity: 0.6,
+                      ml: "2px",
+                    }}
+                  >
+                    &#8942;
+                  </Typography>
+                </Stack>
+              </Paper>
+            ) : (
+              <DataGrid
+                sx={{ m: 2 }}
+                disableColumnMenu
+                disableColumnSorting
+                columnHeaderHeight={36}
+                columnVisibilityModel={{ id: false, t: false, dt: false }}
+                rowHeight={36}
+                columns={[
+                  ...Object.keys(dataSource.metadata.preview.parsed[0]).map(
+                    (key) => {
+                      return { field: key, headerName: key, flex: 1 };
+                    },
+                  ),
+                ]}
+                hideFooter
+                rows={dataSource.metadata.preview.parsed}
+              />
+            )}
           </Stack>
         </Paper>
 
@@ -262,49 +364,33 @@ export default function DataTab({ id }: DataTabProps) {
               {t("Sources.options")}
             </Typography>
           </Box>
-          {/* <SubAccordion
-            slotProps={{
-              root: {
-                sx: {
-                  outline: !dataSource.interface.loadable
-                    ? `1px solid ${theme.palette.error.main}`
-                    : "0",
-                  borderLeft: !dataSource.interface.loadable
-                    ? `1px solid ${theme.palette.error.main}`
-                    : "0",
-                  borderRight: !dataSource.interface.loadable
-                    ? `1px solid ${theme.palette.error.main}`
-                    : "0",
-                },
-              },
-            }}
-          >
-            <Box sx={{ display: "flex" }}>
-              <SubAccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="panel2a-header"
-                sx={{
-                  flexGrow: 1,
-                }}
-              >
-                <Numbers
-                  sx={{
-                    opacity: 0.6,
-                    mr: 1,
-                    ml: -0.5,
-                  }}
-                />
-                <Typography>{t("Variables.variables")}</Typography>
-              </SubAccordionSummary>
-            </Box>*/}
+
           <SubAccordionDetails>
+            <ToggleButtonGroup
+              color="primary"
+              value={previewType}
+              exclusive
+              onChange={(event) => {
+                updateMetaData(
+                  dataSource,
+                  (event.target as HTMLInputElement).value,
+                );
+              }}
+              aria-label="mode"
+            >
+              <ToggleButton value="\s+" sx={sxButton}>
+                whitespace
+              </ToggleButton>
+              <ToggleButton value="," sx={sxButton}>
+                comma
+              </ToggleButton>
+            </ToggleButtonGroup>
             <Typography sx={{ fontWeight: "bold" }}>
               {t("Sources.variable_mapping")}
             </Typography>
+
             <DataSourceVariableForm dataSource={dataSource} />
           </SubAccordionDetails>
-          {/*  </SubAccordion> */}
 
           <SubAccordion
             sx={{ borderBottom: "0px!important" }}

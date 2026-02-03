@@ -200,20 +200,20 @@ export default function StemPlot() {
     // setIsLoading(true);
   }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
 
-  // set bounds
-  useEffect(() => {
-    dataSources.allIDs.map((dataSourceID) => {
-      const dataSource = dataSources.byID[dataSourceID];
+  // // set bounds
+  // useEffect(() => {
+  //   Object.keys(data).map((dataSourceID) => {
+  //     const dataSource = dataSources.byID[dataSourceID];
 
-      setBounds({
-        x: [
-          new Date(dataSource.metadata.variables.by_id["t"].bounds[0]),
-          new Date(dataSource.metadata.variables.by_id["t"].bounds[1]),
-        ],
-        y: dataSource.metadata.variables.by_id["mag"].bounds,
-      });
-    });
-  }, [data, dataSources.allIDs, parentRef]);
+  //     setBounds({
+  //       x: [
+  //         new Date(dataSource.metadata.variables.by_id["t"].bounds[0]),
+  //         new Date(dataSource.metadata.variables.by_id["t"].bounds[1]),
+  //       ],
+  //       y: dataSource.metadata.variables.by_id["mag"].bounds,
+  //     });
+  //   });
+  // }, [data, parentRef]);
 
   // set bounds based on ViewState
   useEffect(() => {
@@ -297,24 +297,24 @@ export default function StemPlot() {
   const layers = useMemo(() => {
     if (scaleX.current && scaleY.current) {
       const minX = Math.min(
-        ...dataSources.allIDs.map(
+        ...Object.keys(data).map(
           (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[0],
         ),
       );
       const maxX = Math.max(
-        ...dataSources.allIDs.map(
+        ...Object.keys(data).map(
           (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[1],
         ),
       );
 
       const minY = Math.min(
-        ...dataSources.allIDs.map(
+        ...Object.keys(data).map(
           (id) =>
             dataSources.byID[id].metadata.variables.by_id["mag"].bounds[0],
         ),
       );
       const maxY = Math.max(
-        ...dataSources.allIDs.map(
+        ...Object.keys(data).map(
           (id) =>
             dataSources.byID[id].metadata.variables.by_id["mag"].bounds[1],
         ),
@@ -361,7 +361,7 @@ export default function StemPlot() {
 
       console.log(viewPortBounds);
 
-      const layers_to_set = dataSources.allIDs.map((id) => {
+      const layers_to_set = Object.keys(data).map((id) => {
         if (data[id]) {
           const layer = StemPlotLayers(
             dataSources.byID[id],
@@ -386,7 +386,6 @@ export default function StemPlot() {
     }
   }, [
     dimensions,
-    dataSources.allIDs,
     dataSources.byID,
     data,
     scaleX,

@@ -90,6 +90,14 @@ export const theme: ThemeOptions = createTheme({
       letterSpacing: "0.01rem",
       lineHeight: "0.6rem",
     },
+    rawtext: {
+      fontSize: "1rem",
+      opacity: 1,
+      fontWeight: "normal",
+      fontFamily: "monospace",
+      letterSpacing: "0.02rem",
+      lineHeight: "1.5rem",
+    },
   },
   components: {
     MuiToolbar: {
@@ -99,11 +107,6 @@ export const theme: ThemeOptions = createTheme({
           minHeight: 24,
         },
       },
-    },
-    MuiFormControl: {
-      styleOverrides:{root: {
-        height: '40px',
-      }},
     },
     MuiInputBase: {
       styleOverrides:{root: {

@@ -34,6 +34,7 @@ declare module "@mui/material/styles" {
     formlabel: React.CSSProperties;
     formheader: React.CSSProperties;
     navsectionheader: React.CSSProperties;
+    rawtext: React.CSSProperties;
   }
 
   // allow configuration using `createTheme()`
@@ -41,6 +42,7 @@ declare module "@mui/material/styles" {
     formlabel?: React.CSSProperties;
     formheader?: React.CSSProperties;
     navsectionheader?: React.CSSProperties;
+    rawtext: React.CSSProperties;
   }
 }
 
@@ -50,6 +52,7 @@ declare module "@mui/material/Typography" {
     formlabel: true;
     formheader: true;
     navsectionheader: true;
+    rawtext: true;
   }
 }
 

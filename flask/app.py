@@ -1,14 +1,28 @@
-from flask import Flask, request, Response, send_file
-from pathlib import Path
-from shapely import multipoints
 import json
-from numpy import concatenate, float64, int64, isnan
-
 
 # from obspy import UTCDateTime
 from datetime import datetime
+from itertools import islice
+from pathlib import Path
 
 import pandas as pd
+from numpy import concatenate, float64, int64, isnan
+from shapely import multipoints
+
+from flask import Flask, Response, request, send_file
+
+from mmap import mmap
+
+
+def count(filename: Path):
+    with filename.open(mode="r+") as f:
+        buf = mmap(f.fileno(), 0)
+        lines = 0
+        readline = buf.readline
+        while readline():
+            lines += 1
+        return lines
+
 
 app = Flask(__name__)
 
@@ -177,9 +191,15 @@ def map_data():
         }
 
         # LOAD FILE
-        filepath = request.args.get("filepath")
+        filepath = Path(request.args.get("filepath"))
 
-        df = pd.read_csv(filepath)
+        with filepath.open() as input_file:
+            raw_file_preview = list(islice(input_file, 10))
+        print(raw_file_preview)
+
+        seperator = request.args.get("sep") if "sep" in argument_dict else ","
+
+        df = pd.read_csv(filepath, sep=seperator)
 
         # CHECK IF ALL REQUIRED FIELDS ARE SELECTED
 
@@ -302,7 +322,17 @@ def map_data():
         # OUTPUT
 
         meta_data_dict = {
-            "num_events": len(df),
+            "num_events": count(filepath) - 1,
+            "sep": seperator,
+            "preview": {
+                "parsed": [
+                    {"id": index} | record
+                    for index, record in enumerate(
+                        json.loads(df[:10].to_json(orient="records", date_format="iso"))
+                    )
+                ],
+                "raw": raw_file_preview,
+            },
             "extent": {
                 "automatic": True,
                 "centroid": centroid_processed if centroid_calculatable else None,
@@ -346,26 +376,26 @@ def map_data():
         )
 
 
-@app.route("/api/plot_data")
-# @cache.cached(timeout=50)
-def plot_data():
-    mode = request.args.get("mode")
+# @app.route("/api/plot_data")
+# # @cache.cached(timeout=50)
+# def plot_data():
+#     mode = request.args.get("mode")
 
-    argument_dict = request.args.to_dict()
+#     argument_dict = request.args.to_dict()
 
-    print("PLOT DATA REQUEST", argument_dict)
+#     print("PLOT DATA REQUEST", argument_dict)
 
-    if mode == "timeline_plot" or mode is None:
-        event_dict = generate_event_dict()
+#     if mode == "timeline_plot" or mode is None:
+#         event_dict = generate_event_dict()
 
-        return Response(
-            json.dumps(event_dict),
-            mimetype="application/json",
-        )
+#         return Response(
+#             json.dumps(event_dict),
+#             mimetype="application/json",
+#         )
 
 
 # @cache.memoize()
-def generate_event_dict():
+def generate_event_dict(nlines=None):
     # LOAD DATAFRAME
     filepath = request.args.get("filepath")
 
@@ -445,20 +475,20 @@ def get_tile(z, x, y):
     return send_file(tile_path, mimetype="image/png")
 
 
-# @cache.memoize()
-def load_to_df(filepath):
-    # LOAD FILE
-    df = pd.read_csv(filepath)
+# # @cache.memoize()
+# def load_to_df(filepath):
+#     # LOAD FILE
+#     df = pd.read_csv(filepath)
 
-    # DATETIME
+#     # DATETIME
 
-    df["datetime"] = [datetime.fromisoformat(dt) for dt in df["DT"]]
+#     df["datetime"] = [datetime.fromisoformat(dt) for dt in df["DT"]]
 
-    df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
+#     df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
-    df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+#     df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
-    return df
+#     return df
 
 
 @app.errorhandler(ArgumentError)

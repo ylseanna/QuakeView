@@ -89,7 +89,8 @@
     "upload_files": "Upload files",
     "name": "Name",
     "earthquake_catalog": "Earthquake catalog file",
-    "variable_mapping": "Edit variable mappings"
+    "variable_mapping": "Edit variable mappings",
+    "data_preview": "Catalog file preview"
   },
   "Table": {
     "dep": "Depth (km)",
@@ -118,5 +119,9 @@
     "distribution_plot": "Histogram",
     "stem_plot": "Stem plot",
     "open_in_window": "Open page \"{page}\" in new window"
+  },
+  "Source": {
+    "parsed_preview_option": "parsed",
+    "raw_preview_option": "raw"
   }
 }
