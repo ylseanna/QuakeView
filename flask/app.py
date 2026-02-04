@@ -87,12 +87,19 @@ def map_data():
 
         # PREPARE VAR MAPPING (if provided)
         variable_mapped_vars = {
-            "id": None,
-            "dt": None,
-            "lon": None,
-            "lat": None,
-            "dep": None,
-            "mag": None,
+            "id": [],
+            "dt": [],
+            "lon": [],
+            "lat": [],
+            "dep": [],
+            "mag": [],
+            "year": [],
+            "month": [],
+            "day": [],
+            "doy": [],
+            "hour": [],
+            "minute": [],
+            "second": [],
         }
 
         if "vars" in argument_dict:
@@ -112,7 +119,11 @@ def map_data():
         required_data_descr = {  # required parameters
             "id": {
                 "variable": "id",
-                "mapped_var": variable_mapped_vars["id"] or ["EventID", "evid"],
+                "mapped_var": (
+                    variable_mapped_vars["id"]
+                    if "vars" in argument_dict
+                    else ["EventID", "evid"]
+                ),
                 "alias": "Event ID",
                 "unit": "",
                 "data_type": "id_string",
@@ -123,8 +134,11 @@ def map_data():
             },
             "dt": {
                 "variable": "dt",
-                "mapped_var": variable_mapped_vars["dt"]
-                or ["DT", "datetime", "Datetime"],
+                "mapped_var": (
+                    variable_mapped_vars["dt"]
+                    if "vars" in argument_dict
+                    else ["DT", "datetime", "Datetime"]
+                ),
                 "alias": "Time",
                 "unit": "",
                 "data_type": "dt_string",
@@ -146,7 +160,11 @@ def map_data():
             },
             "lon": {
                 "variable": "lon",
-                "mapped_var": variable_mapped_vars["lon"] or ["X", "lon", "Longitude"],
+                "mapped_var": (
+                    variable_mapped_vars["lon"]
+                    if "vars" in argument_dict
+                    else ["X", "lon", "Longitude"]
+                ),
                 "alias": "Longitude",
                 "unit": "degrees",
                 "data_type": "number",
@@ -157,7 +175,11 @@ def map_data():
             },
             "lat": {
                 "variable": "lat",
-                "mapped_var": variable_mapped_vars["lat"] or ["Y", "lat", "Latitude"],
+                "mapped_var": (
+                    variable_mapped_vars["lat"]
+                    if "vars" in argument_dict
+                    else ["Y", "lat", "Latitude"]
+                ),
                 "alias": "Latitude",
                 "unit": "degrees",
                 "data_type": "number",
@@ -168,7 +190,11 @@ def map_data():
             },
             "dep": {
                 "variable": "dep",
-                "mapped_var": variable_mapped_vars["dep"] or ["Z", "dep", "Depth"],
+                "mapped_var": (
+                    variable_mapped_vars["dep"]
+                    if "vars" in argument_dict
+                    else ["Z", "dep", "Depth"]
+                ),
                 "alias": "Depth",
                 "unit": "km",
                 "data_type": "number",
@@ -179,7 +205,11 @@ def map_data():
             },
             "mag": {
                 "variable": "mag",
-                "mapped_var": variable_mapped_vars["mag"] or ["ML", "mag", "Magnitude"],
+                "mapped_var": (
+                    variable_mapped_vars["mag"]
+                    if "vars" in argument_dict
+                    else ["ML", "mag", "Magnitude"]
+                ),
                 "alias": "Magnitude",
                 "unit": "M",
                 "data_type": "number",
@@ -190,12 +220,32 @@ def map_data():
             },
         }
 
+        ### datatime variables
+        datetime_variable_descr = {}
+        for variable, alias, unit in zip(
+            ["year", "month", "day", "doy", "hour", "minute", "second"],
+            ["Year", "Month", "Day", "Day-of-year", "Hour", "Minute", "Second"],
+            ["years", "months", "days", "days", "hours", "minutes", "seconds"],
+        ):
+            datetime_variable_descr[variable] = {
+                "variable": variable,
+                "mapped_var": (
+                    variable_mapped_vars[variable] if "vars" in argument_dict else []
+                ),
+                "alias": alias,
+                "unit": unit,
+                "data_type": "number",
+                "bounds": None,
+                "bins": None,
+                "kde": None,
+                "required": True,
+            }
+
         # LOAD FILE
         filepath = Path(request.args.get("filepath"))
 
         with filepath.open() as input_file:
             raw_file_preview = list(islice(input_file, 10))
-        print(raw_file_preview)
 
         seperator = request.args.get("sep") if "sep" in argument_dict else ","
 
@@ -214,6 +264,23 @@ def map_data():
                     if mapped_var in df.columns:
                         varmap[required_variable] = mapped_var
                         continue
+
+        for datetime_variable in datetime_variable_descr.keys():
+            # initial setting
+            varmap[datetime_variable] = None
+
+            for mapped_var in datetime_variable_descr[datetime_variable]["mapped_var"]:
+                if mapped_var in df.columns:
+                    varmap[datetime_variable] = mapped_var
+                    continue
+
+        ## DATETIME
+
+        datetime_format = (
+            request.args.get("datetimeformat")
+            if "datetimeformat" in argument_dict
+            else "parseable_datetime_string"
+        )
 
         # DATETIME CONVERSION
         if varmap["dt"]:
@@ -324,6 +391,7 @@ def map_data():
         meta_data_dict = {
             "num_events": count(filepath) - 1,
             "sep": seperator,
+            "datetime_format": datetime_format,
             "preview": {
                 "parsed": [
                     {"id": index} | record
@@ -343,8 +411,11 @@ def map_data():
                 str(header) for header in df.columns if (header not in ("dt", "t"))
             ],
             "variables": {
-                "by_id": optional_data_descr | required_data_descr,
+                "by_id": optional_data_descr
+                | datetime_variable_descr
+                | required_data_descr,
                 "required_vars": list(required_data_descr.keys()),
+                "datetime_vars": list(datetime_variable_descr.keys()),
                 "optional_vars": list(optional_data_descr.keys()),
                 "added_vars": [],
             },

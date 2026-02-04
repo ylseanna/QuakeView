@@ -79,7 +79,7 @@ export const theme: ThemeOptions = createTheme({
       letterSpacing: "0.01rem",
     },
     formlabel: {
-      fontSize: "0.9rem",
+      fontSize: ".95rem",
       opacity: 0.6,
       fontWeight: "normal",
     },

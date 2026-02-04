@@ -52,10 +52,7 @@ export type ProjectActions = {
   dataSourceActions: {
     addDataSource: (dataSource: DataSource) => void;
     removeDataSource: (id: string) => void;
-    setMetadata: (
-      id: string,
-      value: DataSourceMetaData,
-    ) => void;
+    setMetadata: (id: string, value: DataSourceMetaData) => void;
     setFormatting: (
       id: string,
       keyToModify: keyof DataSourceFormatting,
@@ -75,6 +72,10 @@ export type ProjectActions = {
     setAddedVars: (id: string, value: string[]) => void;
     setVisible: (id: string, value: boolean) => void;
     setLoadable: (id: string, value: boolean) => void;
+  };
+  metadataActions: {
+    setSep: (id: string, value: string) => void;
+    setDatetimeFormat: (id: string, value: string) => void;
   };
 };
 
@@ -186,6 +187,16 @@ export const createProjectStore = (
           setLoadable: (id, value) =>
             set((state) => {
               state.dataSources.byID[id].interface.loadable = value;
+            }),
+        },
+        metadataActions: {
+          setSep: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata.sep = value;
+            }),
+          setDatetimeFormat: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata.datetime_format = value as "parseable_datetime_string" | "year-month-day-hour-minute-second";
             }),
         },
       })),

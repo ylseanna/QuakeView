@@ -89,8 +89,16 @@
     "upload_files": "Upload files",
     "name": "Name",
     "earthquake_catalog": "Earthquake catalog file",
-    "variable_mapping": "Edit variable mappings",
-    "data_preview": "Catalog file preview"
+    "variable_mapping": "Variable mapping",
+    "data_preview": "Catalog file preview",
+    "other_options": "Other options",
+    "parsing_options": "Catalog file parsing",
+    "delimiter": "Delimiter",
+    "datetime_format": "Date & time format",
+    "whitespace": "whitespace",
+    "comma": "comma",
+    "parseable_datetime_string": "datetime string",
+    "year-month-day-hour-minute-second": "year+month+day+hour+minute+second"
   },
   "Table": {
     "dep": "Depth (km)",

@@ -124,14 +124,14 @@ function VariableEditingRow({
   const SharedTextFieldProps = {
     sx: {
       inputProps: {
-        sx: {minHeight: "40px"}
-      }
+        sx: { minHeight: "40px" },
+      },
     },
   };
 
   return (
     <Grid container spacing={1} alignItems="flex-start">
-      <Grid size={1.5}>
+      <Grid sx={dataSource.metadata.variables.datetime_vars.includes(dataDescription.variable) ? {width: "104px" , ml:  "16px"} : {width: "120px"}}>
         <TextField value={dataDescription.variable} size="small" disabled />
       </Grid>
       <Grid
@@ -301,17 +301,39 @@ export default function DataSourceVariableForm({
             </Typography>
           </Grid>
         </Grid>
-        {dataSource.metadata.variables.required_vars.map(
-          (variable: string) =>
-            variable != "t" && (
-              <VariableEditingRow
-                key={"EditingElement-" + variable}
-                dataDescription={dataSource.metadata.variables.by_id[variable]}
-                dataSource={dataSource}
-                required
-              />
-            ),
-        )}
+        {dataSource.metadata.datetime_format != "parseable_datetime_string"
+          ? [
+              "id",
+              ...dataSource.metadata.variables.datetime_vars.filter((variable) => variable != "doy"),
+              ...dataSource.metadata.variables.required_vars.filter(
+                (variable) => !(["id", "dt", "t"].includes(variable)),
+              ),
+            ].map(
+              (variable: string) =>
+                variable != "t" && (
+                  <VariableEditingRow
+                    key={"EditingElement-" + variable}
+                    dataDescription={
+                      dataSource.metadata.variables.by_id[variable]
+                    }
+                    dataSource={dataSource}
+                    required
+                  />
+                ),
+            )
+          : dataSource.metadata.variables.required_vars.map(
+              (variable: string) =>
+                variable != "t" && (
+                  <VariableEditingRow
+                    key={"EditingElement-" + variable}
+                    dataDescription={
+                      dataSource.metadata.variables.by_id[variable]
+                    }
+                    dataSource={dataSource}
+                    required
+                  />
+                ),
+            )}
         {dataSource.metadata.variables.added_vars.map((variable: string) => (
           <VariableEditingRow
             key={"EditingElement-" + variable}
@@ -328,7 +350,7 @@ export default function DataSourceVariableForm({
           />
         ))}
         <Grid container spacing={1} alignItems="center">
-          <Grid size={1.5}>
+          <Grid sx={{width: "120px"}}>
             <Autocomplete
               options={dataSource.metadata.variables.optional_vars
                 .filter(
