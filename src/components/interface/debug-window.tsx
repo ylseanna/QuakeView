@@ -5,13 +5,21 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { useDataStore } from "@/providers/data-store-provider";
 import { JSONTree } from "react-json-tree";
 import { ScrollBarStyling } from "../layout/scrollbar-styling";
+import { useDraggable } from "@dnd-kit/core";
+import { CSS } from "@dnd-kit/utilities";
 
 export default function DebugWindow() {
   const { sessionInterface, GPUfiltering, dataSources } = useProjectStore(
     (state) => state,
   );
 
+  const { attributes, listeners, setNodeRef, transform } = useDraggable({
+    id: "debug-window",
+  });
+
   const { data } = useDataStore((state) => state);
+
+  const { allIDs } = useDataStore((state) => state);
 
   const theme = {
     scheme: "Ocean",
@@ -36,6 +44,9 @@ export default function DebugWindow() {
 
   return (
     <Paper
+      ref={setNodeRef}
+      {...listeners}
+      {...attributes}
       sx={{
         ...ScrollBarStyling,
         position: "fixed",
@@ -50,6 +61,7 @@ export default function DebugWindow() {
         color: "#8fa1b3",
         fontFamily: "monospace",
         zIndex: 2000,
+        transform: CSS.Translate.toString(transform) as string,
       }}
       elevation={6}
       square
@@ -72,14 +84,28 @@ export default function DebugWindow() {
       <JSONTree data={GPUfiltering} theme={theme} hideRoot />
       <Box display="flex" flexDirection={"column"}>
         <span>Data loaded:</span>
-        {Object.keys(data).map((key) => (
-          <div key={key}>
-            <span style={{ color: "#bf616a" }}>{key}</span>{" "}
-            <span style={{ color: "#a3be8c" }}>
-              [{data[key].data.length} items]
-            </span>
-          </div>
-        ))}
+        {allIDs.map((key) => {
+          console.log(key);
+          return data[key] ? (
+            <div key={key}>
+              <span style={{ color: "#bf616a" }}>{key}</span>{" "}
+              <span style={{ color: "#a3be8c" }}>
+                [{data[key].data.length} items]
+              </span>
+              <Box sx={{ ml: 2, mt: -1 }}>
+                <JSONTree
+                  data={{
+                    bounds: data[key].bounds,
+                    extent: data[key].extent,
+                    filters: data[key].filters,
+                  }}
+                  theme={theme}
+                  hideRoot
+                />
+              </Box>
+            </div>
+          ) : null;
+        })}
       </Box>
     </Paper>
   );

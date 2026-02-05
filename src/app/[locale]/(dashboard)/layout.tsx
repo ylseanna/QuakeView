@@ -38,8 +38,10 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
                 addData(
                   id,
-                  fetched_data,
+                  fetched_data.data,
                   dataSources.byID[id].metadata.variables.added_vars,
+                  fetched_data.bounds,
+                  fetched_data.extent,
                   dataSources.byID[id].filtering,
                 );
 
@@ -64,8 +66,10 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
                   addData(
                     id,
-                    fetched_data,
+                    fetched_data.data,
                     dataSources.byID[id].metadata.variables.added_vars,
+                    fetched_data.bounds,
+                    fetched_data.extent,
                     dataSources.byID[id].filtering,
                   );
 

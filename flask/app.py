@@ -85,34 +85,52 @@ def map_data():
 
         print("METADATA REQUEST", argument_dict)
 
-        # PREPARE VAR MAPPING (if provided)
-        variable_mapped_vars = {
-            "id": [],
-            "dt": [],
-            "lon": [],
-            "lat": [],
-            "dep": [],
-            "mag": [],
-            "year": [],
-            "month": [],
-            "day": [],
-            "doy": [],
-            "hour": [],
-            "minute": [],
-            "second": [],
-        }
-
+        # IS INITIAL REQUEST?
         if "vars" in argument_dict:
-            vars = json.loads(request.args.get("vars"))
+            # vars = json.loads(request.args.get("vars"))
+            varmaps = json.loads(request.args.get("var_maps"))
+            initial_request = False
+        else:
+            initial_request = True
 
-            print(vars, type(vars))
+        # LOAD FILE
+        filepath = Path(request.args.get("filepath"))
 
-            for variable in vars:
-                if variable not in ("t",):
-                    if variable in argument_dict:
-                        mapped_vars = json.loads(request.args.get(variable))
+        with filepath.open() as input_file:
+            raw_file_preview = list(islice(input_file, 10))
 
-                        variable_mapped_vars[variable] = mapped_vars
+        seperator = request.args.get("sep") if not initial_request else ","
+
+        preview_df = pd.read_csv(filepath, sep=seperator, nrows=10)
+
+        # if not initial_request:
+        #     varmap = get_varmap(vars, varmaps, preview_df.columns)
+
+        # variable_mapped_vars = {
+        #     "id": [],
+        #     "dt": [],
+        #     "lon": [],
+        #     "lat": [],
+        #     "dep": [],
+        #     "mag": [],
+        #     "year": [],
+        #     "month": [],
+        #     "day": [],
+        #     "doy": [],
+        #     "hour": [],
+        #     "minute": [],
+        #     "second": [],
+        # }
+
+        # if "vars" in argument_dict:
+        #     vars = json.loads(request.args.get("vars"))
+
+        #     for variable in vars:
+        #         if variable not in ("t",):
+        #             if variable in argument_dict:
+        #                 mapped_vars = json.loads(request.args.get(variable))
+
+        #                 variable_mapped_vars[variable] = mapped_vars
 
         # DEFINE REQUIRED PARAMS
 
@@ -120,9 +138,7 @@ def map_data():
             "id": {
                 "variable": "id",
                 "mapped_var": (
-                    variable_mapped_vars["id"]
-                    if "vars" in argument_dict
-                    else ["EventID", "evid"]
+                    varmaps["id"] if not initial_request else ["EventID", "evid"]
                 ),
                 "alias": "Event ID",
                 "unit": "",
@@ -135,8 +151,8 @@ def map_data():
             "dt": {
                 "variable": "dt",
                 "mapped_var": (
-                    variable_mapped_vars["dt"]
-                    if "vars" in argument_dict
+                    varmaps["dt"]
+                    if not initial_request
                     else ["DT", "datetime", "Datetime"]
                 ),
                 "alias": "Time",
@@ -161,9 +177,7 @@ def map_data():
             "lon": {
                 "variable": "lon",
                 "mapped_var": (
-                    variable_mapped_vars["lon"]
-                    if "vars" in argument_dict
-                    else ["X", "lon", "Longitude"]
+                    varmaps["lon"] if not initial_request else ["X", "lon", "Longitude"]
                 ),
                 "alias": "Longitude",
                 "unit": "degrees",
@@ -176,9 +190,7 @@ def map_data():
             "lat": {
                 "variable": "lat",
                 "mapped_var": (
-                    variable_mapped_vars["lat"]
-                    if "vars" in argument_dict
-                    else ["Y", "lat", "Latitude"]
+                    varmaps["lat"] if not initial_request else ["Y", "lat", "Latitude"]
                 ),
                 "alias": "Latitude",
                 "unit": "degrees",
@@ -191,9 +203,7 @@ def map_data():
             "dep": {
                 "variable": "dep",
                 "mapped_var": (
-                    variable_mapped_vars["dep"]
-                    if "vars" in argument_dict
-                    else ["Z", "dep", "Depth"]
+                    varmaps["dep"] if not initial_request else ["Z", "dep", "Depth"]
                 ),
                 "alias": "Depth",
                 "unit": "km",
@@ -206,8 +216,8 @@ def map_data():
             "mag": {
                 "variable": "mag",
                 "mapped_var": (
-                    variable_mapped_vars["mag"]
-                    if "vars" in argument_dict
+                    varmaps["mag"]
+                    if not initial_request
                     else ["ML", "mag", "Magnitude"]
                 ),
                 "alias": "Magnitude",
@@ -220,7 +230,7 @@ def map_data():
             },
         }
 
-        ### datatime variables
+        ### DEFINE DATETIME VARIABLES (not datetime string)
         datetime_variable_descr = {}
         for variable, alias, unit in zip(
             ["year", "month", "day", "doy", "hour", "minute", "second"],
@@ -229,9 +239,7 @@ def map_data():
         ):
             datetime_variable_descr[variable] = {
                 "variable": variable,
-                "mapped_var": (
-                    variable_mapped_vars[variable] if "vars" in argument_dict else []
-                ),
+                "mapped_var": (varmaps[variable] if not initial_request else []),
                 "alias": alias,
                 "unit": unit,
                 "data_type": "number",
@@ -241,87 +249,55 @@ def map_data():
                 "required": True,
             }
 
-        # LOAD FILE
-        filepath = Path(request.args.get("filepath"))
-
-        with filepath.open() as input_file:
-            raw_file_preview = list(islice(input_file, 10))
-
-        seperator = request.args.get("sep") if "sep" in argument_dict else ","
-
-        df = pd.read_csv(filepath, sep=seperator)
-
-        # CHECK IF ALL REQUIRED FIELDS ARE SELECTED
-
-        varmap = {}
-
-        for required_variable in required_data_descr.keys():
-            if required_variable != "t":
-                # initial setting
-                varmap[required_variable] = None
-
-                for mapped_var in required_data_descr[required_variable]["mapped_var"]:
-                    if mapped_var in df.columns:
-                        varmap[required_variable] = mapped_var
-                        continue
-
-        for datetime_variable in datetime_variable_descr.keys():
-            # initial setting
-            varmap[datetime_variable] = None
-
-            for mapped_var in datetime_variable_descr[datetime_variable]["mapped_var"]:
-                if mapped_var in df.columns:
-                    varmap[datetime_variable] = mapped_var
-                    continue
-
         ## DATETIME
 
         datetime_format = (
             request.args.get("datetimeformat")
-            if "datetimeformat" in argument_dict
+            if not initial_request
             else "parseable_datetime_string"
         )
 
-        # DATETIME CONVERSION
-        if varmap["dt"]:
-            df["datetime"] = [datetime.fromisoformat(dt) for dt in df[varmap["dt"]]]
+        df = pd.read_csv(filepath, sep=seperator)
 
-            df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
+        # # DATETIME CONVERSION
+        # if not initial_request:
+        #     df["datetime"] = [datetime.fromisoformat(dt) for dt in df[varmap["dt"]]]
 
-            df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+        #     df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
-        # DEFINE BOUNDS
-        for required_variable in required_data_descr.keys():
-            if required_variable not in ("id", "dt", "t"):
-                if varmap[required_variable]:
-                    print(required_variable, varmap[required_variable])
-                    required_data_descr[required_variable]["bounds"] = (
-                        [
-                            float(df[varmap[required_variable]].min()),
-                            float(df[varmap[required_variable]].max()),
-                        ]
-                        if df.dtypes[varmap[required_variable]]
-                        in (float, float64, int, int64)
-                        and not (
-                            isnan(float(df[varmap[required_variable]].min()))
-                            or isnan(float(df[varmap[required_variable]].max()))
-                        )
-                        else None
-                    )
-            elif required_variable == "t":
-                if "t" in df.columns:
-                    required_data_descr[required_variable]["bounds"] = (
-                        [
-                            float(df[required_variable].min()),
-                            float(df[required_variable].max()),
-                        ]
-                        if df.dtypes[required_variable] in (float, float64, int, int64)
-                        and not (
-                            isnan(float(df[required_variable].min()))
-                            or isnan(float(df[required_variable].max()))
-                        )
-                        else None
-                    )
+        #     df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+
+        # # DEFINE BOUNDS
+        # for required_variable in required_data_descr.keys():
+        #     if required_variable not in ("id", "dt", "t"):
+        #         if varmap[required_variable]:
+        #             required_data_descr[required_variable]["bounds"] = (
+        #                 [
+        #                     float(df[varmap[required_variable]].min()),
+        #                     float(df[varmap[required_variable]].max()),
+        #                 ]
+        #                 if df.dtypes[varmap[required_variable]]
+        #                 in (float, float64, int, int64)
+        #                 and not (
+        #                     isnan(float(df[varmap[required_variable]].min()))
+        #                     or isnan(float(df[varmap[required_variable]].max()))
+        #                 )
+        #                 else None
+        #             )
+        #     elif required_variable == "t":
+        #         if "t" in df.columns:
+        #             required_data_descr[required_variable]["bounds"] = (
+        #                 [
+        #                     float(df[required_variable].min()),
+        #                     float(df[required_variable].max()),
+        #                 ]
+        #                 if df.dtypes[required_variable] in (float, float64, int, int64)
+        #                 and not (
+        #                     isnan(float(df[required_variable].min()))
+        #                     or isnan(float(df[required_variable].max()))
+        #                 )
+        #                 else None
+        #             )
 
         # DEFINE OPTIONAL PARAMS
 
@@ -337,18 +313,18 @@ def map_data():
                 "alias": "",
                 "data_type": variable_mapping(df.dtypes[column_name]),
                 "unit": "",
-                "bounds": (
-                    [float(df[column_name].min()), float(df[column_name].max())]
-                    if df.dtypes[column_name] in (float, float64, int, int64)
-                    and not (
-                        isnan(float(df[column_name].min()))
-                        or isnan(float(df[column_name].max()))
-                    )
-                    else None
-                ),
-                "bins": None,
-                "kde": None,
-                "required": False,
+                # "bounds": (
+                #     [float(df[column_name].min()), float(df[column_name].max())]
+                #     if df.dtypes[column_name] in (float, float64, int, int64)
+                #     and not (
+                #         isnan(float(df[column_name].min()))
+                #         or isnan(float(df[column_name].max()))
+                #     )
+                #     else None
+                # ),
+                # "bins": None,
+                # "kde": None,
+                # "required": False,
             }
             for column_name in df.columns
             if column_name
@@ -360,25 +336,6 @@ def map_data():
                 ]
             ).tolist()
         }
-
-        # GET EXTENT
-        centroid_calculatable = (
-            varmap["lon"] is not None
-            and varmap["lat"] is not None
-            and varmap["dep"] is not None
-        )
-
-        if centroid_calculatable:
-            MultiPoint = multipoints(
-                [
-                    (event[varmap["lon"]], event[varmap["lat"]], event[varmap["dep"]])
-                    for _, event in df.iterrows()
-                ]
-            )
-
-            centroid = MultiPoint.centroid
-
-            centroid_processed = [centroid.x, centroid.y, df[varmap["dep"]].mean()]
 
         # DATA OUTLINES
 
@@ -396,19 +353,17 @@ def map_data():
                 "parsed": [
                     {"id": index} | record
                     for index, record in enumerate(
-                        json.loads(df[:10].to_json(orient="records", date_format="iso"))
+                        json.loads(
+                            preview_df.to_json(orient="records", date_format="iso")
+                        )
                     )
                 ],
                 "raw": raw_file_preview,
             },
-            "extent": {
-                "automatic": True,
-                "centroid": centroid_processed if centroid_calculatable else None,
-                "bounds": MultiPoint.bounds if centroid_calculatable else None,
-                "polygon": MultiPoint.envelope.wkt if centroid_calculatable else None,
-            },
             "catalog_headers": [
-                str(header) for header in df.columns if (header not in ("dt", "t"))
+                str(header)
+                for header in preview_df.columns
+                if (header not in ("dt", "t"))
             ],
             "variables": {
                 "by_id": optional_data_descr
@@ -474,22 +429,11 @@ def generate_event_dict(nlines=None):
 
     # PREPARE VAR MAPPING
     vars = json.loads(request.args.get("vars"))
+    varmaps = json.loads(request.args.get("var_maps"))
 
-    print(vars, type(vars))
+    varmap = get_varmap(vars, varmaps, df.columns)
 
-    varmap = {}
-
-    for variable in vars:
-        if variable in ("id", "dt", "mag", "dep", "lon", "lat"):
-            # initial setting
-            varmap[variable] = None
-
-            mapped_vars = json.loads(request.args.get(variable))
-
-            for mapped_var in mapped_vars:
-                if mapped_var in df.columns:
-                    varmap[variable] = mapped_var
-                    continue
+    print(varmap)
 
     # DATETIME CONVERSION
     if varmap["dt"]:
@@ -512,8 +456,27 @@ def generate_event_dict(nlines=None):
                 & (df[varmap[variable]] < filtering[variable][1])
             ]
 
+    # GET EXTENT
+    centroid_calculatable = (
+        varmap["lon"] is not None
+        and varmap["lat"] is not None
+        and varmap["dep"] is not None
+    )
+
+    if centroid_calculatable:
+        MultiPoint = multipoints(
+            [
+                (event[varmap["lon"]], event[varmap["lat"]], event[varmap["dep"]])
+                for _, event in df.iterrows()
+            ]
+        )
+
+        centroid = MultiPoint.centroid
+
+        centroid_processed = [centroid.x, centroid.y, df[varmap["dep"]].mean()]
+
     # CONVERT TO JSON
-    event_dict = []
+    event_list = []
     for index, row in df.iterrows():
         if not isnan(row[varmap["mag"]]):
             event_row = {
@@ -527,12 +490,31 @@ def generate_event_dict(nlines=None):
             }
 
             for var in vars:
-                if var not in ("id", "t", "dt", "mag", "dep", "lon", "lat"):
+                if var not in list(varmaps.keys()):
                     event_row[var] = row[var]
 
-            event_dict.append(event_row)
+            event_list.append(event_row)
 
-    return event_dict
+    # GENERATE BOUNDS
+    bounds = {
+        var: (
+            [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
+            if df.dtypes[var] in (float, float64, int, int64)
+            and not (isnan(float(df[var].min())) or isnan(float(df[var].max())))
+            else None
+        )
+        for var in event_list[0].keys()
+    }
+
+    return {
+        "data": event_list,
+        "bounds": bounds,
+        "extent": {
+            "centroid": centroid_processed if centroid_calculatable else None,
+            "bounds": MultiPoint.bounds if centroid_calculatable else None,
+            "polygon": MultiPoint.envelope.wkt if centroid_calculatable else None,
+        },
+    }
 
 
 @app.route("/api/tiles/<z>/<x>/<y>.png")
@@ -560,6 +542,25 @@ def get_tile(z, x, y):
 #     df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
 #     return df
+
+
+def get_varmap(vars, varmaps, columns):
+    varmap = {}
+    for var in vars:
+        if var in varmaps:
+            if varmaps[var]:
+                for mapped_var in varmaps[var]:
+                    if mapped_var in columns:
+                        varmap[var] = mapped_var
+                        continue
+
+                    # varmap[var] = None
+        else:
+            varmap[var] = var
+
+    varmap["t"] = "t"
+
+    return varmap
 
 
 @app.errorhandler(ArgumentError)

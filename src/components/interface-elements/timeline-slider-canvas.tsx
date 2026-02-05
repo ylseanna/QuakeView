@@ -1,44 +1,19 @@
-/* eslint-disable @typescript-eslint/no-unused-vars */
-/* eslint-disable @typescript-eslint/no-explicit-any */
-
-import { DataSource, EarthQuake } from "../datasource/types";
-import {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import * as d3 from "d3";
-
-import {
-  Box,
-  Checkbox,
-  IconButton,
-  Paper,
-  Skeleton,
-  Slider,
-  Input,
-  Select,
-  styled,
-  Switch,
-  Typography,
-  useTheme,
-  MenuItem,
-  SelectChangeEvent,
-  Grow,
-  Divider,
-} from "@mui/material";
-import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { CheckBox, Pause, PlayArrow, RestartAlt } from "@mui/icons-material";
-import { dataSourceDataUrl } from "../datasource/data-source-query";
-import { useTranslations } from "next-intl";
 // import strftime from "strftime";
 import useAnimationFrame from "use-animation-frame";
-import { useProjectStore } from "@/providers/project-store-provider";
 import { GradientHorizontal, Speedometer } from "mdi-material-ui";
+import { Box, Checkbox, Divider, Grow, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, Skeleton, Slider, styled, Switch, Typography, useTheme } from "@mui/material";
+import { useTranslations } from "next-intl";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import * as d3 from "d3";
+
+import { ColorMapping } from "../datasource/formatting/color-mapping";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { dataSourceDataUrl } from "../datasource/data-source-query";
 import { useDataStore } from "@/providers/data-store-provider";
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
+import { DataSource, EarthQuake } from "../datasource/types";
 
 type D3Earthquake = EarthQuake & { date: Date };
 
@@ -83,7 +58,7 @@ export default function TimelineSlider() {
   // DATA
 
   const [isLoading, setIsLoading] = useState(true);
-  const { data } = useDataStore((state) => state);
+  const { data, allIDs } = useDataStore((state) => state);
   const dataSources = useProjectStore((state) => state.dataSources);
 
   // RESPONSIVE SIZING AND LOADING
@@ -112,28 +87,28 @@ export default function TimelineSlider() {
   // DATA BOUNDS
 
   const t_min = Math.min(
-    ...dataSources.allIDs.map(
+    ...allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.variables.by_id["t"]!.bounds[0]
+        data[id]!.bounds["t"]![0]
     )
   );
   const t_max = Math.max(
-    ...dataSources.allIDs.map(
+    ...allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.variables.by_id["t"]!.bounds[1]
+        data[id]!.bounds["t"]![1]
     )
   );
 
   const m_min = Math.min(
-    ...dataSources.allIDs.map(
+    ...allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.variables.by_id["mag"]!.bounds[0]
+        data[id]!.bounds["mag"]![0]
     )
   );
   const m_max = Math.max(
-    ...dataSources.allIDs.map(
+    ...allIDs.map(
       (id) =>
-        dataSources.byID[id].metadata.variables.by_id["mag"]!.bounds[1]
+        data[id]!.bounds["mag"]![1]
     )
   );
 

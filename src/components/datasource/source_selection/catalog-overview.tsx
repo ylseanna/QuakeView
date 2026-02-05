@@ -8,9 +8,13 @@ import {
   IconButton,
   Paper,
   Stack,
+  styled,
   TextField,
   ToggleButton,
   ToggleButtonGroup,
+  Tooltip,
+  tooltipClasses,
+  TooltipProps,
   Typography,
   useTheme,
 } from "@mui/material";
@@ -45,6 +49,25 @@ const sxButton = {
   lineHeight: 1,
   h: 3,
 };
+
+const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
+  <Tooltip slotProps={{
+        popper: {
+          modifiers: [
+            {
+              name: 'offset',
+              options: {
+                offset: [0, -14],
+              },
+            },
+          ],
+        },
+      }} {...props} classes={{ popper: className }} />
+))({
+  [`& .${tooltipClasses.tooltip}`]: {
+    maxWidth: 'none',
+  },
+});
 
 export default function CatalogOverview({ dataSource }: DataTabProps) {
   const t = useTranslations();
@@ -102,14 +125,13 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
   const previewGridApiRef = useGridApiRef();
 
   const autosizeOptions = {
-            includeHeaders: true,
-              includeOutliers: true,
-              expand: true,
-            }
+    includeHeaders: true,
+    includeOutliers: true,
+    expand: true,
+  };
 
   useEffect(() => {
     updateMetadata(dataSource);
-    
   }, [dataSource.metadata.sep]);
 
   const [amEditingName, setAmEditingName] = useState(false);
@@ -180,11 +202,15 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
           </Stack>
         </ClickAwayListener>
         <Stack className="full-row">
-          <Stack className="first-bit" direction="row">
-            <Typography className="row-header" noWrap>
+          <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
+            <Typography className="row-header">
               <b>{t("Sources.filepath")}:</b>
             </Typography>
-            <Typography>{dataSource.filepath}</Typography>
+            <NoMaxWidthTooltip placement="bottom-start" title={dataSource.filepath}>
+              <Typography noWrap textOverflow="ellipsis">
+                {dataSource.filepath}
+              </Typography>
+            </NoMaxWidthTooltip>
           </Stack>
           <IconButton>
             <Folder />
@@ -279,7 +305,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
             sx={{
               m: 2,
               ".MuiDataGrid-row--lastVisible": {
-                opacity: theme.palette.action.disabledOpacity
+                opacity: theme.palette.action.disabledOpacity,
               },
             }}
             rows={dataSource.metadata.preview.parsed}

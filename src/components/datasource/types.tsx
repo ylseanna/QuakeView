@@ -25,7 +25,7 @@ export type DataSource = {
 
 export type DataSourceMetaData = {
   num_events: number;
-  extent: Extent;
+  // extent: Extent;
   sep: string;
   datetime_format: "parseable_datetime_string" | "year-month-day-hour-minute-second";
   preview: { parsed: { [key: string]: number | string }[], raw: string[] };
@@ -45,10 +45,6 @@ export type DataSourceDataDescription = {
   alias: string;
   unit: string;
   data_type: "number" | "string" | "id_string" | "dt_string" | "dt_timestamp";
-  bounds: [number, number];
-  kde: [number[], number[]] | null;
-  bins: [number[], number[]] | null;
-  required: boolean;
 };
 
 export type DataSourceFiltering = {
@@ -80,7 +76,6 @@ export type DataSourceColorFormatting = {
 };
 
 export type Extent = {
-  automatic: boolean;
   centroid: [number, number, number];
   bounds: [number, number, number, number];
   polygon: string;

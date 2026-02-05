@@ -11,15 +11,17 @@ import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
+  const { data, allIDs } = useDataStore((state) => state);
 
   const calculateExtent = () => {
     let extent: Extent | null = null;
     if (dataSources != null) {
-      dataSources.allIDs.map((id) => {
-        extent = dataSources.byID[id].metadata.extent;
+      allIDs.map((id) => {
+        extent = data[id].extent;
       });
     }
     return extent;

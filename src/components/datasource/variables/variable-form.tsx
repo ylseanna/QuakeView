@@ -3,9 +3,12 @@
 import {
   Autocomplete,
   Box,
+  Divider,
   Grid,
   IconButton,
+  Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 
@@ -23,6 +26,7 @@ import {
 import { Clear } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { updatedMetaDataUrl } from "../data-source-query";
+import { Nuke } from "mdi-material-ui";
 
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
@@ -131,7 +135,15 @@ function VariableEditingRow({
 
   return (
     <Grid container spacing={1} alignItems="flex-start">
-      <Grid sx={dataSource.metadata.variables.datetime_vars.includes(dataDescription.variable) ? {width: "104px" , ml:  "16px"} : {width: "120px"}}>
+      <Grid
+        sx={
+          dataSource.metadata.variables.datetime_vars.includes(
+            dataDescription.variable,
+          )
+            ? { width: "104px", ml: "16px" }
+            : { width: "120px" }
+        }
+      >
         <TextField value={dataDescription.variable} size="small" disabled />
       </Grid>
       <Grid
@@ -268,11 +280,15 @@ export default function DataSourceVariableForm({
     (state) => state.dataSourceActions.setAddedVars,
   );
 
+  const clearAllVariableMaps = useProjectStore(
+    (state) => state.metadataActions.clearAllVariableMaps,
+  );
+
   return (
     <>
       <Grid container spacing={1} direction="column">
         <Grid container spacing={1} alignItems="flex-end">
-          <Grid size={1.5} sx={{ ml: 1.5 }}>
+          <Grid size={1.5} sx={{ ml: 0 }}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
@@ -293,34 +309,80 @@ export default function DataSourceVariableForm({
               {t("Variables.unit")}
             </Typography>
           </Grid>
-          <Grid size="grow">
-            <Typography
-              sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
+          <Grid
+            size="grow"
+            sx={{
+              flexDirection: "column",
+              display: "flex",
+              alignItems: "stretch",
+            }}
+          >
+            <Stack
+              display="flex"
+              direction="row"
+              justifyContent="space-between"
+              alignItems="end"
             >
-              {t("Variables.mapping")}
-            </Typography>
+              <Typography
+                sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
+              >
+                {t("Variables.mapping")}
+              </Typography>
+              <Tooltip
+                title={t("Variables.clear_all_maps")}
+                slotProps={{
+                  popper: {
+                    modifiers: [
+                      {
+                        name: "offset",
+                        options: {
+                          offset: [0, -10],
+                        },
+                      },
+                    ],
+                  },
+                }}
+              >
+                <IconButton
+                  onClick={() => clearAllVariableMaps(dataSource.internal_id)}
+                  size="small"
+                  sx={{ mb: "-6px" }}
+                >
+                  <Nuke sx={{ height: "16px", width: "16px" }} />
+                </IconButton>
+              </Tooltip>
+            </Stack>
           </Grid>
         </Grid>
         {dataSource.metadata.datetime_format != "parseable_datetime_string"
           ? [
               "id",
-              ...dataSource.metadata.variables.datetime_vars.filter((variable) => variable != "doy"),
-              ...dataSource.metadata.variables.required_vars.filter(
-                (variable) => !(["id", "dt", "t"].includes(variable)),
+              ...dataSource.metadata.variables.datetime_vars.filter(
+                (variable) => variable != "doy",
               ),
-            ].map(
-              (variable: string) =>
-                variable != "t" && (
-                  <VariableEditingRow
-                    key={"EditingElement-" + variable}
-                    dataDescription={
-                      dataSource.metadata.variables.by_id[variable]
-                    }
-                    dataSource={dataSource}
-                    required
-                  />
-                ),
-            )
+              ...dataSource.metadata.variables.required_vars.filter(
+                (variable) => !["id", "dt", "t"].includes(variable),
+              ),
+            ].map((variable: string, index) => (
+              <Box key={"EditingElement-" + variable}>
+                {index == 1 ? (
+                  <Divider textAlign="left" sx={{ my: 1 }}>
+                    <span style={{ opacity: 0.4 }}>
+                      {t("Variables.time_variables")}
+                    </span>
+                  </Divider>
+                ) : (
+                  index == 7 && <Divider sx={{ my: 1 }} />
+                )}
+                <VariableEditingRow
+                  dataDescription={
+                    dataSource.metadata.variables.by_id[variable]
+                  }
+                  dataSource={dataSource}
+                  required
+                />
+              </Box>
+            ))
           : dataSource.metadata.variables.required_vars.map(
               (variable: string) =>
                 variable != "t" && (
@@ -350,7 +412,7 @@ export default function DataSourceVariableForm({
           />
         ))}
         <Grid container spacing={1} alignItems="center">
-          <Grid sx={{width: "120px"}}>
+          <Grid sx={{ width: "120px" }}>
             <Autocomplete
               options={dataSource.metadata.variables.optional_vars
                 .filter(

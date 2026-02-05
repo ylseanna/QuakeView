@@ -112,7 +112,9 @@
     "unit": "Unit",
     "variable": "Variable",
     "variables": "Variables",
-    "mapping_warning": "Please fill in a correct column to variable mapping"
+    "mapping_warning": "Please fill in a correct column to variable mapping",
+    "time_variables": "Date & Time variables",
+    "clear_all_maps": "clear all variable maps"
   },
   "Titlebar": {
     "language": "Language",

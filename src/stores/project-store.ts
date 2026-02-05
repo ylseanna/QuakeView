@@ -76,6 +76,7 @@ export type ProjectActions = {
   metadataActions: {
     setSep: (id: string, value: string) => void;
     setDatetimeFormat: (id: string, value: string) => void;
+    clearAllVariableMaps: (id: string) => void;
   };
 };
 
@@ -196,7 +197,19 @@ export const createProjectStore = (
             }),
           setDatetimeFormat: (id, value) =>
             set((state) => {
-              state.dataSources.byID[id].metadata.datetime_format = value as "parseable_datetime_string" | "year-month-day-hour-minute-second";
+              state.dataSources.byID[id].metadata.datetime_format = value as
+                | "parseable_datetime_string"
+                | "year-month-day-hour-minute-second";
+            }),
+          clearAllVariableMaps: (id) =>
+            set((state) => {
+              Object.keys(
+                state.dataSources.byID[id].metadata.variables.by_id,
+              ).forEach((key) => {
+                state.dataSources.byID[id].metadata.variables.by_id[
+                  key
+                ].mapped_var = [];
+              });
             }),
         },
       })),
