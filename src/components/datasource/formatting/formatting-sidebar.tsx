@@ -5,6 +5,7 @@ import { useRef } from "react";
 
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useDataStore } from "@/providers/data-store-provider";
 import DataSourceFormattingElement from "./formatting-element";
 
 interface FormattingProps {
@@ -29,6 +30,7 @@ export default function FormattingSidebar({
 
   const ref = useRef(null);
 
+  const {allIDs: loadedIDS} = useDataStore((state) => state);
   const dataSources = useProjectStore((state) => state.dataSources);
 
   return (
@@ -57,7 +59,7 @@ export default function FormattingSidebar({
         </Typography>
         {!dataSources
           ? null
-          : dataSources.allIDs.map((id) => (
+          : loadedIDS.map((id) => (
               <DataSourceFormattingElement
                 key={id}
                 dataSource={dataSources.byID[id]}

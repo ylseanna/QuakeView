@@ -1,16 +1,8 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import {
-  ColorLens,
-  ExpandMore,
-  FilterAlt,
-} from "@mui/icons-material";
-import {
-  Box,
-  Paper,
-  Typography,
-} from "@mui/material";
+import { ColorLens, ExpandMore, FilterAlt } from "@mui/icons-material";
+import { Box, Paper, Typography } from "@mui/material";
 
 // import {
 //   DataSource,
@@ -42,7 +34,6 @@ export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
 
 export default function OtherOptionsForm({ dataSource }: DataTabProps) {
   const t = useTranslations();
-
 
   // dataSourceSubactions
   const setFormatting = useProjectStore(
@@ -95,14 +86,15 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
     );
   };
 
-  useEffect(()=>{
-    updateMetadata(dataSource)
-  }, [dataSource.metadata.sep])
+  useEffect(() => {
+    updateMetadata(dataSource);
+  }, [dataSource.metadata.sep]);
 
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
 
   useEffect(() => {
     const all_domains_present = dataSource.metadata.variables.required_vars
+      .concat(dataSource.metadata.variables.datetime_vars)
       .concat(dataSource.metadata.variables.added_vars)
       .map((variable) => {
         if (
@@ -110,15 +102,27 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
             variable,
           )
         ) {
-          return variable == "dt" || variable == "id"
-            ? true
-            : dataSource.formatting.color.linear.domain[variable] != null;
-        } else {
-          return false;
+          if (
+            dataSource.metadata.datetime_format == "parseable_datetime_string"
+          ) {
+            return [
+              "dt",
+              "id",
+              "year",
+              "month",
+              "day",
+              "doy",
+              "hour",
+              "minute",
+              "second",
+            ].includes(variable)
+              ? true
+              : dataSource.formatting.color.linear.domain[variable] != null;
+          } else {
+            return false;
+          }
         }
       });
-
-    console.log(all_domains_present);
 
     setAllDomainsPresent(all_domains_present.every((el) => el));
   }, [
@@ -127,62 +131,62 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
   ]);
 
   return (
-        <Paper variant="outlined" sx={{ overflow: "hidden" }}>
-          <Box display="flex" sx={{ m: 2 }}>
-            <Typography sx={{ fontWeight: "bold" }}>
-              {t("Sources.other_options")}
-            </Typography>
-          </Box>
+    <Paper variant="outlined" sx={{ overflow: "hidden" }}>
+      <Box display="flex" sx={{ m: 2 }}>
+        <Typography sx={{ fontWeight: "bold" }}>
+          {t("Sources.other_options")}
+        </Typography>
+      </Box>
 
-          <SubAccordion
-            sx={{ borderBottom: "0px!important" }}
-            disabled={!(dataSource.interface.loadable && allDomainsPresent)}
+      <SubAccordion
+        sx={{ borderBottom: "0px!important" }}
+        disabled={!(dataSource.interface.loadable && allDomainsPresent)}
+      >
+        <Box sx={{ display: "flex" }}>
+          <SubAccordionSummary
+            expandIcon={<ExpandMore />}
+            aria-controls="panel1a-content"
+            id="panel2a-header"
+            sx={{ flexGrow: 1 }}
           >
-            <Box sx={{ display: "flex" }}>
-              <SubAccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="panel2a-header"
-                sx={{ flexGrow: 1 }}
-              >
-                <ColorLens sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
-                <Typography>{t("Formatting.formatting")}</Typography>
-              </SubAccordionSummary>
-            </Box>
-            <SubAccordionDetails>
-              {dataSource.interface.loadable && allDomainsPresent && (
-                <DataSourceFormattingForm
-                  dataSource={dataSource}
-                  setFormatting={setFormatting}
-                />
-              )}
-            </SubAccordionDetails>
-          </SubAccordion>
+            <ColorLens sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
+            <Typography>{t("Formatting.formatting")}</Typography>
+          </SubAccordionSummary>
+        </Box>
+        <SubAccordionDetails>
+          {dataSource.interface.loadable && allDomainsPresent && (
+            <DataSourceFormattingForm
+              dataSource={dataSource}
+              setFormatting={setFormatting}
+            />
+          )}
+        </SubAccordionDetails>
+      </SubAccordion>
 
-          <SubAccordion
-            sx={{ borderBottom: "0px!important" }}
-            disabled={!dataSource.interface.loadable}
+      <SubAccordion
+        sx={{ borderBottom: "0px!important" }}
+        disabled={!dataSource.interface.loadable}
+      >
+        <Box sx={{ display: "flex" }}>
+          <SubAccordionSummary
+            expandIcon={<ExpandMore />}
+            aria-controls="panel1a-content"
+            id="panel2a-header"
+            sx={{ flexGrow: 1 }}
           >
-            <Box sx={{ display: "flex" }}>
-              <SubAccordionSummary
-                expandIcon={<ExpandMore />}
-                aria-controls="panel1a-content"
-                id="panel2a-header"
-                sx={{ flexGrow: 1 }}
-              >
-                <FilterAlt sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
-                <Typography>{t("Filtering.filtering")}</Typography>
-              </SubAccordionSummary>
-            </Box>
-            <SubAccordionDetails>
-              {dataSource.interface.loadable && (
-                <FilteringForm
-                  dataSource={dataSource}
-                  setFiltering={setFiltering}
-                />
-              )}
-            </SubAccordionDetails>
-          </SubAccordion>
-        </Paper>
+            <FilterAlt sx={{ opacity: 0.6, mr: 1, ml: -0.5 }} />
+            <Typography>{t("Filtering.filtering")}</Typography>
+          </SubAccordionSummary>
+        </Box>
+        <SubAccordionDetails>
+          {dataSource.interface.loadable && (
+            <FilteringForm
+              dataSource={dataSource}
+              setFiltering={setFiltering}
+            />
+          )}
+        </SubAccordionDetails>
+      </SubAccordion>
+    </Paper>
   );
 }

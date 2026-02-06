@@ -135,7 +135,7 @@ export default function GutenbergRichterPlot() {
       .append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .style("font-size", ".9rem")
-      .call(d3.axisLeft(y).ticks(4).tickFormat((d) => `${Math.log10(d as number)}`));
+      .call(d3.axisLeft(y).ticks(3).tickFormat((d) => `${Math.log10(d as number)}`));
 
     // y axes label
     svg

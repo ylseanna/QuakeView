@@ -1,4 +1,4 @@
-import { CheckBox, Pause, PlayArrow, RestartAlt } from "@mui/icons-material";
+import { Pause, PlayArrow } from "@mui/icons-material";
 // import strftime from "strftime";
 import useAnimationFrame from "use-animation-frame";
 import { GradientHorizontal, Speedometer } from "mdi-material-ui";
@@ -9,7 +9,6 @@ import * as d3 from "d3";
 
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { dataSourceDataUrl } from "../datasource/data-source-query";
 import { useDataStore } from "@/providers/data-store-provider";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -58,7 +57,7 @@ export default function TimelineSlider() {
   // DATA
 
   const [isLoading, setIsLoading] = useState(true);
-  const { data, allIDs } = useDataStore((state) => state);
+  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
   const dataSources = useProjectStore((state) => state.dataSources);
 
   // RESPONSIVE SIZING AND LOADING
@@ -87,26 +86,26 @@ export default function TimelineSlider() {
   // DATA BOUNDS
 
   const t_min = Math.min(
-    ...allIDs.map(
+    ...loadedIDs.map(
       (id) =>
         data[id]!.bounds["t"]![0]
     )
   );
   const t_max = Math.max(
-    ...allIDs.map(
+    ...loadedIDs.map(
       (id) =>
         data[id]!.bounds["t"]![1]
     )
   );
 
   const m_min = Math.min(
-    ...allIDs.map(
+    ...loadedIDs.map(
       (id) =>
         data[id]!.bounds["mag"]![0]
     )
   );
   const m_max = Math.max(
-    ...allIDs.map(
+    ...loadedIDs.map(
       (id) =>
         data[id]!.bounds["mag"]![1]
     )

@@ -257,8 +257,6 @@ def map_data():
             else "parseable_datetime_string"
         )
 
-        df = pd.read_csv(filepath, sep=seperator)
-
         # # DATETIME CONVERSION
         # if not initial_request:
         #     df["datetime"] = [datetime.fromisoformat(dt) for dt in df[varmap["dt"]]]
@@ -311,7 +309,7 @@ def map_data():
             column_name: {
                 "variable": column_name,
                 "alias": "",
-                "data_type": variable_mapping(df.dtypes[column_name]),
+                "data_type": variable_mapping(preview_df.dtypes[column_name]),
                 "unit": "",
                 # "bounds": (
                 #     [float(df[column_name].min()), float(df[column_name].max())]
@@ -326,7 +324,7 @@ def map_data():
                 # "kde": None,
                 # "required": False,
             }
-            for column_name in df.columns
+            for column_name in preview_df.columns
             if column_name
             not in concatenate(
                 [
@@ -499,8 +497,11 @@ def generate_event_dict(nlines=None):
     bounds = {
         var: (
             [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
-            if df.dtypes[var] in (float, float64, int, int64)
-            and not (isnan(float(df[var].min())) or isnan(float(df[var].max())))
+            if df.dtypes[varmap[var]] in (float, float64, int, int64)
+            and not (
+                isnan(float(df[varmap[var]].min()))
+                or isnan(float(df[varmap[var]].max()))
+            )
             else None
         )
         for var in event_list[0].keys()

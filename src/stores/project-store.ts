@@ -4,7 +4,7 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
+import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
 import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
@@ -57,6 +57,10 @@ export type ProjectActions = {
       id: string,
       keyToModify: keyof DataSourceFormatting,
       value: never,
+    ) => void;
+    setColorFormatting: (
+      id: string,
+      value: DataSourceColorFormatting,
     ) => void;
     setFiltering: (
       id: string,
@@ -162,6 +166,10 @@ export const createProjectStore = (
           setFormatting: (id, keyToModify, value) =>
             set((state) => {
               state.dataSources.byID[id].formatting[keyToModify] = value;
+            }),
+          setColorFormatting: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].formatting.color = value;
             }),
           setFiltering: (id, keyToModify, value) =>
             set((state) => {

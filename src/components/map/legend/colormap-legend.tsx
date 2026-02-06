@@ -2,6 +2,7 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
 
+import { useDataStore } from "@/providers/data-store-provider";
 import { DataSource } from "../../datasource/types";
 import { colormaps } from "../crameri-colormaps";
 // import { ReImg } from "reimg";
@@ -13,6 +14,12 @@ interface LegendElementProps {
 export default function ColormapLegend({ dataSource }: LegendElementProps) {
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  const bounds = useDataStore((state) =>
+    state.data[dataSource.internal_id]
+      ? state.data[dataSource.internal_id].bounds
+      : null,
+  )!;
 
   useLayoutEffect(() => {
     if (parentRef.current) {
@@ -32,8 +39,8 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
         d3.interpolateRgb,
         colorFormatting.linear.inverted
           ? colormaps[colorFormatting.linear.cmap].toReversed()
-          : colormaps[colorFormatting.linear.cmap]
-      )
+          : colormaps[colorFormatting.linear.cmap],
+      ),
     )
     .domain([0, 0.5]);
 
@@ -44,7 +51,7 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
         context.fillRect(i, 0, 1, context.canvas.height);
       }
     },
-    [colorScale]
+    [colorScale],
   );
 
   // set the dimensions and margins of the graph
@@ -67,14 +74,11 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
 
     const x = d3
       .scaleLinear()
-      .domain([
-        Math.min(
-          ...colorFormatting.linear.domain[colorFormatting.linear.variable]
-        ),
-        Math.max(
-          ...colorFormatting.linear.domain[colorFormatting.linear.variable]
-        ),
-      ])
+      .domain(
+        colorFormatting.linear.domain[colorFormatting.linear.variable]
+          ? colorFormatting.linear.domain[colorFormatting.linear.variable]
+          : bounds[colorFormatting.linear.variable]!,
+      )
       .range([0, width - 1]);
 
     svg
@@ -91,7 +95,8 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
       .attr("x", width / 2)
       .attr("y", height + margin.top + margin.bottom - 2)
       .text(
-        dataSource.metadata.variables.by_id[colorFormatting.linear.variable].alias
+        dataSource.metadata.variables.by_id[colorFormatting.linear.variable]
+          .alias,
       );
   });
 

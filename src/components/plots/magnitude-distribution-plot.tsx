@@ -9,7 +9,7 @@ import { EarthQuake } from "../datasource/types";
 export default function MagnitudeDistributionPlot() {
   const { dataSources } = useProjectStore((state) => state);
 
-  const { data } = useDataStore((state) => state);
+  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -40,49 +40,36 @@ export default function MagnitudeDistributionPlot() {
   useEffect(() => {
     // loop over datasources and calculate bins and bounds
 
-    const dataSourcesBins = [];
+    const dataSourcesBins= [] as DataSourceBins[];
 
-    for (let i = 0; i < dataSources.allIDs.length; i++) {
-      const dataSourceId = dataSources.allIDs[i];
+    loadedIDs.map((id) => {
 
-      if (data[dataSourceId]) {
-        const dataSource = dataSources.byID[dataSourceId];
+        const dataSource = dataSources.byID[id];
 
-        const xbounds = dataSource.metadata.variables.by_id["mag"].bounds;
+        const xbounds = data[id].bounds["mag"]!;
 
         const bins = d3.bin().thresholds(50).domain([xbounds[0], xbounds[1]])(
-          (data[dataSourceId].data as EarthQuake[]).map(
+          (data[id].data as EarthQuake[]).map(
             (d) => d["mag"],
           ) as ArrayLike<number>,
         );
 
         const ybounds = [
-          d3.min(bins, (d) => d.length),
-          d3.max(bins, (d) => d.length),
-        ];
+          d3.min(bins, (d) => d.length)!,
+          d3.max(bins, (d) => d.length)!,
+        ] as [number, number];
 
         dataSourcesBins.push({
-          id: dataSourceId,
+          id: id,
           color: dataSource.formatting.color.single,
           bins: bins,
           xbounds: xbounds,
           ybounds: ybounds,
         });
-      }
-    }
+    })
 
     setDataSourcesBins(dataSourcesBins as DataSourceBins[]);
-  }, [
-    dimensions,
-    data,
-    dataSources,
-    width,
-    margin.left,
-    margin.right,
-    margin.top,
-    margin.bottom,
-    height,
-  ]);
+  }, [dimensions, data, dataSources, width, margin.left, margin.right, margin.top, margin.bottom, height, loadedIDs]);
 
   useEffect(() => {
     setIsLoading(true);

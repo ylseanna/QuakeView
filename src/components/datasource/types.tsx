@@ -1,3 +1,6 @@
+import { TinyColor } from "mui-color-input";
+import { Color } from "deck.gl";
+
 import { colormaps } from "../map/crameri-colormaps";
 import { colormaps_categorical } from "../map/crameri-colormaps";
 
@@ -61,17 +64,17 @@ export type DataSourceFormatting = {
 
 export type DataSourceColorFormatting = {
   mapping: "single" | "linear" | "categorical" | "custom";
-  single: "rgb(0, 0, 0)";
+  single: TinyColor;
   linear: {
     variable: string;
     cmap: keyof typeof colormaps;
-    inverted: false;
+    inverted: boolean;
     domain: { [variable: string]: [number, number] };
   };
   categorical: {
     variable: string;
     cmap: keyof typeof colormaps_categorical;
-    inverted: false;
+    inverted: boolean;
   };
 };
 

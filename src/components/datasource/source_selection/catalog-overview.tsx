@@ -34,6 +34,7 @@ import { updatedMetaDataUrl } from "../data-source-query";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import { Folder } from "mdi-material-ui";
 import { useGridApiRef } from "@mui/x-data-grid/hooks/utils/useGridApiRef";
+import { useDataStore } from "@/providers/data-store-provider";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -51,21 +52,25 @@ const sxButton = {
 };
 
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
-  <Tooltip slotProps={{
-        popper: {
-          modifiers: [
-            {
-              name: 'offset',
-              options: {
-                offset: [0, -14],
-              },
+  <Tooltip
+    slotProps={{
+      popper: {
+        modifiers: [
+          {
+            name: "offset",
+            options: {
+              offset: [0, -14],
             },
-          ],
-        },
-      }} {...props} classes={{ popper: className }} />
+          },
+        ],
+      },
+    }}
+    {...props}
+    classes={{ popper: className }}
+  />
 ))({
   [`& .${tooltipClasses.tooltip}`]: {
-    maxWidth: 'none',
+    maxWidth: "none",
   },
 });
 
@@ -83,6 +88,12 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
     (state) => state.dataSourceActions.setMetadata,
   );
 
+  const bounds = useDataStore((state) =>
+    state.data[dataSource.internal_id]
+      ? state.data[dataSource.internal_id].bounds
+      : null,
+  )!;
+
   const updateMetadata = async (dataSource: DataSource) => {
     // update bounds and metadata after setting mapped variables
 
@@ -92,34 +103,38 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
     // set metadata
     setMetadata(dataSource.internal_id, updatedMetadata);
 
-    // colormapBounds
-    const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
-      (variable: string) => {
-        const obj: { [variable: string]: [number, number] } = {};
-        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
-        return obj;
-      },
-    );
+    console.log(bounds)
 
-    console.log(colormapsBounds);
+    if (bounds) {
+      // colormapBounds
+      const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
+        (variable: string) => {
+          const obj: { [variable: string]: [number, number] } = {};
+          obj[variable] = bounds[variable]!;
+          return obj;
+        },
+      );
 
-    const updatedColorFormatting = {
-      ...dataSource.formatting.color,
-      linear: {
-        ...dataSource.formatting.color.linear,
-        domain: Object.assign({}, ...colormapsBounds),
-      },
-    };
+      console.log(colormapsBounds);
 
-    console.log(updatedColorFormatting);
+      const updatedColorFormatting = {
+        ...dataSource.formatting.color,
+        linear: {
+          ...dataSource.formatting.color.linear,
+          domain: Object.assign({}, ...colormapsBounds),
+        },
+      };
 
-    // updatedColorFormatting.linear.domain = ;
+      console.log(updatedColorFormatting);
 
-    setFormatting(
-      dataSource.internal_id,
-      "color",
-      updatedColorFormatting as never,
-    );
+      // updatedColorFormatting.linear.domain = ;
+
+      setFormatting(
+        dataSource.internal_id,
+        "color",
+        updatedColorFormatting as never,
+      );
+    }
   };
 
   const previewGridApiRef = useGridApiRef();
@@ -132,7 +147,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   useEffect(() => {
     updateMetadata(dataSource);
-  }, [dataSource.metadata.sep]);
+  }, [dataSource.metadata.sep, bounds]);
 
   const [amEditingName, setAmEditingName] = useState(false);
   const [previewType, setPreviewType] = useState("raw");
@@ -206,7 +221,10 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
             <Typography className="row-header">
               <b>{t("Sources.filepath")}:</b>
             </Typography>
-            <NoMaxWidthTooltip placement="bottom-start" title={dataSource.filepath}>
+            <NoMaxWidthTooltip
+              placement="bottom-start"
+              title={dataSource.filepath}
+            >
               <Typography noWrap textOverflow="ellipsis">
                 {dataSource.filepath}
               </Typography>

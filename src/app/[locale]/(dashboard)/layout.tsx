@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { Box, LinearProgress } from "@mui/material";
@@ -16,7 +17,7 @@ import DebugWindow from "@/components/interface/debug-window";
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   // load data (synchronized accros app)
   const { dataSources } = useProjectStore((state) => state);
-  const { data, addData, removeData } = useDataStore((state) => state);
+  const { data, allIDs, addData, removeData } = useDataStore((state) => state);
   const [dataLoading, setDataLoading] = useState(false);
   const [debugVisible, setDebugVisible] = useState(false);
 
@@ -25,12 +26,17 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
   });
 
   useEffect(() => {
-    dataSources.allIDs.forEach(async (id: string) => {
-      if (data) {
-        if (!Object.keys(data).includes(id)) {
-          if (dataSources.byID[id].interface.loadable) {
-            setDataLoading(true);
-            setTimeout(async () => {
+    console.log(`All loaded data ids: ${allIDs.join(",")}`);
+    if (!dataLoading) {
+      dataSources.allIDs.forEach(async (id: string) => {
+        if (data) {
+          if (!allIDs.includes(id)) {
+            if (dataSources.byID[id].interface.loadable) {
+              console.log(
+                `Data not loaded for ${id} (all loaded: ${allIDs.join(",")}), starting fetch`,
+              );
+
+              setDataLoading(true);
               console.log(`Fetching data for ${id}`);
 
               await fetchData(dataSources.byID[id]).then((fetched_data) => {
@@ -47,18 +53,18 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
                 setDataLoading(false);
               });
-            }, 500);
-          }
-        }
-        if (data[id]) {
-          if (dataSources.byID[id].interface.loadable) {
-            if (
-              dataSources.byID[id].metadata.variables.added_vars.length !=
-                data[id].addedVars.length ||
-              dataSources.byID[id].filtering != data[id].filters
-            ) {
-              setDataLoading(true);
-              setTimeout(async () => {
+            }
+          } else {
+            if (dataSources.byID[id].interface.loadable) {
+              if (
+                dataSources.byID[id].metadata.variables.added_vars.length !=
+                  data[id].addedVars.length ||
+                dataSources.byID[id].filtering != data[id].filters
+              ) {
+                console.log(
+                  `Data parameters have changed for ${id}, starting fetch`,
+                );
+                setDataLoading(true);
                 console.log(`Fetching data for ${id}`);
 
                 await fetchData(dataSources.byID[id]).then((fetched_data) => {
@@ -75,15 +81,15 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
                   setDataLoading(false);
                 });
-              }, 500);
+              }
+            } else {
+              removeData(id);
             }
-          } else {
-            removeData(id);
           }
         }
-      }
-    });
-  }, [data, addData, dataSources, removeData]);
+      });
+    }
+  }, [dataSources.allIDs, dataLoading]);
 
   return (
     <>

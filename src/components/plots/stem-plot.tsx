@@ -33,7 +33,7 @@ export default function StemPlot() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  const { data } = useDataStore((state) => state);
+  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -297,26 +297,26 @@ export default function StemPlot() {
   const layers = useMemo(() => {
     if (scaleX.current && scaleY.current) {
       const minX = Math.min(
-        ...Object.keys(data).map(
-          (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[0],
+        ...loadedIDs.map(
+          (id) => data[id]!.bounds["t"]![0],
         ),
       );
       const maxX = Math.max(
-        ...Object.keys(data).map(
-          (id) => dataSources.byID[id].metadata.variables.by_id["t"].bounds[1],
+        ...loadedIDs.map(
+          (id) => data[id]!.bounds["t"]![1],
         ),
       );
 
       const minY = Math.min(
-        ...Object.keys(data).map(
+        ...loadedIDs.map(
           (id) =>
-            dataSources.byID[id].metadata.variables.by_id["mag"].bounds[0],
+            data[id]!.bounds["mag"]![0],
         ),
       );
       const maxY = Math.max(
-        ...Object.keys(data).map(
+        ...loadedIDs.map(
           (id) =>
-            dataSources.byID[id].metadata.variables.by_id["mag"].bounds[1],
+           data[id]!.bounds["mag"]![1],
         ),
       );
 
