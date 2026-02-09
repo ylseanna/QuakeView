@@ -24,14 +24,41 @@ export default function DataSourceFormattingElement({
 
   useEffect(() => {
     const all_domains_present = dataSource.metadata.variables.required_vars
+      .concat(dataSource.metadata.variables.datetime_vars)
       .concat(dataSource.metadata.variables.added_vars)
       .map((variable) => {
         if (
-          Object.keys(dataSource.formatting.color.linear.domain).includes(
-            variable,
-          )
+          dataSource.metadata.datetime_format == "parseable_datetime_string"
         ) {
-          return variable == "dt" || variable == "id"
+          return [
+            "dt",
+            "id",
+            "year",
+            "month",
+            "day",
+            "doy",
+            "hour",
+            "minute",
+            "second",
+          ].includes(variable)
+            ? true
+            : dataSource.formatting.color.linear.domain[variable] != null;
+        } else if (
+          dataSource.metadata.datetime_format ==
+          "year-month-day-hour-minute-second"
+        ) {
+          console.log(variable);
+          return [
+            "dt",
+            "id",
+            "year",
+            "month",
+            "day",
+            "doy",
+            "hour",
+            "minute",
+            "second",
+          ].includes(variable)
             ? true
             : dataSource.formatting.color.linear.domain[variable] != null;
         } else {
@@ -42,6 +69,7 @@ export default function DataSourceFormattingElement({
     console.log(all_domains_present);
 
     setAllDomainsPresent(all_domains_present.every((el) => el));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     dataSource.formatting.color.linear.domain,
     dataSource.metadata.variables,
@@ -60,7 +88,9 @@ export default function DataSourceFormattingElement({
         >
           <Stack direction="row" sx={{ minWidth: 0 }}>
             <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-            <Typography noWrap textOverflow="ellipsis">{dataSource.name}</Typography>
+            <Typography noWrap textOverflow="ellipsis">
+              {dataSource.name}
+            </Typography>
           </Stack>
         </SubAccordionSummary>
       </Box>

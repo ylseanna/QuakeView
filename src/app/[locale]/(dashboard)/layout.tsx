@@ -66,8 +66,8 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
             console.log(`Fetching data for ${dataSourceID}`);
             setDataLoading([...dataLoading, dataSourceID]);
 
-            await fetchData(dataSources.byID[dataSourceID]).then(
-              (fetched_data) => {
+            await fetchData(dataSources.byID[dataSourceID])
+              .then((fetched_data) => {
                 console.log(fetched_data);
 
                 addData(
@@ -86,9 +86,11 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
                 Object.keys(
                   dataSources.byID[dataSourceID].formatting.color.linear.domain,
-                ).forEach((variable) => {
-                  boundsFromData[variable] = fetched_data.bounds[variable];
-                });
+                )
+                  .concat(["t"])
+                  .forEach((variable) => {
+                    boundsFromData[variable] = fetched_data.bounds[variable];
+                  });
 
                 setColorFormatting(dataSourceID, {
                   ...dataSources.byID[dataSourceID].formatting.color,
@@ -109,13 +111,25 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
                     1,
                   ),
                 );
-              },
-            );
+              })
+              .catch((err) => {
+                console.log("Server responded with error", err);
+
+                // remove ID from data that is loading (this still doesn't seem to completely work though)
+                setDataLoading(
+                  (dataLoading as string[]).splice(
+                    (dataLoading as string[]).findIndex(
+                      (iid) => iid === dataSourceID,
+                    ),
+                    1,
+                  ),
+                );
+              });
           }
         }
       }
     });
-  }, [dataSources.allIDs]);
+  }, [dataSources]);
 
   return (
     <>

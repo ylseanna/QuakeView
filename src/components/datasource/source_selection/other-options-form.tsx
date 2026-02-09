@@ -66,10 +66,27 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
           ].includes(variable)
             ? true
             : dataSource.formatting.color.linear.domain[variable] != null;
+        } else if (dataSource.metadata.datetime_format == "year-month-day-hour-minute-second") {
+          console.log(variable)
+          return [
+            "dt",
+            "id",
+            "year",
+            "month",
+            "day",
+            "doy",
+            "hour",
+            "minute",
+            "second",
+          ].includes(variable)
+            ? true
+            : dataSource.formatting.color.linear.domain[variable] != null;
         } else {
           return false;
         }
       });
+
+    console.log(all_domains_present)
 
     setAllDomainsPresent(all_domains_present.every((el) => el));
   }, [

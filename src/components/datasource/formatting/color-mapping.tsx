@@ -1,15 +1,15 @@
+import { Color } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import { DataSourceColorFormatting, EarthQuake } from "../types";
 import { colormaps, colormaps_categorical } from "../../map/crameri-colormaps";
-import { Color } from "@deck.gl/core";
+import { DataSourceColorFormatting, EarthQuake } from "../types";
 
 export const ColorMapping = (
   d: EarthQuake,
   colorFormatting: DataSourceColorFormatting
 ) => {
   if (colorFormatting.mapping == "single") {
-    const color = d3.color(colorFormatting.single) as d3.RGBColor;
+    const color = d3.color(colorFormatting.single as unknown as string) as d3.RGBColor;
     return [color.r, color.g, color.b] as Color;
   } else if (colorFormatting.mapping == "linear") {
     const colorScale = d3
@@ -23,7 +23,7 @@ export const ColorMapping = (
               ].toReversed()
         )
       )
-      .domain(colorFormatting.linear.domain[colorFormatting.linear.variable]);
+      .domain(colorFormatting.linear.domain[colorFormatting.linear.variable]!);
     const color = d3.color(
       colorScale(d[colorFormatting.linear.variable] as d3.NumberValue)
     ) as d3.RGBColor;

@@ -3,15 +3,36 @@ import json
 # from obspy import UTCDateTime
 from datetime import datetime
 from itertools import islice
+from mmap import mmap
 from pathlib import Path
 
 import pandas as pd
 from numpy import concatenate, float64, int64, isnan
+from obspy import UTCDateTime
 from shapely import multipoints
 
 from flask import Flask, Response, request, send_file
 
-from mmap import mmap
+from logging.config import dictConfig
+
+dictConfig(
+    {
+        "version": 1,
+        "formatters": {
+            "default": {
+                "format": "[%(asctime)s] %(levelname)s in %(module)s: %(message)s",
+            }
+        },
+        "handlers": {
+            "wsgi": {
+                "class": "logging.StreamHandler",
+                "stream": "ext://flask.logging.wsgi_errors_stream",
+                "formatter": "default",
+            }
+        },
+        "root": {"level": "INFO", "handlers": ["wsgi"]},
+    }
+)
 
 
 def count(filename: Path):
@@ -421,40 +442,104 @@ def map_data():
 # @cache.memoize()
 def generate_event_dict(nlines=None):
     # LOAD DATAFRAME
+    app.logger.info("loading...")
     filepath = request.args.get("filepath")
 
-    df = pd.read_csv(filepath)
+    seperator = request.args.get("sep")
+
+    df = pd.read_csv(filepath, sep=seperator)
 
     # PREPARE VAR MAPPING
+    app.logger.info("getting varmaps...")
     vars = json.loads(request.args.get("vars"))
     varmaps = json.loads(request.args.get("var_maps"))
 
     varmap = get_varmap(vars, varmaps, df.columns)
 
-    print(varmap)
+    required_vars = [var for var in vars if var in list(varmaps.keys()) if varmaps[var]] + ["t"]
+    optional_vars = [var for var in vars if var not in list(varmaps.keys())]
+
+    app.logger.debug(
+        f"\n{varmap}\nRequired: {required_vars}\nOptional: {optional_vars}"
+    )
 
     # DATETIME CONVERSION
-    if varmap["dt"]:
+    app.logger.info("converting datetime...")
+    datetime_format = request.args.get("datetimeformat")
+
+    app.logger.info(f"format: {datetime_format}")
+
+    if datetime_format == "parseable_datetime_string":
         df["datetime"] = [datetime.fromisoformat(dt) for dt in df[varmap["dt"]]]
 
         df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+    elif datetime_format == "year-month-day-hour-minute-second":
+        # df["datetime"] = [
+        #     UTCDateTime(
+        #         year=int(row[varmap["year"]]),
+        #         month=int(row[varmap["month"]]),
+        #         day=int(row[varmap["day"]]),
+        #         hour=int(row[varmap["hour"]]),
+        #         minute=int(row[varmap["minute"]]),
+        #         second=int(row[varmap["second"]]),
+        #         strict=False,
+        #     ).datetime
+        #     for index, row in df[
+        # [
+        #     varmap["year"],
+        #     varmap["month"],
+        #     varmap["day"],
+        #     varmap["hour"],
+        #     varmap["minute"],
+        #     varmap["second"],
+        # ]
+        #     ].iterrows()
+        # ]
+
+        df["datetime"] = pd.to_datetime(
+            df[
+                [
+                    varmap["year"],
+                    varmap["month"],
+                    varmap["day"],
+                    varmap["hour"],
+                    varmap["minute"],
+                    varmap["second"],
+                ]
+            ],
+            yearfirst=True,
+        )
+
+        df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
+
+        df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+
+        varmap["dt"] = "dt"
+        varmap["doy"] = "dt"
+
+        app.logger.debug(df["datetime"][:10])
 
     # OPTIONAL FILTERING
 
-    if "filtering" in request.args.to_dict():
-        print("FILTERING:")
-        filtering = json.loads(request.args.get("filtering"))
+    filtering = json.loads(request.args.get("filtering"))
 
+    if len(list(filtering.keys())) > 1:
+        app.logger.info("applying filters...")
         for variable in filtering.keys():
-            print(f"{filtering[variable][0]} < {variable} < {filtering[variable][1]}")
+            app.logger.info(
+                f"{filtering[variable][0]} < {variable} < {filtering[variable][1]}"
+            )
             df = df[
                 (df[varmap[variable]] > filtering[variable][0])
                 & (df[varmap[variable]] < filtering[variable][1])
             ]
+    else:
+        app.logger.info("skipping filters...")
 
     # GET EXTENT
+    app.logger.info("pre-calculating extent...")
     centroid_calculatable = (
         varmap["lon"] is not None
         and varmap["lat"] is not None
@@ -473,7 +558,24 @@ def generate_event_dict(nlines=None):
 
         centroid_processed = [centroid.x, centroid.y, df[varmap["dep"]].mean()]
 
+    # GENERATE BOUNDS
+    app.logger.info("getting bounds...")
+    bounds = {
+        var: (
+            [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
+            if df.dtypes[varmap[var]] in (float, float64, int, int64)
+            and not (
+                isnan(float(df[varmap[var]].min()))
+                or isnan(float(df[varmap[var]].max()))
+            )
+            else None
+        )
+        for var in required_vars + optional_vars
+        if varmap[var]
+    }
+
     # CONVERT TO JSON
+    app.logger.info("converting to json...")
     event_list = []
     for index, row in df.iterrows():
         if not isnan(row[varmap["mag"]]):
@@ -487,26 +589,12 @@ def generate_event_dict(nlines=None):
                 "lat": row[varmap["lat"]],
             }
 
-            for var in vars:
-                if var not in list(varmaps.keys()):
-                    event_row[var] = row[var]
+            for var in optional_vars:
+                event_row[var] = row[var]
 
             event_list.append(event_row)
 
-    # GENERATE BOUNDS
-    bounds = {
-        var: (
-            [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
-            if df.dtypes[varmap[var]] in (float, float64, int, int64)
-            and not (
-                isnan(float(df[varmap[var]].min()))
-                or isnan(float(df[varmap[var]].max()))
-            )
-            else None
-        )
-        for var in event_list[0].keys()
-    }
-
+    app.logger.info("returning data object...")
     return {
         "data": event_list,
         "bounds": bounds,
@@ -549,7 +637,7 @@ def get_varmap(vars, varmaps, columns):
     varmap = {}
     for var in vars:
         if var in varmaps:
-            if varmaps[var]:
+            if varmaps[var] is not None:
                 for mapped_var in varmaps[var]:
                     if mapped_var in columns:
                         varmap[var] = mapped_var

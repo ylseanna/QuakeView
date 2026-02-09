@@ -1,6 +1,7 @@
 import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
 import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { Color } from "@deck.gl/core";
+import { color } from "d3";
 
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { DataSource, EarthQuake } from "@/components/datasource/types";
@@ -105,8 +106,27 @@ export function StemPlotLayers(
       getRadius: 0.1,
       radiusScale: dataSource.formatting.scale,
       getPosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
-      getFillColor: (d: EarthQuake) =>
-        ColorMapping(d, dataSource.formatting.color) as Color,
+      getFillColor:
+        dataSource.formatting.color.mapping == "single"
+          ? ([
+              (
+                color(
+                  dataSource.formatting.color.single! as unknown as string,
+                )! as d3.RGBColor
+              ).r,
+              (
+                color(
+                  dataSource.formatting.color.single! as unknown as string,
+                )! as d3.RGBColor
+              ).g,
+              (
+                color(
+                  dataSource.formatting.color.single! as unknown as string,
+                )! as d3.RGBColor
+              ).b,
+            ] as Color)
+          : (d: EarthQuake) =>
+              ColorMapping(d, dataSource.formatting.color) as Color,
       autoHighlight: true,
       highlightColor: [255, 255, 255, 140],
       colorFormat: "RGB",

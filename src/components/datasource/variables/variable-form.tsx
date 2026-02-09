@@ -53,21 +53,48 @@ function VariableEditingRow({
     (state) => state.dataSourceActions.setLoadable,
   );
 
-
   useEffect(() => {
-    const mappedVarCheck = dataSource.metadata.variables.required_vars
-      .map((requiredVar) => {
-        const description = dataSource.metadata.variables.by_id[requiredVar];
+    let mappedVarCheck = false;
+    if (dataSource.metadata.datetime_format == "parseable_datetime_string") {
+      mappedVarCheck = dataSource.metadata.variables.required_vars
+        .map((requiredVar) => {
+          const description = dataSource.metadata.variables.by_id[requiredVar];
 
-        return description.variable != "t"
-          ? description.mapped_var
-              .map((mapped_var) =>
-                dataSource.metadata.catalog_headers.includes(mapped_var),
-              )
-              .some((check) => check)
-          : true;
-      })
-      .every((check) => check);
+          console.log(requiredVar);
+
+          return description.variable != "t"
+            ? description.mapped_var
+                .map((mapped_var) =>
+                  dataSource.metadata.catalog_headers.includes(mapped_var),
+                )
+                .some((check) => check)
+            : true;
+        })
+        .every((check) => check);
+    } else if (
+      dataSource.metadata.datetime_format == "year-month-day-hour-minute-second"
+    ) {
+      mappedVarCheck = dataSource.metadata.variables.required_vars
+        .concat(dataSource.metadata.variables.datetime_vars)
+        .map((requiredVar) => {
+          const description = dataSource.metadata.variables.by_id[requiredVar];
+
+          console.log(requiredVar);
+
+          return description.variable != "t" &&
+            description.variable != "dt" &&
+            description.variable != "doy"
+            ? description.mapped_var
+                .map((mapped_var) =>
+                  dataSource.metadata.catalog_headers.includes(mapped_var),
+                )
+                .some((check) => check)
+            : true;
+        })
+        .every((check) => check);
+    }
+
+    console.log(mappedVarCheck);
 
     if (mappedVarCheck != dataSource.interface.loadable) {
       setLoadable(dataSource.internal_id, mappedVarCheck);

@@ -85,7 +85,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
   };
 
   const [amEditingName, setAmEditingName] = useState(false);
-  const [previewType, setPreviewType] = useState("raw");
+  const [previewType, setPreviewType] = useState("parsed");
 
   const theme = useTheme();
 
@@ -197,11 +197,11 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
             aria-label="mode"
             sx={{ height: "24px", alignSelf: "end" }}
           >
-            <ToggleButton value="raw" sx={sxButton}>
-              {t("Source.raw_preview_option")}
-            </ToggleButton>
             <ToggleButton value="parsed" sx={sxButton}>
               {t("Source.parsed_preview_option")}
+            </ToggleButton>
+            <ToggleButton value="raw" sx={sxButton}>
+              {t("Source.raw_preview_option")}
             </ToggleButton>
           </ToggleButtonGroup>
         </Stack>
