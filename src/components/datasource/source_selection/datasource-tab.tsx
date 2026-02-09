@@ -1,12 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
-import {
-  Close,
-  ExpandMore,
-  ScatterPlot,
-  Warning,
-} from "@mui/icons-material";
+import { Close, ExpandMore, ScatterPlot, Warning } from "@mui/icons-material";
 import {
   Accordion,
   AccordionDetails,
@@ -52,11 +47,6 @@ export default function DataTab({ id }: DataTabProps) {
   );
   const { removeData } = useDataStore((state) => state);
 
-  // dataSourceSubactions
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-
   const setMetadata = useProjectStore(
     (state) => state.dataSourceActions.setMetadata,
   );
@@ -69,35 +59,6 @@ export default function DataTab({ id }: DataTabProps) {
 
     // set metadata
     setMetadata(dataSource.internal_id, updatedMetadata);
-
-    // colormapBounds
-    const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
-      (variable: string) => {
-        const obj: { [variable: string]: [number, number] } = {};
-        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
-        return obj;
-      },
-    );
-
-    console.log(colormapsBounds);
-
-    const updatedColorFormatting = {
-      ...dataSource.formatting.color,
-      linear: {
-        ...dataSource.formatting.color.linear,
-        domain: Object.assign({}, ...colormapsBounds),
-      },
-    };
-
-    console.log(updatedColorFormatting);
-
-    // updatedColorFormatting.linear.domain = ;
-
-    setFormatting(
-      dataSource.internal_id,
-      "color",
-      updatedColorFormatting as never,
-    );
   };
 
   useEffect(() => {

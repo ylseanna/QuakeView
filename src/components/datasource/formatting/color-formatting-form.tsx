@@ -22,7 +22,7 @@ import {
 import { styled } from "@mui/material/styles";
 
 import { DataSource } from "@/components/datasource/types";
-import { SyntheticEvent, useEffect, useState } from "react";
+import { SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MuiColorInput, TinyColor } from "mui-color-input";
 import HistogramSlider from "../../interface-elements/histogram-slider";
@@ -65,61 +65,28 @@ export default function ColorFormattingForm({
       : null,
   )!;
 
-  const setColorFormatting = useProjectStore((state) => state.dataSourceActions.setColorFormatting)
+  const setColorFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setColorFormatting,
+  );
 
   const [localValues, setLocalValues] = useState<{
     localLinearDomain: [number, number];
     localLinearMin: number;
     localLinearMax: number;
   }>({
-    localLinearDomain: dataSource.formatting.color.linear.domain[
-      dataSource.formatting.color.linear.variable
-    ]
-      ? dataSource.formatting.color.linear.domain[
-          dataSource.formatting.color.linear.variable
-        ]
-      : bounds[dataSource.formatting.color.linear.variable]!,
-    localLinearMin: dataSource.formatting.color.linear.domain[
-      dataSource.formatting.color.linear.variable
-    ]
-      ? dataSource.formatting.color.linear.domain[
-          dataSource.formatting.color.linear.variable
-        ][0]
-      : bounds[dataSource.formatting.color.linear.variable]![0],
-    localLinearMax: dataSource.formatting.color.linear.domain[
-      dataSource.formatting.color.linear.variable
-    ]
-      ? dataSource.formatting.color.linear.domain[
-          dataSource.formatting.color.linear.variable
-        ][1]
-      : bounds[dataSource.formatting.color.linear.variable]![1],
+    localLinearDomain:
+      dataSource.formatting.color.linear.domain[
+        dataSource.formatting.color.linear.variable
+      ]!,
+    localLinearMin:
+      dataSource.formatting.color.linear.domain[
+        dataSource.formatting.color.linear.variable
+      ]![0],
+    localLinearMax:
+      dataSource.formatting.color.linear.domain[
+        dataSource.formatting.color.linear.variable
+      ]![1],
   });
-
-  useEffect(() => {
-    setLocalValues({
-      localLinearDomain: dataSource.formatting.color.linear.domain[
-        dataSource.formatting.color.linear.variable
-      ]
-        ? dataSource.formatting.color.linear.domain[
-            dataSource.formatting.color.linear.variable
-          ]
-        : bounds[dataSource.formatting.color.linear.variable]!,
-      localLinearMin: dataSource.formatting.color.linear.domain[
-        dataSource.formatting.color.linear.variable
-      ]
-        ? dataSource.formatting.color.linear.domain[
-            dataSource.formatting.color.linear.variable
-          ][0]
-        : bounds[dataSource.formatting.color.linear.variable]![0],
-      localLinearMax: dataSource.formatting.color.linear.domain[
-        dataSource.formatting.color.linear.variable
-      ]
-        ? dataSource.formatting.color.linear.domain[
-            dataSource.formatting.color.linear.variable
-          ][1]
-        : bounds[dataSource.formatting.color.linear.variable]![1],
-    });
-  }, [dataSource.formatting, bounds]);
 
   return (
     <Grid container spacing={1} direction="column" sx={{ mt: 1 }}>
@@ -133,10 +100,7 @@ export default function ColorFormattingForm({
           size="small"
           exclusive
           value={dataSource.formatting.color.mapping}
-          onChange={(
-            event: React.MouseEvent<HTMLElement>,
-            newValue,
-          ) => {
+          onChange={(event: React.MouseEvent<HTMLElement>, newValue) => {
             if (newValue !== null) {
               setColorFormatting(dataSource.internal_id, {
                 ...dataSource.formatting.color,

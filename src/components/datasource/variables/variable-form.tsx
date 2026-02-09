@@ -53,52 +53,6 @@ function VariableEditingRow({
     (state) => state.dataSourceActions.setLoadable,
   );
 
-  const setMetadata = useProjectStore(
-    (state) => state.dataSourceActions.setMetadata,
-  );
-
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-
-  const updateMetaData = async (dataSource: DataSource) => {
-    // update bounds and metadata after setting mapped variables
-
-    // fetch updated metadata
-    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
-
-    // set metadata
-    setMetadata(dataSource.internal_id, updatedMetadata);
-
-    // colormapBounds
-    const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
-      (variable: string) => {
-        const obj: { [variable: string]: [number, number] } = {};
-        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
-        return obj;
-      },
-    );
-
-    console.log(colormapsBounds);
-
-    const updatedColorFormatting = {
-      ...dataSource.formatting.color,
-      linear: {
-        ...dataSource.formatting.color.linear,
-        domain: Object.assign({}, ...colormapsBounds),
-      },
-    };
-
-    console.log(updatedColorFormatting);
-
-    // updatedColorFormatting.linear.domain = ;
-
-    setFormatting(
-      dataSource.internal_id,
-      "color",
-      updatedColorFormatting as never,
-    );
-  };
 
   useEffect(() => {
     const mappedVarCheck = dataSource.metadata.variables.required_vars
@@ -115,10 +69,7 @@ function VariableEditingRow({
       })
       .every((check) => check);
 
-    console.log(mappedVarCheck);
-
     if (mappedVarCheck != dataSource.interface.loadable) {
-      updateMetaData(dataSource);
       setLoadable(dataSource.internal_id, mappedVarCheck);
     }
 

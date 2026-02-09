@@ -43,53 +43,6 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
     (state) => state.dataSourceActions.setFiltering,
   );
 
-  const setMetadata = useProjectStore(
-    (state) => state.dataSourceActions.setMetadata,
-  );
-
-  const updateMetadata = async (dataSource: DataSource) => {
-    // update bounds and metadata after setting mapped variables
-
-    // fetch updated metadata
-    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
-
-    // set metadata
-    setMetadata(dataSource.internal_id, updatedMetadata);
-
-    // colormapBounds
-    const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
-      (variable: string) => {
-        const obj: { [variable: string]: [number, number] } = {};
-        obj[variable] = updatedMetadata.variables.by_id[variable].bounds;
-        return obj;
-      },
-    );
-
-    console.log(colormapsBounds);
-
-    const updatedColorFormatting = {
-      ...dataSource.formatting.color,
-      linear: {
-        ...dataSource.formatting.color.linear,
-        domain: Object.assign({}, ...colormapsBounds),
-      },
-    };
-
-    console.log(updatedColorFormatting);
-
-    // updatedColorFormatting.linear.domain = ;
-
-    setFormatting(
-      dataSource.internal_id,
-      "color",
-      updatedColorFormatting as never,
-    );
-  };
-
-  useEffect(() => {
-    updateMetadata(dataSource);
-  }, [dataSource.metadata.sep]);
-
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
 
   useEffect(() => {
@@ -98,29 +51,23 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
       .concat(dataSource.metadata.variables.added_vars)
       .map((variable) => {
         if (
-          Object.keys(dataSource.formatting.color.linear.domain).includes(
-            variable,
-          )
+          dataSource.metadata.datetime_format == "parseable_datetime_string"
         ) {
-          if (
-            dataSource.metadata.datetime_format == "parseable_datetime_string"
-          ) {
-            return [
-              "dt",
-              "id",
-              "year",
-              "month",
-              "day",
-              "doy",
-              "hour",
-              "minute",
-              "second",
-            ].includes(variable)
-              ? true
-              : dataSource.formatting.color.linear.domain[variable] != null;
-          } else {
-            return false;
-          }
+          return [
+            "dt",
+            "id",
+            "year",
+            "month",
+            "day",
+            "doy",
+            "hour",
+            "minute",
+            "second",
+          ].includes(variable)
+            ? true
+            : dataSource.formatting.color.linear.domain[variable] != null;
+        } else {
+          return false;
         }
       });
 

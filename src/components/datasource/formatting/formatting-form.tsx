@@ -1,15 +1,11 @@
-/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import {
-
   Divider,
   Grid,
   Input,
-
   Slider,
   Switch,
-
   Tooltip,
   tooltipClasses,
   TooltipProps,
@@ -195,7 +191,7 @@ export default function DataSourceFormattingForm({
         </Grid>
       </Grid>
       <Divider sx={{ mt: 2, mb: 2 }} />
-      <ColorFormattingForm dataSource={dataSource}/>
+      <ColorFormattingForm dataSource={dataSource} />
     </>
   );
 }

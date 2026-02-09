@@ -1,6 +1,6 @@
 import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
-import { LineLayer, ScatterplotLayer, ScatterplotLayerProps } from "@deck.gl/layers";
-import { Color, LayerProps } from "@deck.gl/core";
+import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
+import { Color } from "@deck.gl/core";
 
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { DataSource, EarthQuake } from "@/components/datasource/types";

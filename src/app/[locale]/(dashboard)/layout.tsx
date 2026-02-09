@@ -17,79 +17,105 @@ import DebugWindow from "@/components/interface/debug-window";
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   // load data (synchronized accros app)
   const { dataSources } = useProjectStore((state) => state);
-  const { data, allIDs, addData, removeData } = useDataStore((state) => state);
-  const [dataLoading, setDataLoading] = useState(false);
+  const {
+    allIDs: allLoadedIDs,
+    addData,
+    removeData,
+  } = useDataStore((state) => state);
+  const [dataLoading, setDataLoading] = useState([] as string[]);
   const [debugVisible, setDebugVisible] = useState(false);
 
   useKeyStroke(["F3"], () => {
     setDebugVisible(!debugVisible);
   });
 
+  const setColorFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setColorFormatting,
+  );
+
+  // load data
+
   useEffect(() => {
-    console.log(`All loaded data ids: ${allIDs.join(",")}`);
-    if (!dataLoading) {
-      dataSources.allIDs.forEach(async (id: string) => {
-        if (data) {
-          if (!allIDs.includes(id)) {
-            if (dataSources.byID[id].interface.loadable) {
-              console.log(
-                `Data not loaded for ${id} (all loaded: ${allIDs.join(",")}), starting fetch`,
-              );
+    console.log(
+      `Check load;\nloaded data ids: ${allLoadedIDs.join(", ")}\nCurrently loading data ids: ${dataLoading.join(", ")}`,
+    );
+    dataSources.allIDs.forEach(async (dataSourceID: string) => {
+      console.log(`Load check for ${dataSourceID}`);
 
-              setDataLoading(true);
-              console.log(`Fetching data for ${id}`);
+      if (!dataSources.byID[dataSourceID].interface.loadable) {
+        console.log("DataSource not marked as loadable");
+        if (allLoadedIDs.includes(dataSourceID)) {
+          console.log("DataSource included in loaded data, oh no, removing");
+          removeData(dataSourceID);
+        } else {
+          console.log("DataSource not included in loaded data, yay");
+        }
+      } else {
+        console.log("DataSource marked as loadable");
+        if (allLoadedIDs.includes(dataSourceID)) {
+          console.log("DataSource included in loaded data, yay");
+        } else {
+          console.log(
+            "DataSource not included in loaded data, it should be loaded",
+          );
+          if (dataLoading.includes(dataSourceID)) {
+            console.log(
+              "The DataSource or another is already being loaded, waiting for next attempt to avoid double-loading",
+            );
+          } else {
+            console.log(`Fetching data for ${dataSourceID}`);
+            setDataLoading([...dataLoading, dataSourceID]);
 
-              await fetchData(dataSources.byID[id]).then((fetched_data) => {
+            await fetchData(dataSources.byID[dataSourceID]).then(
+              (fetched_data) => {
                 console.log(fetched_data);
 
                 addData(
-                  id,
+                  dataSourceID,
                   fetched_data.data,
-                  dataSources.byID[id].metadata.variables.added_vars,
+                  dataSources.byID[dataSourceID].metadata.variables.added_vars,
                   fetched_data.bounds,
                   fetched_data.extent,
-                  dataSources.byID[id].filtering,
+                  dataSources.byID[dataSourceID].filtering,
                 );
 
-                setDataLoading(false);
-              });
-            }
-          } else {
-            if (dataSources.byID[id].interface.loadable) {
-              if (
-                dataSources.byID[id].metadata.variables.added_vars.length !=
-                  data[id].addedVars.length ||
-                dataSources.byID[id].filtering != data[id].filters
-              ) {
-                console.log(
-                  `Data parameters have changed for ${id}, starting fetch`,
-                );
-                setDataLoading(true);
-                console.log(`Fetching data for ${id}`);
+                // Add color maps boundaries from data
+                const boundsFromData = {} as {
+                  [variable: string]: [number, number] | null;
+                };
 
-                await fetchData(dataSources.byID[id]).then((fetched_data) => {
-                  console.log(fetched_data);
-
-                  addData(
-                    id,
-                    fetched_data.data,
-                    dataSources.byID[id].metadata.variables.added_vars,
-                    fetched_data.bounds,
-                    fetched_data.extent,
-                    dataSources.byID[id].filtering,
-                  );
-
-                  setDataLoading(false);
+                Object.keys(
+                  dataSources.byID[dataSourceID].formatting.color.linear.domain,
+                ).forEach((variable) => {
+                  boundsFromData[variable] = fetched_data.bounds[variable];
                 });
-              }
-            } else {
-              removeData(id);
-            }
+
+                setColorFormatting(dataSourceID, {
+                  ...dataSources.byID[dataSourceID].formatting.color,
+                  linear: {
+                    ...dataSources.byID[dataSourceID].formatting.color.linear,
+                    domain: boundsFromData,
+                  },
+                });
+
+                console.log(dataSources.byID[dataSourceID].formatting.color);
+
+                // remove ID from data that is loading (this still doesn't seem to completely work though)
+                setDataLoading(
+                  (dataLoading as string[]).splice(
+                    (dataLoading as string[]).findIndex(
+                      (iid) => iid === dataSourceID,
+                    ),
+                    1,
+                  ),
+                );
+              },
+            );
           }
         }
-      });
-    }
-  }, [dataSources.allIDs, dataLoading]);
+      }
+    });
+  }, [dataSources.allIDs]);
 
   return (
     <>
@@ -104,7 +130,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
         }}
       >
         <Suspense fallback={<LinearProgress />}>
-          {dataLoading && <LinearProgress />}
+          {dataLoading.length != 0 && <LinearProgress />}
           {props.children}
         </Suspense>
       </Box>

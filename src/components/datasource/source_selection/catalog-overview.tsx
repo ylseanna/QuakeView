@@ -1,4 +1,3 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { Edit, EditOff } from "@mui/icons-material";
@@ -27,14 +26,12 @@ import {
 import { useFormatter, useTranslations } from "next-intl";
 // import { Dispatch, SetStateAction, useCallback } from "react";
 
-import { useProjectStore } from "@/providers/project-store-provider";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { DataSource } from "../types";
 import { updatedMetaDataUrl } from "../data-source-query";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import { Folder } from "mdi-material-ui";
 import { useGridApiRef } from "@mui/x-data-grid/hooks/utils/useGridApiRef";
-import { useDataStore } from "@/providers/data-store-provider";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -79,64 +76,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   const format = useFormatter();
 
-  // dataSourceSubactions
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-
-  const setMetadata = useProjectStore(
-    (state) => state.dataSourceActions.setMetadata,
-  );
-
-  const bounds = useDataStore((state) =>
-    state.data[dataSource.internal_id]
-      ? state.data[dataSource.internal_id].bounds
-      : null,
-  )!;
-
-  const updateMetadata = async (dataSource: DataSource) => {
-    // update bounds and metadata after setting mapped variables
-
-    // fetch updated metadata
-    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
-
-    // set metadata
-    setMetadata(dataSource.internal_id, updatedMetadata);
-
-    console.log(bounds)
-
-    if (bounds) {
-      // colormapBounds
-      const colormapsBounds = Object.keys(updatedMetadata.variables.by_id).map(
-        (variable: string) => {
-          const obj: { [variable: string]: [number, number] } = {};
-          obj[variable] = bounds[variable]!;
-          return obj;
-        },
-      );
-
-      console.log(colormapsBounds);
-
-      const updatedColorFormatting = {
-        ...dataSource.formatting.color,
-        linear: {
-          ...dataSource.formatting.color.linear,
-          domain: Object.assign({}, ...colormapsBounds),
-        },
-      };
-
-      console.log(updatedColorFormatting);
-
-      // updatedColorFormatting.linear.domain = ;
-
-      setFormatting(
-        dataSource.internal_id,
-        "color",
-        updatedColorFormatting as never,
-      );
-    }
-  };
-
   const previewGridApiRef = useGridApiRef();
 
   const autosizeOptions = {
@@ -144,10 +83,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
     includeOutliers: true,
     expand: true,
   };
-
-  useEffect(() => {
-    updateMetadata(dataSource);
-  }, [dataSource.metadata.sep, bounds]);
 
   const [amEditingName, setAmEditingName] = useState(false);
   const [previewType, setPreviewType] = useState("raw");
