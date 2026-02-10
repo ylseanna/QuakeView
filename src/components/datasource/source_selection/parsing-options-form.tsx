@@ -8,6 +8,7 @@ import {
   ToggleButtonGroup,
   Typography,
   Grid,
+  Switch,
 } from "@mui/material";
 
 // import {
@@ -48,8 +49,9 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
   //   (state) => state.dataSourceActions.setFormatting,
   // );
 
-  const setSep = useProjectStore((state) => state.metadataActions.setSep);
-  const setDatetimeFormat = useProjectStore((state) => state.metadataActions.setDatetimeFormat);
+  const { setIndex, setSep, setDatetimeFormat } = useProjectStore(
+    (state) => state.metadataActions,
+  );
 
   // const setMetadata = useProjectStore(
   //   (state) => state.dataSourceActions.setMetadata,
@@ -112,6 +114,33 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
           sx={{ alignItems: "center", minHeight: "40px" }}
         >
           <Grid size={2.5}>
+            <Typography variant="formlabel">{t("Sources.index")}</Typography>
+          </Grid>
+          <Grid
+            size="grow"
+            display="flex"
+            justifyContent="end"
+            alignItems="center"
+          >
+            <Switch
+              size="small"
+              checked={dataSource.metadata.index == "numerical" ? true : false}
+              onChange={(event) => {
+                setIndex(
+                  dataSource.internal_id,
+                  event.target!.checked ? "numerical" : "from_file",
+                );
+              }}
+              slotProps={{ input: { "aria-label": "controlled" } }}
+            />
+          </Grid>
+        </Grid>
+        <Grid
+          container
+          spacing={2}
+          sx={{ alignItems: "center", minHeight: "40px" }}
+        >
+          <Grid size={2.5}>
             <Typography variant="formlabel">
               {t("Sources.delimiter")}
             </Typography>
@@ -166,7 +195,9 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
               value={dataSource.metadata.datetime_format}
               exclusive
               onChange={(event) => {
-                setDatetimeFormat(dataSource.internal_id, (event.target as HTMLInputElement).value,
+                setDatetimeFormat(
+                  dataSource.internal_id,
+                  (event.target as HTMLInputElement).value,
                 );
               }}
               aria-label="mode"
@@ -174,6 +205,9 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
             >
               <ToggleButton value="parseable_datetime_string" sx={sxButton}>
                 {t("Sources.parseable_datetime_string")}
+              </ToggleButton>
+              <ToggleButton value="date_string-time_string" sx={sxButton}>
+                {t("Sources.date_string-time_string")}
               </ToggleButton>
               <ToggleButton
                 value="year-month-day-hour-minute-second"

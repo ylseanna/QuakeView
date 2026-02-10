@@ -98,7 +98,9 @@
     "whitespace": "whitespace",
     "comma": "comma",
     "parseable_datetime_string": "datetime string",
-    "year-month-day-hour-minute-second": "year+month+day+hour+minute+second"
+    "year-month-day-hour-minute-second": "year+month+day+hour+minute+second",
+    "date_string-time_string": "Date string+time string",
+    "index": "Numerical index as ID"
   },
   "Table": {
     "dep": "Depth (km)",

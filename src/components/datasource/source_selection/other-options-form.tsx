@@ -50,43 +50,66 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
       .concat(dataSource.metadata.variables.datetime_vars)
       .concat(dataSource.metadata.variables.added_vars)
       .map((variable) => {
-        if (
-          dataSource.metadata.datetime_format == "parseable_datetime_string"
-        ) {
-          return [
-            "dt",
-            "id",
-            "year",
-            "month",
-            "day",
-            "doy",
-            "hour",
-            "minute",
-            "second",
-          ].includes(variable)
-            ? true
-            : dataSource.formatting.color.linear.domain[variable] != null;
-        } else if (dataSource.metadata.datetime_format == "year-month-day-hour-minute-second") {
-          console.log(variable)
-          return [
-            "dt",
-            "id",
-            "year",
-            "month",
-            "day",
-            "doy",
-            "hour",
-            "minute",
-            "second",
-          ].includes(variable)
-            ? true
-            : dataSource.formatting.color.linear.domain[variable] != null;
-        } else {
-          return false;
-        }
+        console.log(variable);
+
+        // if (
+        //   dataSource.metadata.datetime_format == "parseable_datetime_string"
+        // ) {
+        return [
+          "dt",
+          "id",
+          "time",
+          "date",
+          "year",
+          "month",
+          "day",
+          "doy",
+          "hour",
+          "minute",
+          "second",
+        ].includes(variable)
+          ? true
+          : dataSource.formatting.color.linear.domain[variable] != null;
+        // } else if (dataSource.metadata.datetime_format == "year-month-day-hour-minute-second") {
+        //   console.log(variable)
+        //   return [
+        //     "dt",
+        //     "id",
+        //     "time",
+        //     "date",
+        //     "year",
+        //     "month",
+        //     "day",
+        //     "doy",
+        //     "hour",
+        //     "minute",
+        //     "second",
+        //   ].includes(variable)
+        //     ? true
+        //     : dataSource.formatting.color.linear.domain[variable] != null;
+        // }else if (dataSource.metadata.datetime_format == "date_string-time_string") {
+        //   console.log(variable)
+        //   return [
+        //     "dt",
+        //     "id",
+        //     "time",
+        //     "date",
+        //     "year",
+        //     "month",
+        //     "day",
+        //     "doy",
+        //     "hour",
+        //     "minute",
+        //     "second",
+        //   ].includes(variable)
+        //     ? true
+        //     : dataSource.formatting.color.linear.domain[variable] != null;
+        // } else {
+        //   return false;
+        // }
       });
 
-    console.log(all_domains_present)
+    console.log(all_domains_present);
 
     setAllDomainsPresent(all_domains_present.every((el) => el));
   }, [

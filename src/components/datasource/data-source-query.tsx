@@ -21,6 +21,7 @@ export function dataSourceDataUrl(dataSource: DataSource) {
   );
 
   const sep = encodeURIComponent(dataSource.metadata.sep);
+  const index = encodeURIComponent(dataSource.metadata.index);
   const DTFormat = encodeURIComponent(dataSource.metadata.datetime_format);
 
   const filtering = dataSource.filtering;
@@ -29,11 +30,13 @@ export function dataSourceDataUrl(dataSource: DataSource) {
     encoded_filtering = encodeURIComponent(JSON.stringify(filtering));
   }
 
-  return `/api/map_data?mode=data_query&filepath=${dataSource.filepath}&sep=${sep}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}${filtering ? "&filtering=" + encoded_filtering : ""}`;
+  return `/api/map_data?mode=data_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}${filtering ? "&filtering=" + encoded_filtering : ""}`;
 }
 
 export function updatedMetaDataUrl(dataSource: DataSource) {
   const sep = encodeURIComponent(dataSource.metadata.sep);
+
+  const index = encodeURIComponent(dataSource.metadata.index);
 
   const DTFormat = encodeURIComponent(dataSource.metadata.datetime_format);
 
@@ -56,5 +59,5 @@ export function updatedMetaDataUrl(dataSource: DataSource) {
     ),
   );
 
-  return `/api/map_data?mode=metadata_query&filepath=${dataSource.filepath}&sep=${sep}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
+  return `/api/map_data?mode=metadata_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
 }

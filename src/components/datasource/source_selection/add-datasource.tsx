@@ -1,4 +1,5 @@
 import path from "path";
+import { TinyColor } from "mui-color-input";
 
 import { DataSource, DataSourceFormatting, DataSourceMetaData } from "../types";
 
@@ -12,8 +13,8 @@ export const getInitDataSource = async (filepath: string) => {
 
       const colormapsBounds = Object.keys(metadata.variables.by_id).map(
         (variable: string) => {
-          const obj: { [variable: string]: [number, number] } = {};
-          obj[variable] = metadata.variables.by_id[variable].bounds;
+          const obj: { [variable: string]: [number, number] | null } = {};
+          obj[variable] = null;
           return obj;
         },
       );
@@ -32,7 +33,7 @@ export const getInitDataSource = async (filepath: string) => {
           positionOffset: 0,
           color: {
             mapping: "single",
-            single: "rgb(0, 0, 0)",
+            single: "rgb(0, 0, 0)" as unknown as TinyColor,
             linear: {
               variable: "mag",
               cmap: "Batlow",

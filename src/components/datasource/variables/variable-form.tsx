@@ -62,7 +62,9 @@ function VariableEditingRow({
 
           console.log(requiredVar);
 
-          return description.variable != "t"
+          return !(dataSource.metadata.index == "from_file" ? ["t"] : ["id", "t"]).includes(
+            requiredVar,
+          )
             ? description.mapped_var
                 .map((mapped_var) =>
                   dataSource.metadata.catalog_headers.includes(mapped_var),
@@ -81,9 +83,44 @@ function VariableEditingRow({
 
           console.log(requiredVar);
 
-          return description.variable != "t" &&
-            description.variable != "dt" &&
-            description.variable != "doy"
+          return !(
+            dataSource.metadata.index == "from_file"
+              ? ["t", "dt", "doy"]
+              : ["id", "t", "dt", "doy"]
+          ).includes(requiredVar)
+            ? description.mapped_var
+                .map((mapped_var) =>
+                  dataSource.metadata.catalog_headers.includes(mapped_var),
+                )
+                .some((check) => check)
+            : true;
+        })
+        .every((check) => check);
+    } else if (
+      dataSource.metadata.datetime_format == "date_string-time_string"
+    ) {
+      mappedVarCheck = dataSource.metadata.variables.required_vars
+        .concat(["date", "time"])
+        .map((requiredVar) => {
+          const description = dataSource.metadata.variables.by_id[requiredVar];
+
+          console.log(requiredVar);
+
+          console.log(
+            !(
+              dataSource.metadata.index == "from_file" ? ["t", "dt"] : ["id", "t", "dt"]
+            ).includes(requiredVar)
+              ? description.mapped_var
+                  .map((mapped_var) =>
+                    dataSource.metadata.catalog_headers.includes(mapped_var),
+                  )
+                  .some((check) => check)
+              : true,
+          );
+
+          return !(
+            dataSource.metadata.index == "from_file" ? ["t", "dt"] : ["id", "t", "dt"]
+          ).includes(requiredVar)
             ? description.mapped_var
                 .map((mapped_var) =>
                   dataSource.metadata.catalog_headers.includes(mapped_var),
@@ -113,15 +150,7 @@ function VariableEditingRow({
 
   return (
     <Grid container spacing={1} alignItems="flex-start">
-      <Grid
-        sx={
-          dataSource.metadata.variables.datetime_vars.includes(
-            dataDescription.variable,
-          )
-            ? { width: "104px", ml: "16px" }
-            : { width: "120px" }
-        }
-      >
+      <Grid sx={{ width: "120px" }}>
         <TextField value={dataDescription.variable} size="small" disabled />
       </Grid>
       <Grid
@@ -148,7 +177,7 @@ function VariableEditingRow({
         />
       </Grid>
       <Grid
-        size={1.5}
+        size={1.8}
         display="flex"
         justifyContent="center"
         alignItems="center"
@@ -266,7 +295,7 @@ export default function DataSourceVariableForm({
     <>
       <Grid container spacing={1} direction="column">
         <Grid container spacing={1} alignItems="flex-end">
-          <Grid size={1.5} sx={{ ml: 0 }}>
+          <Grid sx={{ width: "120px" }}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
@@ -280,7 +309,7 @@ export default function DataSourceVariableForm({
               {t("Variables.alias")}
             </Typography>
           </Grid>
-          <Grid size={1.5}>
+          <Grid size={1.8}>
             <Typography
               sx={{ opacity: 0.6, fontWeight: "bold", fontSize: "0.8rem" }}
             >
@@ -332,25 +361,28 @@ export default function DataSourceVariableForm({
             </Stack>
           </Grid>
         </Grid>
-        {dataSource.metadata.datetime_format != "parseable_datetime_string"
+        {dataSource.metadata.datetime_format ==
+        "year-month-day-hour-minute-second"
           ? [
-              "id",
+              ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
               ...dataSource.metadata.variables.datetime_vars.filter(
-                (variable) => variable != "doy",
+                (variable) => !["doy", "date", "time"].includes(variable),
               ),
               ...dataSource.metadata.variables.required_vars.filter(
                 (variable) => !["id", "dt", "t"].includes(variable),
               ),
             ].map((variable: string, index) => (
               <Box key={"EditingElement-" + variable}>
-                {index == 1 ? (
-                  <Divider textAlign="left" sx={{ my: 1 }}>
+                {dataSource.metadata.index == "from_file" && index == 1 ? (
+                  <Divider textAlign="left" sx={{ mb: 1 }}>
                     <span style={{ opacity: 0.4 }}>
                       {t("Variables.time_variables")}
                     </span>
                   </Divider>
                 ) : (
-                  index == 7 && <Divider sx={{ my: 1 }} />
+                  index == (dataSource.metadata.index == "from_file" ? 7 : 6) && (
+                    <Divider sx={{ mb: 1 }} />
+                  )
                 )}
                 <VariableEditingRow
                   dataDescription={
@@ -361,19 +393,61 @@ export default function DataSourceVariableForm({
                 />
               </Box>
             ))
-          : dataSource.metadata.variables.required_vars.map(
-              (variable: string) =>
-                variable != "t" && (
+          : dataSource.metadata.datetime_format == "date_string-time_string"
+            ? [
+                ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
+                ...dataSource.metadata.variables.datetime_vars.filter(
+                  (variable) =>
+                    ![
+                      "year",
+                      "month",
+                      "day",
+                      "doy",
+                      "hour",
+                      "minute",
+                      "second",
+                    ].includes(variable),
+                ),
+                ...dataSource.metadata.variables.required_vars.filter(
+                  (variable) => !["id", "dt", "t"].includes(variable),
+                ),
+              ].map((variable: string, index) => (
+                <Box key={"EditingElement-" + variable}>
+                  {dataSource.metadata.index == "from_file" && index == 1 ? (
+                    <Divider textAlign="left" sx={{ my: 1, mb: 2 }}>
+                      <span style={{ opacity: 0.4 }}>
+                        {t("Variables.time_variables")}
+                      </span>
+                    </Divider>
+                  ) : (
+                    index == (dataSource.metadata.index == "from_file" ? 3 : 2) && (
+                      <Divider sx={{ my: 1, mb: 2 }} />
+                    )
+                  )}
                   <VariableEditingRow
-                    key={"EditingElement-" + variable}
                     dataDescription={
                       dataSource.metadata.variables.by_id[variable]
                     }
                     dataSource={dataSource}
                     required
                   />
-                ),
-            )}
+                </Box>
+              ))
+            : dataSource.metadata.variables.required_vars.map(
+                (variable: string) =>
+                  !(dataSource.metadata.index == "from_file" ? ["t"] : ["t", "id"]).includes(
+                    variable,
+                  ) && (
+                    <VariableEditingRow
+                      key={"EditingElement-" + variable}
+                      dataDescription={
+                        dataSource.metadata.variables.by_id[variable]
+                      }
+                      dataSource={dataSource}
+                      required
+                    />
+                  ),
+              )}
         {dataSource.metadata.variables.added_vars.map((variable: string) => (
           <VariableEditingRow
             key={"EditingElement-" + variable}

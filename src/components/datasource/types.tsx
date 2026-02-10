@@ -27,10 +27,13 @@ export type DataSource = {
 
 export type DataSourceMetaData = {
   num_events: number;
-  // extent: Extent;
   sep: string;
-  datetime_format: "parseable_datetime_string" | "year-month-day-hour-minute-second";
-  preview: { parsed: { [key: string]: number | string }[], raw: string[] };
+  index: "from_file" | "numerical";
+  datetime_format:
+    | "parseable_datetime_string"
+    | "date_string-time_string"
+    | "year-month-day-hour-minute-second";
+  preview: { parsed: { [key: string]: number | string }[]; raw: string[] };
   catalog_headers: string[];
   variables: {
     by_id: { [variable: string]: DataSourceDataDescription };

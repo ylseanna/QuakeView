@@ -121,6 +121,7 @@ def map_data():
             raw_file_preview = list(islice(input_file, 10))
 
         seperator = request.args.get("sep") if not initial_request else ","
+        index = request.args.get("index") if not initial_request else "from_file"
 
         preview_df = pd.read_csv(filepath, sep=seperator, nrows=10)
 
@@ -254,9 +255,29 @@ def map_data():
         ### DEFINE DATETIME VARIABLES (not datetime string)
         datetime_variable_descr = {}
         for variable, alias, unit in zip(
-            ["year", "month", "day", "doy", "hour", "minute", "second"],
-            ["Year", "Month", "Day", "Day-of-year", "Hour", "Minute", "Second"],
-            ["years", "months", "days", "days", "hours", "minutes", "seconds"],
+            ["date", "time", "year", "month", "day", "doy", "hour", "minute", "second"],
+            [
+                "Date",
+                "Time",
+                "Year",
+                "Month",
+                "Day",
+                "Day-of-year",
+                "Hour",
+                "Minute",
+                "Second",
+            ],
+            [
+                "YYYY-MM-DD",
+                "HH:MM:SS[,SSSS]",
+                "years",
+                "months",
+                "days",
+                "days",
+                "hours",
+                "minutes",
+                "seconds",
+            ],
         ):
             datetime_variable_descr[variable] = {
                 "variable": variable,
@@ -367,6 +388,7 @@ def map_data():
         meta_data_dict = {
             "num_events": count(filepath) - 1,
             "sep": seperator,
+            "index": index,
             "datetime_format": datetime_format,
             "preview": {
                 "parsed": [
@@ -446,6 +468,7 @@ def generate_event_dict(nlines=None):
     filepath = request.args.get("filepath")
 
     seperator = request.args.get("sep")
+    index = request.args.get("index")
 
     df = pd.read_csv(filepath, sep=seperator)
 
@@ -456,8 +479,15 @@ def generate_event_dict(nlines=None):
 
     varmap = get_varmap(vars, varmaps, df.columns)
 
-    required_vars = [var for var in vars if var in list(varmaps.keys()) if varmaps[var]] + ["t"]
+    required_vars = [
+        var for var in vars if var in list(varmaps.keys()) if varmaps[var]
+    ] + ["t"]
     optional_vars = [var for var in vars if var not in list(varmaps.keys())]
+
+    # INDEX MANAGING
+    if index == "numerical":
+        app.logger.info("Numerical index selected, ignoring id field")
+        required_vars = [var for var in required_vars if var != "id"]
 
     app.logger.debug(
         f"\n{varmap}\nRequired: {required_vars}\nOptional: {optional_vars}"
@@ -475,29 +505,26 @@ def generate_event_dict(nlines=None):
         df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
-    elif datetime_format == "year-month-day-hour-minute-second":
-        # df["datetime"] = [
-        #     UTCDateTime(
-        #         year=int(row[varmap["year"]]),
-        #         month=int(row[varmap["month"]]),
-        #         day=int(row[varmap["day"]]),
-        #         hour=int(row[varmap["hour"]]),
-        #         minute=int(row[varmap["minute"]]),
-        #         second=int(row[varmap["second"]]),
-        #         strict=False,
-        #     ).datetime
-        #     for index, row in df[
-        # [
-        #     varmap["year"],
-        #     varmap["month"],
-        #     varmap["day"],
-        #     varmap["hour"],
-        #     varmap["minute"],
-        #     varmap["second"],
-        # ]
-        #     ].iterrows()
-        # ]
+    elif datetime_format == "date_string-time_string":
+        df["datetime"] = pd.to_datetime(
+            df[varmap["date"]].values + "T" + df[varmap["time"]].values
+        )
 
+        df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
+
+        df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+
+        varmap["dt"] = "dt"
+        varmap["year"] = "year"
+        varmap["month"] = "month"
+        varmap["day"] = "day"
+        varmap["doy"] = "doy"
+        varmap["hour"] = "hour"
+        varmap["minute"] = "minute"
+        varmap["second"] = "second"
+
+        app.logger.debug(df["datetime"][:10])
+    elif datetime_format == "year-month-day-hour-minute-second":
         df["datetime"] = pd.to_datetime(
             df[
                 [
@@ -517,7 +544,7 @@ def generate_event_dict(nlines=None):
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
         varmap["dt"] = "dt"
-        varmap["doy"] = "dt"
+        varmap["doy"] = "doy"
 
         app.logger.debug(df["datetime"][:10])
 
@@ -560,6 +587,7 @@ def generate_event_dict(nlines=None):
 
     # GENERATE BOUNDS
     app.logger.info("getting bounds...")
+    app.logger.debug(varmap)
     bounds = {
         var: (
             [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
@@ -573,14 +601,21 @@ def generate_event_dict(nlines=None):
         for var in required_vars + optional_vars
         if varmap[var]
     }
+    app.logger.debug(bounds)
+
+    # INDEX MANAGING
+    app.logger.info(f"index: {index}")
+    if index == "numerical":
+        app.logger.info("Numerical index selected, ignoring id field")
+        varmap["id"] = "id"
 
     # CONVERT TO JSON
     app.logger.info("converting to json...")
     event_list = []
-    for index, row in df.iterrows():
+    for row_index, row in df.iterrows():
         if not isnan(row[varmap["mag"]]):
             event_row = {
-                "id": row[varmap["id"]],
+                "id": row[varmap["id"]] if not index == "numerical" else row_index,
                 "t": row["t"],
                 "dt": row["dt"],
                 "mag": row[varmap["mag"]],

@@ -78,6 +78,7 @@ export type ProjectActions = {
     setLoadable: (id: string, value: boolean) => void;
   };
   metadataActions: {
+    setIndex: (id: string, value: "from_file" | "numerical") => void;
     setSep: (id: string, value: string) => void;
     setDatetimeFormat: (id: string, value: string) => void;
     clearAllVariableMaps: (id: string) => void;
@@ -202,6 +203,10 @@ export const createProjectStore = (
           setSep: (id, value) =>
             set((state) => {
               state.dataSources.byID[id].metadata.sep = value;
+            }),
+          setIndex: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata.index = value;
             }),
           setDatetimeFormat: (id, value) =>
             set((state) => {

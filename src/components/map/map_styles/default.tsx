@@ -147,6 +147,10 @@ export const USDEMStyle: MapStyle = {
       tileSize: 256,
       attribution: "USGS",
     },
+    // coastline: {
+    //   type: "geojson",
+    //   data: geoCountriesCoastline,
+    // },
     // Hillshade%20Gray
     // "Provides a hillshaded surface generated dynamically using the hillshade server-side function on the elevation layer with a solar azimuth of 315 degrees and solar altitude of 45 degrees."
     // Aspect%20Map
@@ -198,6 +202,17 @@ export const USDEMStyle: MapStyle = {
         "raster-opacity": 0.5,
       },
     },
+    // {
+    //   id: "coastline",
+    //   type: "line",
+    //   source: "coastline",
+    //   paint: {
+    //     "line-color": "#000",
+    //     "line-opacity": 0.87,
+    //     // "line-dasharray": [2, 4],
+    //     "line-width": 0.8,
+    //   },
+    // },
     // {
     //   id: "ocean",
     //   type: "fill",
