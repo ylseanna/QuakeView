@@ -11,17 +11,19 @@ import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useIsFetching } from "@tanstack/react-query";
+import LinearProgress from "@mui/material/LinearProgress";
+import { useData } from "@/components/datasource/hooks";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
-  const { data, allIDs } = useDataStore((state) => state);
+  const { data } = useData();
 
   const calculateExtent = () => {
     let extent: Extent | null = null;
     if (dataSources != null) {
-      allIDs.map((id) => {
-        extent = data[id].extent;
+      data.allIDs.map((id) => {
+        extent = data.byID[id].extent;
       });
     }
     return extent;
@@ -43,15 +45,17 @@ export default function Page() {
     e.preventDefault();
   });
 
+  const isFetching = useIsFetching()
+
   return (
     <>
-      {/* {dataLoading && <LinearProgress />} */}
+      {isFetching > 0 && <LinearProgress sx={{zIndex: 1000}} />}
       <Actions />
       <>
         <ThreeDDeckGLView
           extent={calculateExtent()}
           positionOffset={positionOffset}
-        />
+        ></ThreeDDeckGLView>
       </>
     </>
   );

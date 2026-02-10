@@ -100,6 +100,7 @@
     "@mui/x-data-grid": "^7.29.12",
     "@next/bundle-analyzer": "^15.5.9",
     "@react-hooks-library/core": "^0.6.2",
+    "@tanstack/react-query": "^5.90.20",
     "@turf/mask": "^7.3.2",
     "@types/d3": "^7.4.3",
     "@types/web": "^0.0.228",

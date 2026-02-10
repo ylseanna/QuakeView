@@ -2,7 +2,6 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
 
-import { useDataStore } from "@/providers/data-store-provider";
 import { DataSource } from "../../datasource/types";
 import { colormaps } from "../crameri-colormaps";
 // import { ReImg } from "reimg";
@@ -15,11 +14,6 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  const bounds = useDataStore((state) =>
-    state.data[dataSource.internal_id]
-      ? state.data[dataSource.internal_id].bounds
-      : null,
-  )!;
 
   useLayoutEffect(() => {
     if (parentRef.current) {
@@ -74,11 +68,7 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
 
     const x = d3
       .scaleLinear()
-      .domain(
-        colorFormatting.linear.domain[colorFormatting.linear.variable]
-          ? colorFormatting.linear.domain[colorFormatting.linear.variable]
-          : bounds[colorFormatting.linear.variable]!,
-      )
+      .domain(colorFormatting.linear.domain[colorFormatting.linear.variable]!)
       .range([0, width - 1]);
 
     svg

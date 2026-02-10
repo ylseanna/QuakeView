@@ -17,7 +17,9 @@ import { Button, LinearProgress } from "@mui/material";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { ScatterplotLayer } from "deck.gl";
+import { DataFilterExtensionProps } from "@deck.gl/extensions";
+import { useData } from "../datasource/hooks";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
 // import { TerrainLayer } from "@deck.gl/geo-layers";
@@ -55,7 +57,8 @@ export default function ThreeDDeckGLView({
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
   const dataSources = useProjectStore((state) => state.dataSources);
-  const { data } = useDataStore((state) => state);
+
+  const { data } = useData();
 
   useEffect(() => {
     mapContainer.current = document.getElementsByTagName("main")[0];
@@ -67,12 +70,17 @@ export default function ThreeDDeckGLView({
 
   // LAYERS
   const layers = useMemo(() => {
-    const layers_to_set = dataSources.allIDs.map((id) => {
-      if (data[id]) {
+    let layers_to_set = [] as ScatterplotLayer<
+      EarthQuake,
+      DataFilterExtensionProps
+    >[];
+
+    if (data) {
+      layers_to_set = data.allIDs.map((id: string) => {
         const layer = generateDataSourceMapLayers(
           "3D",
           dataSources.byID[id],
-          data[id].data,
+          data.byID[id].data,
           sessionInterface,
           GPUfiltering,
           positionOffset,
@@ -84,14 +92,12 @@ export default function ThreeDDeckGLView({
         };
 
         return layer;
-      }
-    });
-
-    console.log(layers_to_set);
+      });
+    }
 
     return layers_to_set;
   }, [
-    dataSources.allIDs,
+    // dataSources.allIDs,
     dataSources.byID,
     data,
     sessionInterface,
@@ -119,7 +125,6 @@ export default function ThreeDDeckGLView({
 
   const onMapLoad = () => {
     setIsLoading(false);
-    console.log("loaded");
   };
 
   const deckRef = useRef(null);

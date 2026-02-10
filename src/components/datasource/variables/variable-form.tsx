@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import {
@@ -27,6 +28,12 @@ import { Clear } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { updatedMetaDataUrl } from "../data-source-query";
 import { Nuke } from "mdi-material-ui";
+import {
+  datePlusTimeStringRequiredVars,
+  dateTimeAsNumbersRequiredVars,
+  dateTimeStringRequiredVars,
+} from "../constants";
+import { useData } from "../hooks";
 
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
@@ -55,83 +62,31 @@ function VariableEditingRow({
 
   useEffect(() => {
     let mappedVarCheck = false;
-    if (dataSource.metadata.datetime_format == "parseable_datetime_string") {
-      mappedVarCheck = dataSource.metadata.variables.required_vars
-        .map((requiredVar) => {
-          const description = dataSource.metadata.variables.by_id[requiredVar];
 
-          console.log(requiredVar);
+    const requiredVars =
+      dataSource.metadata.datetime_format == "parseable_datetime_string"
+        ? dateTimeStringRequiredVars
+        : dataSource.metadata.datetime_format == "date_string-time_string"
+          ? datePlusTimeStringRequiredVars
+          : dateTimeAsNumbersRequiredVars;
 
-          return !(dataSource.metadata.index == "from_file" ? ["t"] : ["id", "t"]).includes(
-            requiredVar,
-          )
-            ? description.mapped_var
-                .map((mapped_var) =>
-                  dataSource.metadata.catalog_headers.includes(mapped_var),
-                )
-                .some((check) => check)
-            : true;
-        })
-        .every((check) => check);
-    } else if (
-      dataSource.metadata.datetime_format == "year-month-day-hour-minute-second"
-    ) {
-      mappedVarCheck = dataSource.metadata.variables.required_vars
-        .concat(dataSource.metadata.variables.datetime_vars)
-        .map((requiredVar) => {
-          const description = dataSource.metadata.variables.by_id[requiredVar];
+    mappedVarCheck = requiredVars
+      .map((requiredVar) => {
+        const description = dataSource.metadata.variables.by_id[requiredVar];
 
-          console.log(requiredVar);
+        console.log(requiredVar);
 
-          return !(
-            dataSource.metadata.index == "from_file"
-              ? ["t", "dt", "doy"]
-              : ["id", "t", "dt", "doy"]
-          ).includes(requiredVar)
-            ? description.mapped_var
-                .map((mapped_var) =>
-                  dataSource.metadata.catalog_headers.includes(mapped_var),
-                )
-                .some((check) => check)
-            : true;
-        })
-        .every((check) => check);
-    } else if (
-      dataSource.metadata.datetime_format == "date_string-time_string"
-    ) {
-      mappedVarCheck = dataSource.metadata.variables.required_vars
-        .concat(["date", "time"])
-        .map((requiredVar) => {
-          const description = dataSource.metadata.variables.by_id[requiredVar];
-
-          console.log(requiredVar);
-
-          console.log(
-            !(
-              dataSource.metadata.index == "from_file" ? ["t", "dt"] : ["id", "t", "dt"]
-            ).includes(requiredVar)
-              ? description.mapped_var
-                  .map((mapped_var) =>
-                    dataSource.metadata.catalog_headers.includes(mapped_var),
-                  )
-                  .some((check) => check)
-              : true,
-          );
-
-          return !(
-            dataSource.metadata.index == "from_file" ? ["t", "dt"] : ["id", "t", "dt"]
-          ).includes(requiredVar)
-            ? description.mapped_var
-                .map((mapped_var) =>
-                  dataSource.metadata.catalog_headers.includes(mapped_var),
-                )
-                .some((check) => check)
-            : true;
-        })
-        .every((check) => check);
-    }
-
-    console.log(mappedVarCheck);
+        return !(
+          dataSource.metadata.index == "from_file" ? [] : ["id"]
+        ).includes(requiredVar)
+          ? description.mapped_var
+              .map((mapped_var) =>
+                dataSource.metadata.catalog_headers.includes(mapped_var),
+              )
+              .some((check) => check)
+          : true;
+      })
+      .every((check) => check);
 
     if (mappedVarCheck != dataSource.interface.loadable) {
       setLoadable(dataSource.internal_id, mappedVarCheck);
@@ -291,6 +246,45 @@ export default function DataSourceVariableForm({
     (state) => state.metadataActions.clearAllVariableMaps,
   );
 
+  const setColorFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setColorFormatting,
+  );
+
+  const { data } = useData();
+
+  const { dataSources } = useProjectStore((state) => state);
+
+  useEffect(() => {
+    if (data) {
+      data.allIDs.forEach((dataSourceID) => {
+        const boundsFromData = {} as {
+          [variable: string]: [number, number] | null;
+        };
+
+        dataSource.metadata.variables.required_vars
+          .concat(dataSource.metadata.variables.datetime_vars)
+          .concat(dataSource.metadata.variables.added_vars)
+          .concat(["t"])
+          .forEach((variable) => {
+            return (boundsFromData[variable] = dataSource.formatting.color
+              .linear.domain[dataSource.formatting.color.linear.variable]
+              ? dataSource.formatting.color.linear.domain[
+                  dataSource.formatting.color.linear.variable
+                ]
+              : data.byID[dataSourceID].bounds[variable]);
+          });
+
+        setColorFormatting(dataSourceID, {
+          ...dataSources.byID[dataSourceID].formatting.color,
+          linear: {
+            ...dataSources.byID[dataSourceID].formatting.color.linear,
+            domain: boundsFromData,
+          },
+        });
+      });
+    }
+  }, [data.allIDs]);
+
   return (
     <>
       <Grid container spacing={1} direction="column">
@@ -380,7 +374,8 @@ export default function DataSourceVariableForm({
                     </span>
                   </Divider>
                 ) : (
-                  index == (dataSource.metadata.index == "from_file" ? 7 : 6) && (
+                  index ==
+                    (dataSource.metadata.index == "from_file" ? 7 : 6) && (
                     <Divider sx={{ mb: 1 }} />
                   )
                 )}
@@ -420,7 +415,8 @@ export default function DataSourceVariableForm({
                       </span>
                     </Divider>
                   ) : (
-                    index == (dataSource.metadata.index == "from_file" ? 3 : 2) && (
+                    index ==
+                      (dataSource.metadata.index == "from_file" ? 3 : 2) && (
                       <Divider sx={{ my: 1, mb: 2 }} />
                     )
                   )}
@@ -435,9 +431,11 @@ export default function DataSourceVariableForm({
               ))
             : dataSource.metadata.variables.required_vars.map(
                 (variable: string) =>
-                  !(dataSource.metadata.index == "from_file" ? ["t"] : ["t", "id"]).includes(
-                    variable,
-                  ) && (
+                  !(
+                    dataSource.metadata.index == "from_file"
+                      ? ["t"]
+                      : ["t", "id"]
+                  ).includes(variable) && (
                     <VariableEditingRow
                       key={"EditingElement-" + variable}
                       dataDescription={

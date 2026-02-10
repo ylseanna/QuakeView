@@ -7,7 +7,9 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
-import { useDataStore } from "@/providers/data-store-provider";
+// import { fetchData } from "../datasource/load-data";
+// import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
 import { EarthQuake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
@@ -33,7 +35,7 @@ export default function StemPlot() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
+  const { data } = useData()
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -198,7 +200,7 @@ export default function StemPlot() {
       );
 
     // setIsLoading(true);
-  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
+  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top]);
 
   // // set bounds
   // useEffect(() => {
@@ -295,99 +297,91 @@ export default function StemPlot() {
   }, [bounds, dimensions]);
 
   const layers = useMemo(() => {
-    if (scaleX.current && scaleY.current) {
-      const minX = Math.min(
-        ...loadedIDs.map(
-          (id) => data[id]!.bounds["t"]![0],
-        ),
-      );
-      const maxX = Math.max(
-        ...loadedIDs.map(
-          (id) => data[id]!.bounds["t"]![1],
-        ),
-      );
+    if (data) {
+      if (scaleX.current && scaleY.current) {
+        const minX = Math.min(
+          ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![0]),
+        );
+        const maxX = Math.max(
+          ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![1]),
+        );
 
-      const minY = Math.min(
-        ...loadedIDs.map(
-          (id) =>
-            data[id]!.bounds["mag"]![0],
-        ),
-      );
-      const maxY = Math.max(
-        ...loadedIDs.map(
-          (id) =>
-           data[id]!.bounds["mag"]![1],
-        ),
-      );
+        const minY = Math.min(
+          ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![0]),
+        );
+        const maxY = Math.max(
+          ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![1]),
+        );
 
-      viewPortScaleX.current = d3
-        .scaleUtc()
-        .domain([minX, maxX] as Iterable<d3.NumberValue>)
-        .range([margin.left, graphWidth + margin.left]);
+        viewPortScaleX.current = d3
+          .scaleUtc()
+          .domain([minX, maxX] as Iterable<d3.NumberValue>)
+          .range([margin.left, graphWidth + margin.left]);
 
-      viewPortScaleY.current = d3
-        .scaleLinear()
-        .domain([minY, maxY] as Iterable<d3.NumberValue>)
-        .range([graphHeight + margin.top, margin.top]);
+        viewPortScaleY.current = d3
+          .scaleLinear()
+          .domain([minY, maxY] as Iterable<d3.NumberValue>)
+          .range([graphHeight + margin.top, margin.top]);
 
-      // const ViewPortPadding = 36;
+        // const ViewPortPadding = 36;
 
-      const viewPortXbounds = [
-        viewPortScaleX.current!(new Date(minX)), // - ViewPortPadding,
-        viewPortScaleX.current!(new Date(maxX)), // ViewPortPadding,
-      ] as [number, number];
+        const viewPortXbounds = [
+          viewPortScaleX.current!(new Date(minX)), // - ViewPortPadding,
+          viewPortScaleX.current!(new Date(maxX)), // ViewPortPadding,
+        ] as [number, number];
 
-      const viewPortYbounds = [
-        viewPortScaleY.current!(minY), //- ViewPortPadding,
-        viewPortScaleY.current!(maxY), // + 0.25 * ViewPortPadding,
-      ] as [number, number];
+        const viewPortYbounds = [
+          viewPortScaleY.current!(minY), //- ViewPortPadding,
+          viewPortScaleY.current!(maxY), // + 0.25 * ViewPortPadding,
+        ] as [number, number];
 
-      setViewPortBounds({
-        pixel: {
-          x: viewPortXbounds,
-          y: viewPortYbounds,
-        },
-        coord: {
-          x: [
-            viewPortScaleX.current!.invert(viewPortXbounds[0]),
-            viewPortScaleX.current!.invert(viewPortXbounds[1]),
-          ],
-          y: [
-            viewPortScaleY.current!.invert(viewPortYbounds[0]),
-            viewPortScaleY.current!.invert(viewPortYbounds[1]),
-          ],
-        },
-      });
+        setViewPortBounds({
+          pixel: {
+            x: viewPortXbounds,
+            y: viewPortYbounds,
+          },
+          coord: {
+            x: [
+              viewPortScaleX.current!.invert(viewPortXbounds[0]),
+              viewPortScaleX.current!.invert(viewPortXbounds[1]),
+            ],
+            y: [
+              viewPortScaleY.current!.invert(viewPortYbounds[0]),
+              viewPortScaleY.current!.invert(viewPortYbounds[1]),
+            ],
+          },
+        });
 
-      console.log(viewPortBounds);
+        console.log(viewPortBounds);
 
-      const layers_to_set = Object.keys(data).map((id) => {
-        if (data[id]) {
-          const layer = StemPlotLayers(
-            dataSources.byID[id],
-            data[id].data,
-            sessionInterface,
-            viewPortScaleX.current!,
-            viewPortScaleY.current!,
-            viewPortScaleY.current!(minY),
-          );
+        const layers_to_set = data.allIDs.map((id) => {
+          if (data.byID[id]) {
+            const layer = StemPlotLayers(
+              dataSources.byID[id],
+              data.byID[id].data,
+              sessionInterface,
+              viewPortScaleX.current!,
+              viewPortScaleY.current!,
+              viewPortScaleY.current!(minY),
+            );
 
-          layer[1].onHover = (info: PickingInfo<EarthQuake>) => {
-            setHoverInfo(info);
-            return true;
-          };
+            layer[1].onHover = (info: PickingInfo<EarthQuake>) => {
+              setHoverInfo(info);
+              return true;
+            };
 
-          console.log(layer);
+            console.log(layer);
 
-          return layer;
-        }
-      });
-      return layers_to_set;
+            return layer;
+          }
+        });
+        return layers_to_set;
+      }
     }
   }, [
     dimensions,
     dataSources.byID,
-    data,
+    data.allIDs,
     scaleX,
     scaleY,
     sessionInterface,
@@ -451,13 +445,18 @@ export default function StemPlot() {
                       Math.pow(2, (viewState.zoom! as [number, number])[0]) <=
                   viewPortBounds.pixel.x[0]
                     ? viewPortBounds.pixel.x[0] +
-                      (graphWidth * 0.5) / Math.pow(2, (viewState.zoom! as [number, number])[0])
+                      (graphWidth * 0.5) /
+                        Math.pow(2, (viewState.zoom! as [number, number])[0])
                     : viewState.target![0] +
                           (graphWidth * 0.5) /
-                            Math.pow(2, (viewState.zoom! as [number, number])[0]) >=
+                            Math.pow(
+                              2,
+                              (viewState.zoom! as [number, number])[0],
+                            ) >=
                         viewPortBounds.pixel.x[1]
                       ? viewPortBounds.pixel.x[1] -
-                        (graphWidth * 0.5) / Math.pow(2, (viewState.zoom! as [number, number])[0])
+                        (graphWidth * 0.5) /
+                          Math.pow(2, (viewState.zoom! as [number, number])[0])
                       : viewState.target![0],
                   viewState.target![1] - graphHeight * 0.5 <=
                   viewPortBounds.pixel.y[0]

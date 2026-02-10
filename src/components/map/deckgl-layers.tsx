@@ -11,7 +11,9 @@ import { EarthQuake } from "@/components/datasource/types";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
+import { ScatterplotLayer } from "deck.gl";
+import { DataFilterExtensionProps } from "@deck.gl/extensions";
 
 function DeckGLOverlay(props: DeckProps) {
   const overlay = useControl<MapboxOverlay>(() => new MapboxOverlay(props));
@@ -24,7 +26,7 @@ export default function DeckGLlayers() {
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
 
   const dataSources = useProjectStore((state) => state.dataSources);
-  const { data } = useDataStore((state) => state);
+  const { data } = useData();
 
   // TOOLTIP
 
@@ -32,12 +34,15 @@ export default function DeckGLlayers() {
 
   // LAYERS
   const layers = useMemo(() => {
-    const layers_to_set = dataSources.allIDs.map((id) => {
-      if (data[id]) {
+    let layers_to_set = [] as ScatterplotLayer<EarthQuake, DataFilterExtensionProps>[];
+
+    if (data) {
+      layers_to_set = data.allIDs.map((id: string) => {
+        console.log(data.byID[id]);
         const layer = generateDataSourceMapLayers(
           "1D",
           dataSources.byID[id],
-          data[id].data,
+          data.byID[id].data,
           sessionInterface,
           GPUfiltering,
         );
@@ -47,16 +52,15 @@ export default function DeckGLlayers() {
           return true;
         };
 
-        return layer
-      }
-    });
+        return layer;
+      });
+    }
 
     console.log(layers_to_set);
 
-    return layers_to_set
-
+    return layers_to_set;
   }, [
-    dataSources.allIDs,
+    // dataSources.allIDs,
     dataSources.byID,
     data,
     sessionInterface,
@@ -65,11 +69,8 @@ export default function DeckGLlayers() {
 
   return (
     <>
-      {" "}
       <DeckGLOverlay layers={layers} {...{ interleaved: true }} />
-      {hoverInfo && (
-        <MapToolTip pickingInfo={hoverInfo}/>
-      )}{" "}
+      {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
     </>
   );
 }

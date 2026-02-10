@@ -13,16 +13,9 @@ import {
   useTheme,
 } from "@mui/material";
 
-// import {
-//   DataSource,
-//   DataSourceDataDescription,
-//   DataSourceFormatting,
-// } from "@/components/datasource/types";
 import { useTranslations } from "next-intl";
-// import { Dispatch, SetStateAction, useCallback } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
 import { useEffect } from "react";
 import { DataSource } from "../types";
 import { updatedMetaDataUrl } from "../data-source-query";
@@ -45,7 +38,6 @@ export default function DataTab({ id }: DataTabProps) {
   const removeDataSource = useProjectStore(
     (state) => state.dataSourceActions.removeDataSource,
   );
-  const { removeData } = useDataStore((state) => state);
 
   const setMetadata = useProjectStore(
     (state) => state.dataSourceActions.setMetadata,
@@ -97,7 +89,7 @@ export default function DataTab({ id }: DataTabProps) {
               size="small"
               onClick={() => {
                 removeDataSource(dataSource.internal_id);
-                removeData(dataSource.internal_id);
+                // removeData(dataSource.internal_id);
               }}
             >
               <Close />

@@ -2,7 +2,7 @@ import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
 import { DataSource, EarthQuake } from "../datasource/types";
 
 export default function HistogramSlider({
@@ -26,7 +26,7 @@ export default function HistogramSlider({
   onChange: SliderOwnProps<number | number[]>["onChange"];
   onChangeCommitted: SliderOwnProps<number | number[]>["onChangeCommitted"];
 }) {
-  const { data } = useDataStore((state) => state);
+  const { data } = useData();
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -70,9 +70,9 @@ export default function HistogramSlider({
     //   if (!data) {
     //     console.log("no data");
     //   } else {
-    if (data[dataSource.internal_id]) {
+    if (data.byID[dataSource.internal_id]) {
       const bins = d3.bin().thresholds(50).domain([min!, max!])(
-        (data[dataSource.internal_id].data as EarthQuake[]).map(
+        (data.byID[dataSource.internal_id].data as EarthQuake[]).map(
           (d) => d[variable]
         ) as ArrayLike<number>
       );

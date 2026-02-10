@@ -2,14 +2,14 @@ import { Pause, PlayArrow } from "@mui/icons-material";
 // import strftime from "strftime";
 import useAnimationFrame from "use-animation-frame";
 import { GradientHorizontal, Speedometer } from "mdi-material-ui";
-import { Box, Checkbox, Divider, Grow, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, Skeleton, Slider, styled, Switch, Typography, useTheme } from "@mui/material";
+import { Box, Checkbox, Divider, Grow, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, Skeleton, Slider, styled, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataSource, EarthQuake } from "../datasource/types";
@@ -34,16 +34,16 @@ export default function TimelineSlider() {
   // animation
 
   const tapered = useProjectStore(
-    (state) => state.sessionInterface.animation.tapered
+    (state) => state.sessionInterface.animation.tapered,
   );
   const setTapered = useProjectStore(
-    (state) => state.interfaceActions.animation.setTapered
+    (state) => state.interfaceActions.animation.setTapered,
   );
   const animationSpeed = useProjectStore(
-    (state) => state.sessionInterface.animation.speed
+    (state) => state.sessionInterface.animation.speed,
   );
   const setAnimationSpeed = useProjectStore(
-    (state) => state.interfaceActions.animation.setSpeed
+    (state) => state.interfaceActions.animation.setSpeed,
   );
 
   // filtering
@@ -51,13 +51,13 @@ export default function TimelineSlider() {
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
 
   const setTimeFiltering = useProjectStore(
-    (state) => state.GPUfilteringActions.setTimeFiltering
+    (state) => state.GPUfilteringActions.setTimeFiltering,
   );
 
   // DATA
 
   const [isLoading, setIsLoading] = useState(true);
-  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
+  const { data } = useData();
   const dataSources = useProjectStore((state) => state.dataSources);
 
   // RESPONSIVE SIZING AND LOADING
@@ -86,29 +86,17 @@ export default function TimelineSlider() {
   // DATA BOUNDS
 
   const t_min = Math.min(
-    ...loadedIDs.map(
-      (id) =>
-        data[id]!.bounds["t"]![0]
-    )
+    ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![0]),
   );
   const t_max = Math.max(
-    ...loadedIDs.map(
-      (id) =>
-        data[id]!.bounds["t"]![1]
-    )
+    ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![1]),
   );
 
   const m_min = Math.min(
-    ...loadedIDs.map(
-      (id) =>
-        data[id]!.bounds["mag"]![0]
-    )
+    ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![0]),
   );
   const m_max = Math.max(
-    ...loadedIDs.map(
-      (id) =>
-        data[id]!.bounds["mag"]![1]
-    )
+    ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![1]),
   );
 
   const [localDomain, setLocalDomain] = useState<[number, number]>([
@@ -183,7 +171,7 @@ export default function TimelineSlider() {
           new Date(t_max + dataMargin.x * (t_max - t_min)),
         ])
         .range([0, width - margin.right - margin.left]),
-    [t_min, dataMargin.x, t_max, width, margin.right, margin.left]
+    [t_min, dataMargin.x, t_max, width, margin.right, margin.left],
   );
   const yScale = useMemo(
     () =>
@@ -194,7 +182,7 @@ export default function TimelineSlider() {
           m_max + dataMargin.y * (m_max - m_min),
         ] as Iterable<d3.NumberValue>)
         .range([height - margin.top - margin.bottom, 0]),
-    [m_min, dataMargin.y, m_max, height, margin.top, margin.bottom]
+    [m_min, dataMargin.y, m_max, height, margin.top, margin.bottom],
   ).nice();
 
   // copy for zoom
@@ -229,7 +217,7 @@ export default function TimelineSlider() {
         setTimeFiltering(newValue as [number, number]);
       }
     },
-    [isPlaying, setTimeFiltering, t_max, t_min, xScale]
+    [isPlaying, setTimeFiltering, t_max, t_min, xScale],
   );
 
   const onBrushStart = useCallback(
@@ -241,7 +229,7 @@ export default function TimelineSlider() {
         setIsPlaying("paused");
       }
     },
-    [isPlaying]
+    [isPlaying],
   );
 
   // Ensure that the brush effect is updated everytime a dataSource changes so it doesn't override formatting
@@ -266,7 +254,7 @@ export default function TimelineSlider() {
           ]);
       }
     },
-    [t_max, t_min, xScale]
+    [t_max, t_min, xScale],
   );
 
   // initial move
@@ -290,7 +278,7 @@ export default function TimelineSlider() {
 
       const clr = ColorMapping(
         d,
-        dataSources.byID[dataSources.allIDs[0]].formatting.color
+        dataSources.byID[dataSources.allIDs[0]].formatting.color,
       )!;
       context.fillStyle = `rgb(${clr[0]},${clr[1]},${clr[2]})`;
       const px = xScale(new Date(d.t));
@@ -300,12 +288,12 @@ export default function TimelineSlider() {
       context.fill();
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-    [xScale, yScale]
+    [xScale, yScale],
   );
 
   // draw points
   const draw = useCallback(() => {
-    setIsLoading(true)
+    setIsLoading(true);
 
     console.log("draw called");
 
@@ -314,18 +302,22 @@ export default function TimelineSlider() {
     if (context) {
       // context.clearRect(0, 0, width, height);
 
-      dataSources.allIDs.forEach((id) => {
-        if (data[id]) {
-          (data[id].data as EarthQuake[]).forEach((d) => {
+      data.allIDs.forEach((id) => {
+        if (data.byID[id]) {
+          (data.byID[id].data as EarthQuake[]).forEach((d) => {
             drawPoint(context, d);
           });
         }
       });
     }
 
-    setIsLoading(false)
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data, dataSources.byID[dataSources.allIDs[0]].formatting.color, drawPoint]);
+    setIsLoading(false);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    data,
+    dataSources.byID[dataSources.allIDs[0]].formatting.color,
+    drawPoint,
+  ]);
 
   // Define and generate plots
   const contextRef = useRef<CanvasRenderingContext2D>(null);
@@ -365,7 +357,7 @@ export default function TimelineSlider() {
       .append("g")
       .attr("transform", `translate(0, ${height - margin.top - margin.bottom})`)
       .call(
-        d3.axisBottom(xScale)
+        d3.axisBottom(xScale),
         // .tickFormat(() => "")
       );
 
@@ -373,7 +365,7 @@ export default function TimelineSlider() {
 
     //ADD Y-AXIS
     const yAxes = g.append("g").attr("transform", `translate(0, 0)`).call(
-      d3.axisLeft(yScale)
+      d3.axisLeft(yScale),
       // .tickFormat(() => "")
     );
     yAxes.selectAll("line").attr("stroke-opacity", 0.6);

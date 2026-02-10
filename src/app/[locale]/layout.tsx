@@ -77,6 +77,7 @@ export default async function LocaleLayout({
     notFound();
   }
 
+
   const messages = await getMessages();
 
   return (
@@ -85,9 +86,9 @@ export default async function LocaleLayout({
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ThemeProvider {...{ theme: theme, forceThemeRerender: true }}>
-              <ProjectStoreProvider>
-                <DataStoreProvider>{children}</DataStoreProvider>
-              </ProjectStoreProvider>
+                <ProjectStoreProvider>
+                  <DataStoreProvider>{children}</DataStoreProvider>
+                </ProjectStoreProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>

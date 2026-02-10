@@ -27,6 +27,7 @@ import { AttributionControl } from "react-map-gl";
 import Actions from "../../../../components/datasource/actions";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
+import { useIsFetching } from "@tanstack/react-query";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
@@ -51,9 +52,11 @@ export default function Page() {
     }
   }
 
+  const isFetching = useIsFetching()
+
   return (
     <>
-      {IsLoading && <LinearProgress />}
+      {(IsLoading || isFetching) && <LinearProgress />}
       <>
         <Paper
           variant="outlined"

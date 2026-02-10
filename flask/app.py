@@ -104,11 +104,11 @@ def map_data():
     if mode == "metadata_query":
         argument_dict = request.args.to_dict()
 
-        print("METADATA REQUEST", argument_dict)
+        app.logger.info("--- Metadata request ---")
 
         # IS INITIAL REQUEST?
         if "vars" in argument_dict:
-            # vars = json.loads(request.args.get("vars"))
+            vars = json.loads(request.args.get("vars"))
             varmaps = json.loads(request.args.get("var_maps"))
             initial_request = False
         else:
@@ -189,7 +189,7 @@ def map_data():
                 "variable": "t",
                 "mapped_var": None,
                 "alias": "Time",
-                "unit": "",
+                "unit": "ISO",
                 "data_type": "dt_timestamp",
                 "bounds": None,
                 "bins": None,
@@ -413,7 +413,17 @@ def map_data():
                 "required_vars": list(required_data_descr.keys()),
                 "datetime_vars": list(datetime_variable_descr.keys()),
                 "optional_vars": list(optional_data_descr.keys()),
-                "added_vars": [],
+                "added_vars": (
+                    [
+                        var
+                        for var in vars
+                        if var
+                        not in list(required_data_descr.keys())
+                        + list(datetime_variable_descr.keys())
+                    ]
+                    if not initial_request
+                    else []
+                ),
             },
         }
 
@@ -435,7 +445,7 @@ def map_data():
     if mode == "data_query" or mode is None:
         argument_dict = request.args.to_dict()
 
-        print("DATA REQUEST\n", argument_dict)
+        app.logger.info("--- Data request ---")
 
         return Response(
             json.dumps(generate_event_dict()),

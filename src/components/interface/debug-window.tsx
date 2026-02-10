@@ -2,11 +2,11 @@
 
 import { Box, Paper, Typography } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
 import { JSONTree } from "react-json-tree";
 import { ScrollBarStyling } from "../layout/scrollbar-styling";
 import { useDraggable } from "@dnd-kit/core";
 import { CSS } from "@dnd-kit/utilities";
+import { useData } from "../datasource/hooks";
 
 export default function DebugWindow() {
   const { sessionInterface, GPUfiltering, dataSources } = useProjectStore(
@@ -17,9 +17,7 @@ export default function DebugWindow() {
     id: "debug-window",
   });
 
-  const { data } = useDataStore((state) => state);
-
-  const { allIDs } = useDataStore((state) => state);
+  const { data } = useData()
 
   const theme = {
     scheme: "Ocean",
@@ -84,20 +82,20 @@ export default function DebugWindow() {
       <JSONTree data={GPUfiltering} theme={theme} hideRoot />
       <Box display="flex" flexDirection={"column"}>
         <span>Data loaded:</span>
-        {allIDs.map((key) => {
+        {data.allIDs.map((key) => {
           console.log(key);
-          return data[key] ? (
+          return data.byID[key] ? (
             <div key={key}>
               <span style={{ color: "#bf616a" }}>{key}</span>{" "}
               <span style={{ color: "#a3be8c" }}>
-                [{data[key].data.length} items]
+                [{data.byID[key].data.length} items]
               </span>
               <Box sx={{ ml: 2, mt: -1 }}>
                 <JSONTree
                   data={{
-                    bounds: data[key].bounds,
-                    extent: data[key].extent,
-                    filters: data[key].filters,
+                    bounds: data.byID[key].bounds,
+                    extent: data.byID[key].extent,
+                    filters: data.byID[key].filters,
                   }}
                   theme={theme}
                   hideRoot

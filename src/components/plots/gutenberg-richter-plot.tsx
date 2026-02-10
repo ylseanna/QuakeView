@@ -3,13 +3,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
 import { EarthQuake } from "../datasource/types";
 
 export default function GutenbergRichterPlot() {
   const { dataSources } = useProjectStore((state) => state);
 
-  const { data } = useDataStore((state) => state);
+  const { data } = useData();
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -45,8 +45,8 @@ export default function GutenbergRichterPlot() {
     for (let i = 0; i < dataSources.allIDs.length; i++) {
       const dataSourceID = dataSources.allIDs[i];
 
-      if (data[dataSourceID]) {
-        const mags = (data[dataSourceID].data as EarthQuake[])
+      if (data.byID[dataSourceID]) {
+        const mags = (data.byID[dataSourceID].data as EarthQuake[])
           .map((d) => d["mag"])
           .toSorted((a, b) => a - b)
           .reverse() as number[];
@@ -111,7 +111,8 @@ export default function GutenbergRichterPlot() {
         overallYbounds[0]!,
         overallYbounds[1]! * 1.1,
       ] as Iterable<d3.NumberValue>)
-      .range([height - margin.bottom, margin.top]).nice();
+      .range([height - margin.bottom, margin.top])
+      .nice();
 
     // x axes
     svg
@@ -135,7 +136,12 @@ export default function GutenbergRichterPlot() {
       .append("g")
       .attr("transform", `translate(${margin.left}, 0)`)
       .style("font-size", ".9rem")
-      .call(d3.axisLeft(y).ticks(3).tickFormat((d) => `${Math.log10(d as number)}`));
+      .call(
+        d3
+          .axisLeft(y)
+          .ticks(3)
+          .tickFormat((d) => `${Math.log10(d as number)}`),
+      );
 
     // y axes label
     svg
@@ -218,7 +224,7 @@ export default function GutenbergRichterPlot() {
         .attr("cx", (d) => x(d))
         .attr("cy", (d, i) => y(i + 1))
         .attr("r", 1.5)
-        .style("fill", dataSource.formatting.color.single);
+        .style("fill", dataSource.formatting.color.single as unknown as string);
 
       setIsLoading(false);
     }

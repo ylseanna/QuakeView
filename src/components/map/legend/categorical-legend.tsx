@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 
 import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "@/components/datasource/hooks";
 import { DataSource, DataSourceDataDescription } from "../../datasource/types";
 
 interface LegendElementProps {
@@ -19,7 +19,9 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
 
   console.log(dataSource.formatting.color.categorical.variable);
 
-  const data = useDataStore((state) => state.data[dataSource.internal_id]);
+  const { data: allData } = useData()
+
+  const data = allData.byID[dataSource.internal_id]
 
   const [categories, setCategories] = useState<
     {

@@ -3,13 +3,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useDataStore } from "@/providers/data-store-provider";
+import { useData } from "../datasource/hooks";
 import { EarthQuake } from "../datasource/types";
 
 export default function MagnitudeDistributionPlot() {
   const { dataSources } = useProjectStore((state) => state);
 
-  const { data: data, allIDs: loadedIDs } = useDataStore((state) => state);
+  const { data } = useData();
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
@@ -42,14 +42,14 @@ export default function MagnitudeDistributionPlot() {
 
     const dataSourcesBins= [] as DataSourceBins[];
 
-    loadedIDs.map((id) => {
+    data.allIDs.map((id) => {
 
         const dataSource = dataSources.byID[id];
 
-        const xbounds = data[id].bounds["mag"]!;
+        const xbounds = data.byID[id].bounds["mag"]!;
 
         const bins = d3.bin().thresholds(50).domain([xbounds[0], xbounds[1]])(
-          (data[id].data as EarthQuake[]).map(
+          (data.byID[id].data as EarthQuake[]).map(
             (d) => d["mag"],
           ) as ArrayLike<number>,
         );
@@ -61,7 +61,7 @@ export default function MagnitudeDistributionPlot() {
 
         dataSourcesBins.push({
           id: id,
-          color: dataSource.formatting.color.single,
+          color: dataSource.formatting.color.single as unknown as string,
           bins: bins,
           xbounds: xbounds,
           ybounds: ybounds,
@@ -69,7 +69,7 @@ export default function MagnitudeDistributionPlot() {
     })
 
     setDataSourcesBins(dataSourcesBins as DataSourceBins[]);
-  }, [dimensions, data, dataSources, width, margin.left, margin.right, margin.top, margin.bottom, height, loadedIDs]);
+  }, [dimensions, data, dataSources, width, margin.left, margin.right, margin.top, margin.bottom, height, data.allIDs]);
 
   useEffect(() => {
     setIsLoading(true);
