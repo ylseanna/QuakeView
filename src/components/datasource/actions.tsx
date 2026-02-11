@@ -21,22 +21,19 @@ import {
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import {
-  ChangeEvent,
-  RefObject,
-  useEffect,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, RefObject, useEffect, useRef, useState } from "react";
 import FormattingSidebar from "./formatting/formatting-sidebar";
 import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "./filtering/filtering-sidebar";
 import Legend from "../map/legend/legend";
 import BottomBar from "./GPU_filtering/bottom-bar";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 export default function Actions() {
   const t = useTranslations();
+
+  const { appInterface } = useAppStateStore((state) => state);
 
   const [panelPosition, setPanelPosition] = useState(0);
   const [bottombarPosition, setBottombarPosition] = useState(0);
@@ -50,19 +47,19 @@ export default function Actions() {
   const [bottombarOpen, setBottombarOpen] = useState<boolean>(false);
 
   const { sessionInterface, interfaceActions } = useProjectStore(
-    (state) => state
+    (state) => state,
   );
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
   const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting
+    (state) => state.dataSourceActions.setFormatting,
   );
   const setFiltering = useProjectStore(
-    (state) => state.dataSourceActions.setFiltering
+    (state) => state.dataSourceActions.setFiltering,
   );
   const setVisible = useProjectStore(
-    (state) => state.dataSourceActions.setVisible
+    (state) => state.dataSourceActions.setVisible,
   );
 
   // if any sidebar open, also move panel
@@ -190,111 +187,115 @@ export default function Actions() {
   return (
     <>
       <Box ref={actionsRef}>
-        <Paper
-          sx={{
-            position: "absolute",
-            display: "flex",
-            flexDirection: "column",
-            transform: `translateX(-${panelPosition}px)`,
-            right: 0,
-            m: 2,
-            p: 1,
-            borderRadius: "24px",
-            zIndex: 9000,
-            color: "var(--theme-palette-text-primary)",
-          }}
-          style={{ transition: "transform.225s" }}
-        >
-          <Tooltip title={t("Common.picking")} placement="left">
-            <Checkbox
-              checked={sessionInterface.pickable}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                interfaceActions.setPickable(event.target.checked);
-              }}
-              icon={<Search />}
-              checkedIcon={<Search />}
-            />
-          </Tooltip>
-          <Tooltip
-            title={sidebarOpen == "layers" ? "" : t("Layers.layers")}
-            placement="left"
+        {appInterface.sideBarsVisible && (
+          <Paper
+            sx={{
+              position: "absolute",
+              display: "flex",
+              flexDirection: "column",
+              transform: `translateX(-${panelPosition}px)`,
+              right: 0,
+              m: 2,
+              p: 1,
+              borderRadius: "24px",
+              zIndex: 9000,
+              color: "var(--theme-palette-text-primary)",
+            }}
+            style={{ transition: "transform.225s" }}
           >
-            <Checkbox
-              checked={layersVisible}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                setLayersVisible(event.target.checked);
-              }}
-              icon={<Layers />}
-              checkedIcon={<Layers />}
-            />
-          </Tooltip>
-          <Divider sx={{ m: 1 }} />
-          <Tooltip
-            title={
-              sidebarOpen == "formatting" ? "" : t("Formatting.formatting")
-            }
-            placement="left"
-          >
-            <IconButton onClick={toggleFormattingSidebar}>
-              <ColorLens sx={{ color: "var(--theme-palette-text-primary)" }} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip
-            title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
-            placement="left"
-          >
-            <IconButton onClick={toggleFilteringSidebar}>
-              <FilterAlt sx={{ color: "var(--theme-palette-text-primary)" }} />
-            </IconButton>
-          </Tooltip>
-          {layersVisible && (
-            <Paper
-              sx={{
-                position: "fixed",
-                right: "80px",
-                p: 2,
-              }}
+            <Tooltip title={t("Common.picking")} placement="left">
+              <Checkbox
+                checked={sessionInterface.pickable}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  interfaceActions.setPickable(event.target.checked);
+                }}
+                icon={<Search />}
+                checkedIcon={<Search />}
+              />
+            </Tooltip>
+            <Tooltip
+              title={sidebarOpen == "layers" ? "" : t("Layers.layers")}
+              placement="left"
             >
-              <Grid
-                container
-                direction={"column"}
-                alignItems="end"
-                spacing={0.5}
+              <Checkbox
+                checked={layersVisible}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  setLayersVisible(event.target.checked);
+                }}
+                icon={<Layers />}
+                checkedIcon={<Layers />}
+              />
+            </Tooltip>
+            <Divider sx={{ m: 1 }} />
+            <Tooltip
+              title={
+                sidebarOpen == "formatting" ? "" : t("Formatting.formatting")
+              }
+              placement="left"
+            >
+              <IconButton onClick={toggleFormattingSidebar}>
+                <ColorLens
+                  sx={{ color: "var(--theme-palette-text-primary)" }}
+                />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
+              placement="left"
+            >
+              <IconButton onClick={toggleFilteringSidebar}>
+                <FilterAlt
+                  sx={{ color: "var(--theme-palette-text-primary)" }}
+                />
+              </IconButton>
+            </Tooltip>
+            {layersVisible && (
+              <Paper
+                sx={{
+                  position: "fixed",
+                  right: "80px",
+                  p: 2,
+                }}
               >
-                {dataSources &&
-                  dataSources.allIDs.map((id) => (
-                    <Grid
-                      size="grow"
-                      key={id}
-                      direction="row"
-                      display={"flex"}
-                      alignItems={"center"}
-                    >
-                      <Typography
-                        noWrap
-                        sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                <Grid
+                  container
+                  direction={"column"}
+                  alignItems="end"
+                  spacing={0.5}
+                >
+                  {dataSources &&
+                    dataSources.allIDs.map((id) => (
+                      <Grid
+                        size="grow"
+                        key={id}
+                        direction="row"
+                        display={"flex"}
+                        alignItems={"center"}
                       >
-                        {dataSources.byID[id].filename}
-                      </Typography>
-                      <Checkbox
-                        checked={dataSources.byID[id].interface.visible}
-                        icon={<VisibilityOff />}
-                        checkedIcon={<Visibility />}
-                        color="default"
-                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                          setVisible(
-                            id,
-                            event.target.checked
-                          );
-                        }}
-                        size="small"
-                      />
-                    </Grid>
-                  ))}
-              </Grid>
-            </Paper>
-          )}
-        </Paper>
+                        <Typography
+                          noWrap
+                          sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                        >
+                          {dataSources.byID[id].filename}
+                        </Typography>
+                        <Checkbox
+                          checked={dataSources.byID[id].interface.visible}
+                          icon={<VisibilityOff />}
+                          checkedIcon={<Visibility />}
+                          color="default"
+                          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                            setVisible(id, event.target.checked);
+                          }}
+                          size="small"
+                        />
+                      </Grid>
+                    ))}
+                </Grid>
+              </Paper>
+            )}
+          </Paper>
+        )}
+
         <FormattingSidebar
           setFormatting={setFormatting}
           drawerOpen={sidebarOpen == "formatting"}
@@ -318,28 +319,33 @@ export default function Actions() {
 
       {dataSources.allIDs.length > 0 && (
         <>
-          <Paper
-            sx={{
-              position: "fixed",
-              display: "flex",
-              flexDirection: "column",
-              transform: `translateY(-${bottombarPosition}px)`,
-              transition: "transform.225s",
-              alignSelf: "center",
-              bottom: 0,
-              p: 1,
-              borderRadius: "24px 24px 0 0",
-              zIndex: 1200,
-              color: "var(--theme-palette-text-primary)",
-            }}
-          >
-            <Tooltip
-              title={bottombarOpen == true ? "" : t("Formatting.formatting")}
-              placement="top"
+          {appInterface.animationControlsVisible && (
+            <Paper
+              sx={{
+                position: "fixed",
+                display: "flex",
+                flexDirection: "column",
+                transform: `translateY(-${bottombarPosition}px)`,
+                transition: "transform.225s",
+                alignSelf: "center",
+                bottom: 0,
+                p: 1,
+                borderRadius: "24px 24px 0 0",
+                zIndex: 1200,
+                color: "var(--theme-palette-text-primary)",
+              }}
             >
-              <Button onClick={toggleBottomBar}>{t("Common.timeline")}</Button>
-            </Tooltip>
-          </Paper>
+              <Tooltip
+                title={bottombarOpen == true ? "" : t("Formatting.formatting")}
+                placement="top"
+              >
+                <Button onClick={toggleBottomBar}>
+                  {t("Common.timeline")}
+                </Button>
+              </Tooltip>
+            </Paper>
+          )}
+
           <BottomBar
             setFiltering={setFiltering}
             drawerOpen={bottombarOpen}

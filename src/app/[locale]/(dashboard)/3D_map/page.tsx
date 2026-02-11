@@ -11,8 +11,6 @@ import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useIsFetching } from "@tanstack/react-query";
-import LinearProgress from "@mui/material/LinearProgress";
 import { useData } from "@/components/datasource/hooks";
 
 export default function Page() {
@@ -45,11 +43,9 @@ export default function Page() {
     e.preventDefault();
   });
 
-  const isFetching = useIsFetching()
 
   return (
     <>
-      {isFetching > 0 && <LinearProgress sx={{zIndex: 1000}} />}
       <Actions />
       <>
         <ThreeDDeckGLView

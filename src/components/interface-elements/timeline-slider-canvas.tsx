@@ -9,6 +9,7 @@ import * as d3 from "d3";
 
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
 import { useData } from "../datasource/hooks";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
@@ -30,6 +31,8 @@ export default function TimelineSlider() {
   const theme = useTheme();
 
   // Access state
+
+  const { appInterface } = useAppStateStore((state) => state);
 
   // animation
 
@@ -472,7 +475,7 @@ export default function TimelineSlider() {
       /> */}
       </div>
       <Grow
-        in={GPUfiltering.t[0] != t_min || GPUfiltering.t[1] != t_max}
+        in={appInterface.animationControlsVisible && (GPUfiltering.t[0] != t_min || GPUfiltering.t[1] != t_max)}
         style={{ transformOrigin: "bottom center" }}
         unmountOnExit
         mountOnEnter

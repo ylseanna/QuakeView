@@ -25,9 +25,9 @@ import { notFound } from "next/navigation";
 import { routing } from "@/i18n/routing";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
-import { DataStoreProvider } from "@/providers/data-store-provider";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
+import { AppStateStoreProvider } from "@/providers/app-state-provider";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
@@ -77,7 +77,6 @@ export default async function LocaleLayout({
     notFound();
   }
 
-
   const messages = await getMessages();
 
   return (
@@ -86,9 +85,9 @@ export default async function LocaleLayout({
         <AppRouterCacheProvider>
           <NextIntlClientProvider locale={locale} messages={messages}>
             <ThemeProvider {...{ theme: theme, forceThemeRerender: true }}>
-                <ProjectStoreProvider>
-                  <DataStoreProvider>{children}</DataStoreProvider>
-                </ProjectStoreProvider>
+              <AppStateStoreProvider>
+                <ProjectStoreProvider>{children}</ProjectStoreProvider>
+              </AppStateStoreProvider>
             </ThemeProvider>
           </NextIntlClientProvider>
         </AppRouterCacheProvider>

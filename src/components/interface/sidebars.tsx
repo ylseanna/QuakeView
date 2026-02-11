@@ -23,9 +23,16 @@ import FormattingSidebar from "../datasource/formatting/formatting-sidebar";
 import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "../datasource/filtering/filtering-sidebar";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 export default function Sidebars() {
   const t = useTranslations();
+
+  // GLOBAL APP STATE
+
+  const { appInterface } = useAppStateStore((state) => state);
+
+  // SIDEBAR STATE
 
   const [panelPosition, setPanelPosition] = useState(0);
 
@@ -102,100 +109,107 @@ export default function Sidebars() {
   return (
     <>
       <Box ref={actionsRef}>
-        <Paper
-          sx={{
-            position: "absolute",
-            display: "flex",
-            flexDirection: "column",
-            justifyContent: "flex-end",
-            transform: `translateX(-${panelPosition}px)`,
-            right: 0,
-            mt: 2,
-            p: 1,
-            pr: 2,
-            borderRadius: "24px 0 0 24px",
-            zIndex: 9000,
-            color: "var(--theme-palette-text-primary)",
-          }}
-          style={{ transition: "transform.225s" }}
-        >
-          <Tooltip
-            title={sidebarOpen == "layers" ? "" : t("Layers.layers")}
-            placement="left"
+        {appInterface.sideBarsVisible && (
+          <Paper
+            sx={{
+              position: "absolute",
+              display: "flex",
+              flexDirection: "column",
+              justifyContent: "flex-end",
+              transform: `translateX(-${panelPosition}px)`,
+              right: 0,
+              mt: 2,
+              p: 1,
+              pr: 2,
+              borderRadius: "24px 0 0 24px",
+              zIndex: 9000,
+              color: "var(--theme-palette-text-primary)",
+            }}
+            style={{ transition: "transform.225s" }}
           >
-            <Checkbox
-              disabled
-              checked={layersVisible}
-              onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                setLayersVisible(event.target.checked);
-              }}
-              icon={<Layers />}
-              checkedIcon={<Layers />}
-            />
-          </Tooltip>
-          <Tooltip
-            title={
-              sidebarOpen == "formatting" ? "" : t("Formatting.formatting")
-            }
-            placement="left"
-          >
-            <IconButton onClick={toggleFormattingSidebar}>
-              <ColorLens sx={{ color: "var(--theme-palette-text-primary)" }} />
-            </IconButton>
-          </Tooltip>
-          <Tooltip
-            title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
-            placement="left"
-          >
-            <IconButton onClick={toggleFilteringSidebar}>
-              <FilterAlt sx={{ color: "var(--theme-palette-text-primary)" }} />
-            </IconButton>
-          </Tooltip>
-          {layersVisible && (
-            <Paper
-              sx={{
-                position: "fixed",
-                right: "80px",
-                p: 2,
-              }}
+            <Tooltip
+              title={sidebarOpen == "layers" ? "" : t("Layers.layers")}
+              placement="left"
             >
-              <Grid
-                container
-                direction={"column"}
-                alignItems="end"
-                spacing={0.5}
+              <Checkbox
+                disabled
+                checked={layersVisible}
+                onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                  setLayersVisible(event.target.checked);
+                }}
+                icon={<Layers />}
+                checkedIcon={<Layers />}
+              />
+            </Tooltip>
+            <Tooltip
+              title={
+                sidebarOpen == "formatting" ? "" : t("Formatting.formatting")
+              }
+              placement="left"
+            >
+              <IconButton onClick={toggleFormattingSidebar}>
+                <ColorLens
+                  sx={{ color: "var(--theme-palette-text-primary)" }}
+                />
+              </IconButton>
+            </Tooltip>
+            <Tooltip
+              title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
+              placement="left"
+            >
+              <IconButton onClick={toggleFilteringSidebar}>
+                <FilterAlt
+                  sx={{ color: "var(--theme-palette-text-primary)" }}
+                />
+              </IconButton>
+            </Tooltip>
+            {layersVisible && (
+              <Paper
+                sx={{
+                  position: "fixed",
+                  right: "80px",
+                  p: 2,
+                }}
               >
-                {dataSources &&
-                  dataSources.allIDs.map((id) => (
-                    <Grid
-                      size="grow"
-                      key={id}
-                      direction="row"
-                      display={"flex"}
-                      alignItems={"center"}
-                    >
-                      <Typography
-                        noWrap
-                        sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                <Grid
+                  container
+                  direction={"column"}
+                  alignItems="end"
+                  spacing={0.5}
+                >
+                  {dataSources &&
+                    dataSources.allIDs.map((id) => (
+                      <Grid
+                        size="grow"
+                        key={id}
+                        direction="row"
+                        display={"flex"}
+                        alignItems={"center"}
                       >
-                        {dataSources.byID[id].filename}
-                      </Typography>
-                      <Checkbox
-                        checked={dataSources.byID[id].interface.visible}
-                        icon={<VisibilityOff />}
-                        checkedIcon={<Visibility />}
-                        color="default"
-                        onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                          setVisible(id, event.target.checked);
-                        }}
-                        size="small"
-                      />
-                    </Grid>
-                  ))}
-              </Grid>
-            </Paper>
-          )}
-        </Paper>
+                        <Typography
+                          noWrap
+                          sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+                        >
+                          {dataSources.byID[id].filename}
+                        </Typography>
+                        <Checkbox
+                          checked={dataSources.byID[id].interface.visible}
+                          icon={<VisibilityOff />}
+                          checkedIcon={<Visibility />}
+                          color="default"
+                          onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                            setVisible(id, event.target.checked);
+                          }}
+                          size="small"
+                        />
+                      </Grid>
+                    ))}
+                </Grid>
+              </Paper>
+            )}
+          </Paper>
+        )}
+
         <FormattingSidebar
           setFormatting={setFormatting}
           drawerOpen={sidebarOpen == "formatting"}

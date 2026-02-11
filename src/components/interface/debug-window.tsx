@@ -1,25 +1,27 @@
 "use client";
 
-import { Box, Paper, Typography } from "@mui/material";
+import { Box, IconButton, Paper, Typography, useTheme } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { JSONTree } from "react-json-tree";
 import { ScrollBarStyling } from "../layout/scrollbar-styling";
-import { useDraggable } from "@dnd-kit/core";
-import { CSS } from "@dnd-kit/utilities";
 import { useData } from "../datasource/hooks";
+import { useAppStateStore } from "@/providers/app-state-provider";
+import { useState } from "react";
+import {
+  ChevronLeft,
+  ChevronRight,
+} from "mdi-material-ui";
 
 export default function DebugWindow() {
   const { sessionInterface, GPUfiltering, dataSources } = useProjectStore(
     (state) => state,
   );
 
-  const { attributes, listeners, setNodeRef, transform } = useDraggable({
-    id: "debug-window",
-  });
+  const { appInterface } = useAppStateStore((state) => state);
 
-  const { data } = useData()
+  const { data } = useData();
 
-  const theme = {
+  const JSONTheme = {
     scheme: "Ocean",
     author: "Chris Kempson (http://chriskempson.com)",
     base00: "#2b303b",
@@ -40,70 +42,104 @@ export default function DebugWindow() {
     base0F: "#ab7967",
   };
 
+  const [position, setPosition] = useState<"left" | "right">("left");
+
+  const theme = useTheme();
+
   return (
     <Paper
-      ref={setNodeRef}
-      {...listeners}
-      {...attributes}
       sx={{
-        ...ScrollBarStyling,
         position: "fixed",
         top: 64 + 32 + 16,
-        left: 0,
-        maxWidth: "calc(100vw - 64px)",
+        ...(position == "left" ? { left: 0 } : { right: 0 }),
+        maxWidth: "calc(0.5 * 100vw - 64px)",
         maxHeight: "calc(100vh - 64px - 32px - 48px)",
         m: "16px",
-        p: "16px",
         backgroundColor: "rgb(43, 48, 59)",
         backgroundImage: "none",
         color: "#8fa1b3",
         fontFamily: "monospace",
         zIndex: 2000,
-        transform: CSS.Translate.toString(transform) as string,
       }}
       elevation={6}
       square
     >
-      <Typography variant="inherit">-- Debug window --</Typography>
+      <IconButton
+        size="small"
+        onClick={() => {
+          if (position == "left") {
+            setPosition("right");
+          } else {
+            setPosition("left");
+          }
+        }}
+        sx={{
+          color: theme.palette.text.primary,
+          position: "absolute",
+          ...(position == "left" ? { right: -32 } : { left: -32 }),
+          borderRadius: 0,
+          height: "100%",
+        }}
+      >
+        {position == "left" ? <ChevronRight /> : <ChevronLeft />}
+      </IconButton>
+      <Box
+        sx={{
+          maxWidth: "calc(0.5 * 100vw - 64px)",
+          maxHeight: "calc(100vh - 64px - 32px - 48px)",
+          ...ScrollBarStyling,
+          overflowX: "auto",
+          p: "16px",
+        }}
+      >
+        <Typography variant="inherit">-- Debug window --</Typography>
+        <JSONTree data={appInterface} theme={JSONTheme} hideRoot />
 
-      <Typography variant="inherit" sx={{ mt: 2 }}>
-        DataSources:
-      </Typography>
-      <JSONTree data={dataSources} theme={theme} hideRoot />
+        <Typography variant="inherit" sx={{ mt: 2 }}>
+          - Global App State -
+        </Typography>
 
-      <Typography variant="inherit" sx={{ mt: 2 }}>
-        SessionInterface:
-      </Typography>
-      <JSONTree data={sessionInterface} theme={theme} hideRoot />
+        <Typography variant="inherit" sx={{ mt: 2 }}>
+          - Project State -
+        </Typography>
 
-      <Typography variant="inherit" sx={{ mt: 2 }}>
-        GPUfiltering:
-      </Typography>
-      <JSONTree data={GPUfiltering} theme={theme} hideRoot />
-      <Box display="flex" flexDirection={"column"}>
-        <span>Data loaded:</span>
-        {data.allIDs.map((key) => {
-          console.log(key);
-          return data.byID[key] ? (
-            <div key={key}>
-              <span style={{ color: "#bf616a" }}>{key}</span>{" "}
-              <span style={{ color: "#a3be8c" }}>
-                [{data.byID[key].data.length} items]
-              </span>
-              <Box sx={{ ml: 2, mt: -1 }}>
-                <JSONTree
-                  data={{
-                    bounds: data.byID[key].bounds,
-                    extent: data.byID[key].extent,
-                    filters: data.byID[key].filters,
-                  }}
-                  theme={theme}
-                  hideRoot
-                />
-              </Box>
-            </div>
-          ) : null;
-        })}
+        <Typography variant="inherit">DataSources:</Typography>
+        <JSONTree data={dataSources} theme={JSONTheme} hideRoot />
+
+        <Typography variant="inherit" sx={{ mt: 2 }}>
+          SessionInterface:
+        </Typography>
+        <JSONTree data={sessionInterface} theme={JSONTheme} hideRoot />
+
+        <Typography variant="inherit" sx={{ mt: 2 }}>
+          GPUfiltering:
+        </Typography>
+        <JSONTree data={GPUfiltering} theme={JSONTheme} hideRoot />
+        <Box display="flex" flexDirection={"column"}>
+          <span>Data loaded:</span>
+          {data.allIDs.map((key) => {
+            console.log(key);
+            return data.byID[key] ? (
+              <div key={key}>
+                <span style={{ color: "#bf616a" }}>{key}</span>{" "}
+                <span style={{ color: "#a3be8c" }}>
+                  [{data.byID[key].data.length} items]
+                </span>
+                <Box sx={{ ml: 2, mt: -1 }}>
+                  <JSONTree
+                    data={{
+                      bounds: data.byID[key].bounds,
+                      extent: data.byID[key].extent,
+                      filters: data.byID[key].filters,
+                    }}
+                    theme={JSONTheme}
+                    hideRoot
+                  />
+                </Box>
+              </div>
+            ) : null;
+          })}
+        </Box>
       </Box>
     </Paper>
   );

@@ -1,6 +1,8 @@
 import { Box, Paper, Slide, useTheme } from "@mui/material";
 import { RefObject, useEffect, useState } from "react";
+
 import TimelineSlider from "../../interface-elements/timeline-slider-canvas";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 export default function BottomBar({
   drawerOpen,
@@ -16,6 +18,8 @@ export default function BottomBar({
 
   const theme = useTheme();
 
+  
+
   useEffect(() => {
     if (parentRef) {
       const observer = new ResizeObserver((entries) => {
@@ -30,7 +34,13 @@ export default function BottomBar({
   }, [parentRef]);
 
   return (
-    <Slide direction="up" in={drawerOpen} style={{ visibility: "visible" }} mountOnEnter unmountOnExit>
+    <Slide
+      direction="up"
+      in={drawerOpen}
+      style={{ visibility: "visible" }}
+      mountOnEnter
+      unmountOnExit
+    >
       <Paper
         square
         sx={{

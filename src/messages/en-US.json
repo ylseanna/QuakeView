@@ -124,7 +124,8 @@
     "show_sidebar": "Show sidebar controls",
     "show_map_tools": "Show map tools",
     "show_animation_controls": "Show animation controls",
-    "debug_window": "Show debug window"
+    "debug_window": "Show debug window",
+    "map_tools": "Map tools"
   },
   "Navbar": {
     "GR_plot": "GR plot",

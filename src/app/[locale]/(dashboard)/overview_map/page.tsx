@@ -6,11 +6,7 @@ import {
 } from "../../../../components/map/map_styles/default";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import Map, {
-  FullscreenControl,
-  ScaleControl,
-  NavigationControl,
-} from "react-map-gl/maplibre";
+import Map, { ScaleControl, NavigationControl } from "react-map-gl/maplibre";
 import { useState } from "react";
 import {
   LinearProgress,
@@ -27,7 +23,7 @@ import { AttributionControl } from "react-map-gl";
 import Actions from "../../../../components/datasource/actions";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
-import { useIsFetching } from "@tanstack/react-query";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
@@ -52,39 +48,12 @@ export default function Page() {
     }
   }
 
-  const isFetching = useIsFetching()
+  const { appInterface } = useAppStateStore((state) => state);
 
   return (
     <>
-      {(IsLoading || isFetching) && <LinearProgress />}
+      {IsLoading && <LinearProgress />}
       <>
-        <Paper
-          variant="outlined"
-          sx={{
-            position: "fixed",
-            top: "calc(8px + 32px + 80px)",
-            left: "48px",
-            width: "200px",
-            height: "120px",
-            p: 2,
-            backGroundColor: theme.palette.background.paper,
-            zIndex: theme.zIndex.appBar,
-          }}
-        >
-          <Select
-            value={mapTheme}
-            fullWidth
-            onChange={(event) => {
-              setMapTheme(event.target!.value as "Iceland" | "US");
-            }}
-          >
-            <MenuItem value={"Iceland"}>
-              DEM Iceland (Náttúrufræðistofnun)
-            </MenuItem>
-            <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
-          </Select>
-        </Paper>
-
         <Map
           onLoad={onMapLoad}
           reuseMaps
@@ -105,8 +74,38 @@ export default function Page() {
         >
           <ScaleControl position="bottom-left" />
           <AttributionControl position="bottom-left" />
-          <FullscreenControl position="top-left" />
-          <NavigationControl position="top-left" />
+          {/* <FullscreenControl position="top-left" /> */}
+          {appInterface.mapToolsVisible && (
+            <>
+              <NavigationControl position="top-left" />
+              <Paper
+                variant="outlined"
+                sx={{
+                  position: "fixed",
+                  top: "calc(8px + 32px + 80px)",
+                  left: "48px",
+                  width: "200px",
+                  height: "120px",
+                  p: 2,
+                  backGroundColor: theme.palette.background.paper,
+                  zIndex: theme.zIndex.appBar,
+                }}
+              >
+                <Select
+                  value={mapTheme}
+                  fullWidth
+                  onChange={(event) => {
+                    setMapTheme(event.target!.value as "Iceland" | "US");
+                  }}
+                >
+                  <MenuItem value={"Iceland"}>
+                    DEM Iceland (Náttúrufræðistofnun)
+                  </MenuItem>
+                  <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
+                </Select>
+              </Paper>
+            </>
+          )}
 
           <DeckGLlayers />
         </Map>

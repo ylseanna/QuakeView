@@ -13,13 +13,14 @@ import {
   MapViewState,
   PickingInfo,
 } from "@deck.gl/core";
-import { Button, LinearProgress } from "@mui/material";
+import { Button } from "@mui/material";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
 import { useData } from "../datasource/hooks";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
 // import { TerrainLayer } from "@deck.gl/geo-layers";
@@ -120,12 +121,12 @@ export default function ThreeDDeckGLView({
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setInitialViewState(INITIAL_VIEWSTATE));
 
-  // LOADING INDICATOR
-  const [IsLoading, setIsLoading] = useState(true);
+  // // LOADING INDICATOR
+  // const [IsLoading, setIsLoading] = useState(true);
 
-  const onMapLoad = () => {
-    setIsLoading(false);
-  };
+  // const onMapLoad = () => {
+  //   setIsLoading(false);
+  // };
 
   const deckRef = useRef(null);
 
@@ -166,6 +167,8 @@ export default function ThreeDDeckGLView({
   //   []
   // );
 
+  const { appInterface } = useAppStateStore((state) => state);
+
   return (
     <>
       <DeckGL
@@ -183,19 +186,22 @@ export default function ThreeDDeckGLView({
           position: "relative",
           backgroundColor: "var(--mui-palette-background-default)",
         }}
-        onLoad={onMapLoad}
+        // onLoad={onMapLoad}
       >
-        {IsLoading && <LinearProgress variant="query" />}
+        {/* {IsLoading && <LinearProgress variant="query" />} */}
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
-        <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
-          reset view
-        </Button>
-
-        <ZoomWidget placement="top-left" />
-        <FullscreenWidget
-          placement="top-left"
-          container={mapContainer.current!}
-        />
+        {appInterface.mapToolsVisible && (
+          <>
+            <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
+              reset view
+            </Button>
+            <ZoomWidget placement="top-left" />
+            <FullscreenWidget
+              placement="top-left"
+              container={mapContainer.current!}
+            />
+          </>
+        )}
       </DeckGL>
     </>
   );
