@@ -118,7 +118,6 @@ export default function DebugWindow() {
         <Box display="flex" flexDirection={"column"}>
           <span>Data loaded:</span>
           {data.allIDs.map((key) => {
-            console.log(key);
             return data.byID[key] ? (
               <div key={key}>
                 <span style={{ color: "#bf616a" }}>{key}</span>{" "}

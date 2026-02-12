@@ -4,7 +4,12 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
+import {
+  DataSourceColorFormatting,
+  DataSourceDataDescription,
+  DataSourceFormatting,
+  DataSourceMetaData,
+} from "./../components/datasource/types";
 import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
@@ -20,10 +25,13 @@ export type SessionInterface = {
   overViewState: ViewState;
   pickable: boolean;
   animation: {
-    tapered: boolean;
-    speed: {
-      multiplier: number;
-      unit: "second" | "minute" | "hour" | "day" | "week" | "year";
+    timeline: {
+      enabled: boolean;
+      tapered: boolean;
+      speed: {
+        multiplier: number;
+        unit: "second" | "minute" | "hour" | "day" | "week" | "year";
+      };
     };
   };
 };
@@ -38,11 +46,14 @@ export type ProjectActions = {
     setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
     animation: {
-      setTapered: (value: boolean) => void;
-      setSpeed: (value: {
-        multiplier: number;
-        unit: "second" | "minute" | "hour" | "day" | "week" | "year";
-      }) => void;
+      timeline: {
+        toggleEnabled: () => void;
+        setTapered: (value: boolean) => void;
+        setSpeed: (value: {
+          multiplier: number;
+          unit: "second" | "minute" | "hour" | "day" | "week" | "year";
+        }) => void;
+      };
     };
   };
   GPUfilteringActions: {
@@ -58,10 +69,7 @@ export type ProjectActions = {
       keyToModify: keyof DataSourceFormatting,
       value: never,
     ) => void;
-    setColorFormatting: (
-      id: string,
-      value: DataSourceColorFormatting,
-    ) => void;
+    setColorFormatting: (id: string, value: DataSourceColorFormatting) => void;
     setFiltering: (
       id: string,
       variableToModify: string,
@@ -103,7 +111,13 @@ export const defaultInitState: ProjectState = {
       },
     },
     pickable: false,
-    animation: { tapered: false, speed: { multiplier: 1, unit: "day" } },
+    animation: {
+      timeline: {
+        enabled: false,
+        tapered: false,
+        speed: { multiplier: 1, unit: "day" },
+      },
+    },
   },
   GPUfiltering: { t: [0, 2147483647 * 1000], mag: [-100, 100] },
   dataSources: { byID: {}, allIDs: [] },
@@ -126,14 +140,21 @@ export const createProjectStore = (
               state.sessionInterface.pickable = value;
             }),
           animation: {
-            setTapered: (value) =>
-              set((state) => {
-                state.sessionInterface.animation.tapered = value;
-              }),
-            setSpeed: (value) =>
-              set((state) => {
-                state.sessionInterface.animation.speed = value;
-              }),
+            timeline: {
+              toggleEnabled: () =>
+                set((state) => {
+                  state.sessionInterface.animation.timeline.enabled =
+                    !state.sessionInterface.animation.timeline.enabled;
+                }),
+              setTapered: (value) =>
+                set((state) => {
+                  state.sessionInterface.animation.timeline.tapered = value;
+                }),
+              setSpeed: (value) =>
+                set((state) => {
+                  state.sessionInterface.animation.timeline.speed = value;
+                }),
+            },
           },
         },
         GPUfilteringActions: {

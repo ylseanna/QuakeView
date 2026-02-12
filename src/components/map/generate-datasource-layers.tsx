@@ -1,9 +1,16 @@
-import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
+import {
+  DataFilterExtension,
+  DataFilterExtensionProps,
+} from "@deck.gl/extensions";
 import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { Color } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import { DataSource, DataSourceColorFormatting, EarthQuake } from "@/components/datasource/types";
+import {
+  DataSource,
+  DataSourceColorFormatting,
+  EarthQuake,
+} from "@/components/datasource/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 import { colormaps, colormaps_categorical } from "./crameri-colormaps";
 
@@ -88,7 +95,6 @@ export function generateDataSourceMapLayers(
     }
   };
 
-
   return new ScatterplotLayer<EarthQuake, DataFilterExtensionProps>({
     id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
@@ -131,7 +137,7 @@ export function generateDataSourceMapLayers(
     filterSoftRange: [
       filtering.mag as [number, number],
       [
-        sessionInterface.animation.tapered
+        sessionInterface.animation.timeline.tapered
           ? (filtering.t[1] as number)
           : (filtering.t[0] as number),
         filtering.t[1] as number,
@@ -155,6 +161,7 @@ export function StemPlotLayers(
   scaleX: d3.ScaleTime<number, number, never>,
   scaleY: d3.ScaleLinear<number, number, never>,
   baseLineY: number,
+  include_stem: boolean = true,
   // filtering: GPU_filtering,
 ) {
   // console.log(filtering);
@@ -229,53 +236,61 @@ export function StemPlotLayers(
     }
   };
 
-  return [
-    new LineLayer<EarthQuake>({
-      id: `StemLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
-      data: data,
-      getWidth: 0.05,
-      widthScale: dataSource.formatting.scale,
-      getSourcePosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
-      getTargetPosition: (d: EarthQuake) => [scaleX(d.t), baseLineY],
-      // getColor: (d: EarthQuake) =>
-      //   ColorMapping(d, dataSource.formatting.color) as Color,
-      getColor: [0, 0, 0],
-      autoHighlight: true,
-      highlightColor: [255, 255, 255, 140],
-      colorFormat: "RGB",
-      opacity: 0.1,
-      pickable: false,
-      transitions: {
-        getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-      },
-    }),
-    new ScatterplotLayer<EarthQuake>({
-      id: `DotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
-      data: data,
-      getRadius: 0.1,
-      radiusScale: dataSource.formatting.scale,
-      getPosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
-      getFillColor:
-        dataSource.formatting.color.mapping == "single"
-          ? d3Color_to_deckGLColor(
-              dataSource.formatting.color.single! as unknown as d3.RGBColor,
-            )
-          : (d: EarthQuake) =>
-              ColorMapping(d, dataSource.formatting.color) as Color,
-      autoHighlight: true,
-      highlightColor: [255, 255, 255, 140],
-      colorFormat: "RGB",
-      opacity: dataSource.formatting.opacity / 100,
-      stroked: false,
-      getLineColor: [255, 255, 255, 0.5 * 255],
-      lineWidthUnits: "pixels",
-      billboard: true,
-      antialiasing: dataSource.formatting.antialiasing,
-      pickable: sessionInterface.pickable,
-      fp64: true,
-      transitions: {
-        getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-      },
-    }),
-  ];
+  const scatterplotLayer = new ScatterplotLayer<EarthQuake>({
+    id: `DotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+    data: data,
+    getRadius: 0.1,
+    radiusScale: dataSource.formatting.scale,
+    getPosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
+    getFillColor:
+      dataSource.formatting.color.mapping == "single"
+        ? d3Color_to_deckGLColor(
+            d3.color(
+              dataSource.formatting.color.single as unknown as string,
+            ) as d3.RGBColor,
+          )
+        : (d: EarthQuake) =>
+            ColorMapping(d, dataSource.formatting.color) as Color,
+    autoHighlight: true,
+    highlightColor: [255, 255, 255, 140],
+    colorFormat: "RGB",
+    opacity: dataSource.formatting.opacity / 100,
+    stroked: false,
+    getLineColor: [255, 255, 255, 0.5 * 255],
+    lineWidthUnits: "pixels",
+    billboard: true,
+    antialiasing: dataSource.formatting.antialiasing,
+    pickable: sessionInterface.pickable,
+    fp64: true,
+    transitions: {
+      getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
+    },
+  });
+
+  if (include_stem) {
+    return [
+      new LineLayer<EarthQuake>({
+        id: `StemLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+        data: data,
+        getWidth: 0.05,
+        widthScale: dataSource.formatting.scale,
+        getSourcePosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
+        getTargetPosition: (d: EarthQuake) => [scaleX(d.t), baseLineY],
+        // getColor: (d: EarthQuake) =>
+        //   ColorMapping(d, dataSource.formatting.color) as Color,
+        getColor: [0, 0, 0],
+        autoHighlight: true,
+        highlightColor: [255, 255, 255, 140],
+        colorFormat: "RGB",
+        opacity: 0.1,
+        pickable: false,
+        transitions: {
+          getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
+        },
+      }),
+      scatterplotLayer,
+    ];
+  } else {
+    return scatterplotLayer;
+  }
 }

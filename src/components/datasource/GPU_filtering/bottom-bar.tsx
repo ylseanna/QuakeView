@@ -1,8 +1,7 @@
 import { Box, Paper, Slide, useTheme } from "@mui/material";
 import { RefObject, useEffect, useState } from "react";
 
-import TimelineSlider from "../../interface-elements/timeline-slider-canvas";
-import { useAppStateStore } from "@/providers/app-state-provider";
+import TimelineSlider from "../../interface-elements/timeline-slider";
 
 export default function BottomBar({
   drawerOpen,
@@ -39,7 +38,6 @@ export default function BottomBar({
       in={drawerOpen}
       style={{ visibility: "visible" }}
       mountOnEnter
-      unmountOnExit
     >
       <Paper
         square
@@ -47,7 +45,6 @@ export default function BottomBar({
           position: "fixed",
           bottom: 0,
           display: "flex",
-          p: 2,
           justifyContent: "center",
           height: DRAWER_HEIGHT,
           zIndex: 1300,
@@ -57,8 +54,8 @@ export default function BottomBar({
       >
         <Box
           sx={{
-            width: `calc(${width}px - ${theme.spacing(2)})`,
-            height: `calc(${DRAWER_HEIGHT}px - ${theme.spacing(2)})`,
+            width: `calc(${width}px)`,
+            height: `calc(${DRAWER_HEIGHT}px`,
           }}
         >
           <TimelineSlider />
