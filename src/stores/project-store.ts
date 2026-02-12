@@ -4,12 +4,7 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import {
-  DataSourceColorFormatting,
-  DataSourceDataDescription,
-  DataSourceFormatting,
-  DataSourceMetaData,
-} from "./../components/datasource/types";
+import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
 import { DataSource } from "@/components/datasource/types";
 
 export type ProjectState = {
@@ -70,11 +65,12 @@ export type ProjectActions = {
       value: never,
     ) => void;
     setColorFormatting: (id: string, value: DataSourceColorFormatting) => void;
-    setFiltering: (
+    setFilter: (
       id: string,
       variableToModify: string,
-      value: [number, number] | null,
+      value: [number, number],
     ) => void;
+    removeFilter: (id: string, variableToModify: string) => void;
     setVariableDescr: (
       id: string,
       variableToModify: string,
@@ -193,13 +189,13 @@ export const createProjectStore = (
             set((state) => {
               state.dataSources.byID[id].formatting.color = value;
             }),
-          setFiltering: (id, keyToModify, value) =>
+          setFilter: (id, keyToModify, value) =>
             set((state) => {
-              if (value) {
-                state.dataSources.byID[id].filtering[keyToModify] = value;
-              } else {
-                delete state.dataSources.byID[id].filtering[keyToModify];
-              }
+              state.dataSources.byID[id].filtering[keyToModify] = value;
+            }),
+          removeFilter: (id, keyToModify) =>
+            set((state) => {
+              delete state.dataSources.byID[id].filtering[keyToModify];
             }),
           setVariableDescr: (id, variableToModify, keyToModify, value) =>
             set((state) => {

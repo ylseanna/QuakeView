@@ -29,7 +29,7 @@ import HistogramSlider from "../../interface-elements/histogram-slider";
 import { colormaps, colormaps_categorical } from "../../map/crameri-colormaps";
 import { SwapHoriz } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../hooks";
+import { useData } from "../use-data";
 
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />

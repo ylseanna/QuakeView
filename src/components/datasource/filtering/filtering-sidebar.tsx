@@ -1,9 +1,10 @@
 import { Drawer, Typography, useTheme } from "@mui/material";
-import { useRef } from "react";
-import { useTranslations } from "next-intl";
-import FilteringElement from "./filtering-element";
-import { useProjectStore } from "@/providers/project-store-provider";
 import { Box } from "@mui/material";
+import { useTranslations } from "next-intl";
+import { useRef } from "react";
+
+import { useProjectStore } from "@/providers/project-store-provider";
+import FilteringElement from "./filtering-element";
 
 interface FormattingProps {
   setFiltering: CallableFunction;
@@ -11,7 +12,6 @@ interface FormattingProps {
 }
 
 export default function FilteringSidebar({
-  setFiltering,
   drawerOpen,
 }: FormattingProps) {
   const theme = useTheme();
@@ -55,7 +55,6 @@ export default function FilteringSidebar({
               <FilteringElement
                 key={id}
                 dataSource={dataSources.byID[id]}
-                setFiltering={setFiltering}
                 single={dataSources.allIDs.length > 1 ? false : true}
               />
             ))}

@@ -1,47 +1,23 @@
+import { Pause, PlayArrow } from "@mui/icons-material";
+import useAnimationFrame from "use-animation-frame";
+import { GradientHorizontal, Selection, SelectionOff, Speedometer } from "mdi-material-ui";
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
-import {
-  Box,
-  Divider,
-  Grow,
-  IconButton,
-  Input,
-  Paper,
-  SelectChangeEvent,
-  Select,
-  MenuItem,
-  Checkbox,
-  useTheme,
-} from "@mui/material";
+import { Box, Checkbox, Divider, Grow, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, useTheme } from "@mui/material";
+import { useTranslations } from "next-intl";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
-import {
-  ChangeEvent,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
+import { useAppStateStore } from "@/providers/app-state-provider";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
-import { useData } from "../datasource/hooks";
+import { useData } from "../datasource/use-data";
 import { EarthQuake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
-import useAnimationFrame from "use-animation-frame";
-import { useAppStateStore } from "@/providers/app-state-provider";
-import {
-  GradientHorizontal,
-  Selection,
-  SelectionOff,
-  Speedometer,
-} from "mdi-material-ui";
-import { useTranslations } from "next-intl";
-import { Pause, PlayArrow } from "@mui/icons-material";
 
 interface Bounds {
   x: [Date, Date];
@@ -190,6 +166,10 @@ export default function TimelineSlider() {
   // graph elements (store statically in component)
   // svg element
   const SVG =
+    useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
+
+  // brush element
+  const brushG =
     useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
 
   // scales
@@ -428,7 +408,9 @@ export default function TimelineSlider() {
       .on("end", onBrush);
 
     // attach the brush to the chart
-    SVG.current.append("g").attr("class", "brush").call(brush);
+    brushG.current = SVG.current!.append("g")
+      .attr("class", "brush")
+      .call(brush);
 
     brushRef.current = brush;
 
@@ -464,20 +446,19 @@ export default function TimelineSlider() {
         ),
       ] as [Date, Date];
 
-      const newYBounds = [
-        viewPortScaleY.current.invert(
-          viewStateMonitor.pixelPosition[1] + graphHeight * 0.5,
-        ),
-        viewPortScaleY.current.invert(
-          viewStateMonitor.pixelPosition[1] - graphHeight * 0.5,
-        ),
-      ] as [number, number];
+      // const newYBounds = [
+      //   viewPortScaleY.current.invert(
+      //     viewStateMonitor.pixelPosition[1] + graphHeight * 0.5,
+      //   ),
+      //   viewPortScaleY.current.invert(
+      //     viewStateMonitor.pixelPosition[1] - graphHeight * 0.5,
+      //   ),
+      // ] as [number, number];
 
       setBounds({
         x: newXBounds,
-        y: newYBounds,
+        y: bounds.y,
       });
-      setTimeFiltering([newXBounds[0].getTime(), newXBounds[1].getTime()]);
 
       // update bounds in DOM
 
@@ -486,10 +467,11 @@ export default function TimelineSlider() {
       scaleY.current!.domain(bounds.y);
 
       if (
-        !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
-        !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
+        (!(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
+        !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1])) &&
         !(viewStateMonitor.zoom[0] == 0)
       ) {
+        setTimeFiltering([newXBounds[0].getTime(), newXBounds[1].getTime()]);
         // update X axes and grid
         xAxes.current!.call(d3.axisBottom(scaleX.current!));
         xAxesGrid.current!.call(
@@ -498,114 +480,119 @@ export default function TimelineSlider() {
             .tickFormat(() => "")
             .tickSize(-graphHeight),
         );
+
+        // update Brush
+        brushG.current!.call(brushRef.current!);
       }
 
-      if (
-        !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
-        !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
-        !(viewStateMonitor.zoom[0] == 0)
-      ) {
-        // update Y axes and grid
-        yAxes.current
-          ?.transition()
-          .duration(10)
-          .call(d3.axisLeft(scaleY.current!).ticks(4));
-        yAxesGrid.current
-          ?.transition()
-          .duration(10)
-          .call(
-            d3
-              .axisLeft(scaleY.current!)
-              .tickFormat(() => "")
-              .tickSize(-graphWidth),
-          );
-      }
+      // if (
+      //   !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
+      //   !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
+      //   !(viewStateMonitor.zoom[0] == 0)
+      // ) {
+      //   // update Y axes and grid
+      //   yAxes.current
+      //     ?.transition()
+      //     .duration(10)
+      //     .call(d3.axisLeft(scaleY.current!).ticks(4));
+      //   yAxesGrid.current
+      //     ?.transition()
+      //     .duration(10)
+      //     .call(
+      //       d3
+      //         .axisLeft(scaleY.current!)
+      //         .tickFormat(() => "")
+      //         .tickSize(-graphWidth),
+      //     );
+      // }
+
+      
     }
   }, [viewStateMonitor]);
 
-//   // update bounds in DOM
-//   useEffect(() => {  // update bounds in DOM
-//   useEffect(() => {
-//     // update domains on scales
-//     scaleX.current!.domain(bounds.x);
-//     scaleY.current!.domain(bounds.y);
+  //   // update bounds in DOM
+  //   useEffect(() => {  // update bounds in DOM
+  //   useEffect(() => {
+  //     // update domains on scales
+  //     scaleX.current!.domain(bounds.x);
+  //     scaleY.current!.domain(bounds.y);
 
-//     if (
-//       !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
-//       !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
-//       !(viewStateMonitor.zoom[0] == 0)
-//     ) {
-//       // update X axes and grid
-//       xAxes.current!.call(d3.axisBottom(scaleX.current!));
-//       xAxesGrid.current!.call(
-//         d3
-//           .axisBottom(scaleX.current!)
-//           .tickFormat(() => "")
-//           .tickSize(-graphHeight),
-//       );
-//     }
+  //     if (
+  //       !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
+  //       !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
+  //       !(viewStateMonitor.zoom[0] == 0)
+  //     ) {
+  //       // update X axes and grid
+  //       xAxes.current!.call(d3.axisBottom(scaleX.current!));
+  //       xAxesGrid.current!.call(
+  //         d3
+  //           .axisBottom(scaleX.current!)
+  //           .tickFormat(() => "")
+  //           .tickSize(-graphHeight),
+  //       );
+  //     }
 
-//     if (
-//       !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
-//       !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
-//       !(viewStateMonitor.zoom[0] == 0)
-//     ) {
-//       // update Y axes and grid
-//       yAxes.current
-//         ?.transition()
-//         .duration(10)
-//         .call(d3.axisLeft(scaleY.current!).ticks(4));
-//       yAxesGrid.current
-//         ?.transition()
-//         .duration(10)
-//         .call(
-//           d3
-//             .axisLeft(scaleY.current!)
-//             .tickFormat(() => "")
-//             .tickSize(-graphWidth),
-//         );
-//     }
-//   }, [bounds]);
-//     // update domains on scales
-//     scaleX.current!.domain(bounds.x);
-//     scaleY.current!.domain(bounds.y);
+  //     if (
+  //       !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
+  //       !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
+  //       !(viewStateMonitor.zoom[0] == 0)
+  //     ) {
+  //       // update Y axes and grid
+  //       yAxes.current
+  //         ?.transition()
+  //         .duration(10)
+  //         .call(d3.axisLeft(scaleY.current!).ticks(4));
+  //       yAxesGrid.current
+  //         ?.transition()
+  //         .duration(10)
+  //         .call(
+  //           d3
+  //             .axisLeft(scaleY.current!)
+  //             .tickFormat(() => "")
+  //             .tickSize(-graphWidth),
+  //         );
+  //     }
+  //   }, [bounds]);
+  //     // update domains on scales
+  //     scaleX.current!.domain(bounds.x);
+  //     scaleY.current!.domain(bounds.y);
 
-//     if (
-//       !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
-//       !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
-//       !(viewStateMonitor.zoom[0] == 0)
-//     ) {
-//       // update X axes and grid
-//       xAxes.current!.call(d3.axisBottom(scaleX.current!));
-//       xAxesGrid.current!.call(
-//         d3
-//           .axisBottom(scaleX.current!)
-//           .tickFormat(() => "")
-//           .tickSize(-graphHeight),
-//       );
-//     }
+  //     if (
+  //       !(scaleX.current!.domain()[0] < viewPortBounds.coord.x[0]) &&
+  //       !(scaleX.current!.domain()[1] > viewPortBounds.coord.x[1]) &&
+  //       !(viewStateMonitor.zoom[0] == 0)
+  //     ) {
+  //       // update X axes and grid
+  //       xAxes.current!.call(d3.axisBottom(scaleX.current!));
+  //       xAxesGrid.current!.call(
+  //         d3
+  //           .axisBottom(scaleX.current!)
+  //           .tickFormat(() => "")
+  //           .tickSize(-graphHeight),
+  //       );
+  //     }
 
-//     if (
-//       !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
-//       !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
-//       !(viewStateMonitor.zoom[0] == 0)
-//     ) {
-//       // update Y axes and grid
-//       yAxes.current
-//         ?.transition()
-//         .duration(10)
-//         .call(d3.axisLeft(scaleY.current!).ticks(4));
-//       yAxesGrid.current
-//         ?.transition()
-//         .duration(10)
-//         .call(
-//           d3
-//             .axisLeft(scaleY.current!)
-//             .tickFormat(() => "")
-//             .tickSize(-graphWidth),
-//         );
-//     }
-//   }, [bounds]);
+  //     if (
+  //       !(scaleY.current!.domain()[0] < viewPortBounds.coord.y[0]) &&
+  //       !(scaleY.current!.domain()[1] > viewPortBounds.coord.y[1]) &&
+  //       !(viewStateMonitor.zoom[0] == 0)
+  //     ) {
+  //       // update Y axes and grid
+  //       yAxes.current
+  //         ?.transition()
+  //         .duration(10)
+  //         .call(d3.axisLeft(scaleY.current!).ticks(4));
+  //       yAxesGrid.current
+  //         ?.transition()
+  //         .duration(10)
+  //         .call(
+  //           d3
+  //             .axisLeft(scaleY.current!)
+  //             .tickFormat(() => "")
+  //             .tickSize(-graphWidth),
+  //         );
+  //     }
+  //   }, [bounds]);
 
   const layers = useMemo(() => {
     if (data) {

@@ -10,7 +10,7 @@ import * as d3 from "d3";
 import { ColorMapping } from "../datasource/formatting/color-mapping";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { useData } from "../datasource/hooks";
+import { useData } from "../datasource/use-data";
 /* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 import { DataSource, EarthQuake } from "../datasource/types";

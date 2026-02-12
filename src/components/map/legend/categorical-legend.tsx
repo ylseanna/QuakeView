@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 
 import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
-import { useData } from "@/components/datasource/hooks";
+import { useData } from "@/components/datasource/use-data";
 import { DataSource, DataSourceDataDescription } from "../../datasource/types";
 
 interface LegendElementProps {

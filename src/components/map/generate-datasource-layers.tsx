@@ -1,16 +1,9 @@
-import {
-  DataFilterExtension,
-  DataFilterExtensionProps,
-} from "@deck.gl/extensions";
+import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
 import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { Color } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import {
-  DataSource,
-  DataSourceColorFormatting,
-  EarthQuake,
-} from "@/components/datasource/types";
+import { DataSource, DataSourceColorFormatting, EarthQuake } from "@/components/datasource/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 import { colormaps, colormaps_categorical } from "./crameri-colormaps";
 
@@ -130,9 +123,9 @@ export function generateDataSourceMapLayers(
     updateTriggers: {
       getPosition: [positionOffset],
     },
-    transitions: {
-      getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-    },
+    // transitions: {
+    //   getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
+    // },
     getFilterValue: (d) => [d.mag, d.t],
     filterSoftRange: [
       filtering.mag as [number, number],
@@ -284,9 +277,9 @@ export function StemPlotLayers(
         colorFormat: "RGB",
         opacity: 0.1,
         pickable: false,
-        transitions: {
-          getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-        },
+        // transitions: {
+        //   getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
+        // },
       }),
       scatterplotLayer,
     ];

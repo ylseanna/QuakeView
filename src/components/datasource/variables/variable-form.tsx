@@ -33,7 +33,7 @@ import {
   dateTimeAsNumbersRequiredVars,
   dateTimeStringRequiredVars,
 } from "../constants";
-import { useData } from "../hooks";
+import { useData } from "../use-data";
 
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());

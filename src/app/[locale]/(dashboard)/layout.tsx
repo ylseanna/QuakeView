@@ -2,7 +2,7 @@
 
 import { Box, LinearProgress } from "@mui/material";
 
-import { ReactNode, Suspense, useState } from "react";
+import { ReactNode, useState } from "react";
 
 import TitleBar from "@/components/navigation/title-bar";
 import NavBar from "@/components/navigation/nav-bar";
@@ -23,7 +23,8 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
       queries: {
         // With SSR, we usually want to set some default staleTime
         // above 0 to avoid refetching immediately on the client
-        staleTime: Infinity,
+        staleTime: 1000,
+        gcTime: Infinity,
       },
     },
   });
@@ -42,12 +43,10 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
         {queryClient.isFetching() > 0 && (
           <LinearProgress sx={{ position: "absolute" }} />
         )}
-        <Suspense fallback={<LinearProgress />}>
-          <QueryClientProvider client={queryClient}>
-            {debugVisible && <DebugWindow />}
-            {props.children}
-          </QueryClientProvider>
-        </Suspense>
+        <QueryClientProvider client={queryClient}>
+          {debugVisible && <DebugWindow />}
+          {props.children}
+        </QueryClientProvider>
       </Box>
     </>
   );

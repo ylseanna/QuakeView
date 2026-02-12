@@ -2,7 +2,7 @@ import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { useData } from "../datasource/hooks";
+import { useData } from "../datasource/use-data";
 import { DataSource, EarthQuake } from "../datasource/types";
 
 export default function HistogramSlider({

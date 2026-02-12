@@ -6,7 +6,7 @@ import { useRef } from "react";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import { useProjectStore } from "@/providers/project-store-provider";
 import DataSourceFormattingElement from "./formatting-element";
-import { useData } from "../hooks";
+import { useData } from "../use-data";
 
 interface FormattingProps {
   setFormatting: CallableFunction;

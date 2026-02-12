@@ -3,7 +3,7 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../datasource/hooks";
+import { useData } from "../datasource/use-data";
 import { EarthQuake } from "../datasource/types";
 
 export default function GutenbergRichterPlot() {

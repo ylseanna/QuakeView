@@ -14,11 +14,9 @@ import FilteringForm from "./filtering-form";
 
 export default function FilteringElement({
   dataSource,
-  setFiltering,
   single = false,
 }: {
   dataSource: DataSource;
-  setFiltering: CallableFunction;
   single?: boolean;
 }) {
   return !single ? (
@@ -36,7 +34,7 @@ export default function FilteringElement({
       </Box>
       <SubAccordionDetails>
         {dataSource.interface.loadable && (
-          <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+          <FilteringForm dataSource={dataSource} />
         )}
       </SubAccordionDetails>
     </SubAccordion>
@@ -44,7 +42,7 @@ export default function FilteringElement({
     <>
       <SubAccordionDetails>
         {dataSource.interface.loadable && (
-          <FilteringForm dataSource={dataSource} setFiltering={setFiltering} />
+          <FilteringForm dataSource={dataSource} />
         )}
       </SubAccordionDetails>
       <Divider />

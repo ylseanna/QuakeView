@@ -4,7 +4,7 @@ import { Box, IconButton, Paper, Typography, useTheme } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { JSONTree } from "react-json-tree";
 import { ScrollBarStyling } from "../layout/scrollbar-styling";
-import { useData } from "../datasource/hooks";
+import { useData } from "../datasource/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useState } from "react";
 import {

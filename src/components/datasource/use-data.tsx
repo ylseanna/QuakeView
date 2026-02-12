@@ -1,4 +1,4 @@
-import { useQueries } from "@tanstack/react-query";
+import { useSuspenseQueries } from "@tanstack/react-query";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { fetchData } from "./load-data";
@@ -10,6 +10,7 @@ export type DataCache = {
       data: EarthQuake[];
       addedVars: string[];
       bounds: { [variable: string]: [number, number] | null };
+      unfiltered_bounds: { [variable: string]: [number, number] | null };
       extent: Extent;
       filters: DataSourceFiltering;
     };
@@ -24,7 +25,7 @@ export type DataCacheResult = {
 export function useData() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  return useQueries({
+  return useSuspenseQueries({
     queries: dataSources.allIDs.map((dataSourceID) => {
       return {
         queryKey: [

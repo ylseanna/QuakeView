@@ -4,8 +4,12 @@ import { Close, ExpandMore, Numbers } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
+  FormControl,
   Grid,
   IconButton,
+  Input,
+  InputLabel,
+  Stack,
   TextField,
   Tooltip,
   Typography,
@@ -18,9 +22,11 @@ import {
   SubAccordionDetails,
   SubAccordionSummary,
 } from "../../layout/accordion";
-import { SyntheticEvent, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import HistogramSlider from "../../interface-elements/histogram-slider";
+import { useData } from "../use-data";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 type FilteringOption = {
   variable: string;
@@ -28,24 +34,31 @@ type FilteringOption = {
   bounds: [number, number];
 };
 
+let round10 = (v: number) => Math.pow(10, Math.floor(Math.log10(Math.abs(v)))) * Math.pow(-1, v < 0);
+
+
 const FilteringEditingRow = ({
   variable,
   bounds,
-  setFiltering,
   dataSource,
 }: {
   variable: string;
   bounds: [number, number];
-  setFiltering: CallableFunction;
   dataSource: DataSource;
 }) => {
   const t = useTranslations("Filtering");
 
   const theme = useTheme();
 
+  const { data } = useData();
+
   const dataDescr = dataSource.metadata.variables.by_id[variable];
 
   const [localDomain, setLocalDomain] = useState<[number, number]>(bounds);
+
+  const { setFilter, removeFilter } = useProjectStore(
+    (state) => state.dataSourceActions,
+  );
 
   return (
     <SubAccordion
@@ -64,37 +77,103 @@ const FilteringEditingRow = ({
             {dataDescr?.alias ? dataDescr.alias : dataDescr?.variable}
           </Typography>
         </SubAccordionSummary>
-          <Tooltip title={t("remove_filter")}>
-            <Box sx={{ display: "flex", p: 1, pl: 0 }}>
-              <IconButton
-                size="small"
-                onClick={() =>
-                  setFiltering(dataSource.internal_id, variable, null)
-                }
-              >
-                <Close />
-              </IconButton>
-            </Box>
-          </Tooltip>
+        <Tooltip title={t("remove_filter")}>
+          <Box sx={{ display: "flex", p: 1, pl: 0 }}>
+            <IconButton
+              size="small"
+              onClick={() => removeFilter(dataSource.internal_id, variable)}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        </Tooltip>
       </Box>
       <SubAccordionDetails>
-        <HistogramSlider
-          dataSource={dataSource}
-          variable={variable}
-          id={`filter-chart-${dataSource.internal_id}-${variable}`}
-          value={localDomain}
-          min={dataDescr!.bounds[0]}
-          max={dataDescr!.bounds[1]}
-          onChange={(event: Event, newValue: number | number[]) => {
-            setLocalDomain(newValue as [number, number]);
-          }}
-          onChangeCommitted={(
-            event: Event | SyntheticEvent<Element, Event>,
-            newValue: number | number[]
-          ) => {
-            setFiltering(dataSource.internal_id, variable, newValue);
-          }}
-        />
+        {data.byID[dataSource.internal_id] && (
+          <>
+            <HistogramSlider
+              dataSource={dataSource}
+              variable={variable}
+              id={`filter-chart-${dataSource.internal_id}-${variable}`}
+              value={localDomain}
+              min={
+                data.byID[dataSource.internal_id].unfiltered_bounds[
+                  variable
+                ]![0]
+              }
+              max={
+                data.byID[dataSource.internal_id].unfiltered_bounds[
+                  variable
+                ]![1]
+              }
+              onChange={(event: Event, newValue: number | number[]) => {
+                setLocalDomain(newValue as [number, number]);
+              }}
+              onChangeCommitted={(
+                event: Event | SyntheticEvent<Element, Event>,
+                newValue: number | number[],
+              ) => {
+                setFilter(
+                  dataSource.internal_id,
+                  variable,
+                  newValue as [number, number],
+                );
+              }}
+            />
+            <Stack direction="row" spacing={2} justifyContent="space-between">
+              <FormControl fullWidth variant="standard">
+                <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>
+                <Input
+                  value={localDomain[0]}
+                  size="small"
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    setLocalDomain([
+                      Number(event.target.value),
+                      localDomain[1],
+                    ]);
+                    setFilter(dataSource.internal_id, variable, [
+                      Number(event.target.value),
+                      localDomain[1],
+                    ]);
+                  }}
+                  sx={{ width: "100%" }}
+                  inputProps={{
+                    step: round10((data.byID[dataSource.internal_id].bounds[variable]![0]! - data.byID[dataSource.internal_id].bounds[variable]![1]) as number),
+                    min: data.byID[dataSource.internal_id].bounds[variable]![0],
+                    max: data.byID[dataSource.internal_id].bounds[variable]![1],
+                    type: "number",
+                    "aria-labelledby": "input-slider",
+                  }}
+                />
+              </FormControl>
+              <FormControl fullWidth variant="standard">
+                <InputLabel sx={{ top: "6px" }}>Maximum</InputLabel>
+                <Input
+                  value={localDomain[1]}
+                  size="small"
+                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
+                    setLocalDomain([
+                      localDomain[0],
+                      Number(event.target.value),
+                    ]);
+                    setFilter(dataSource.internal_id, variable, [
+                      localDomain[0],
+                      Number(event.target.value),
+                    ]);
+                  }}
+                  sx={{ width: "100%" }}
+                  inputProps={{
+                    step: round10((data.byID[dataSource.internal_id].bounds[variable]![0]! - data.byID[dataSource.internal_id].bounds[variable]![1]) as number),
+                    min: data.byID[dataSource.internal_id].bounds[variable]![0],
+                    max: data.byID[dataSource.internal_id].bounds[variable]![1],
+                    type: "number",
+                    "aria-labelledby": "input-slider",
+                  }}
+                />
+              </FormControl>
+            </Stack>
+          </>
+        )}
       </SubAccordionDetails>
     </SubAccordion>
   );
@@ -102,31 +181,35 @@ const FilteringEditingRow = ({
 
 export default function FilteringForm({
   dataSource,
-  setFiltering,
 }: {
   dataSource: DataSource;
-  setFiltering: CallableFunction;
 }) {
   const t = useTranslations("Filtering");
+
+  const { data } = useData();
+
+  const { setFilter } = useProjectStore((state) => state.dataSourceActions);
 
   return (
     <>
       <Autocomplete
-        options={Object.values(dataSource.metadata.variables.by_id)
+        options={dataSource.metadata.variables.required_vars
+          .concat(dataSource.metadata.variables.added_vars)
           .filter(
-            (el) =>
-              (el.data_type == "number" ) && // || el.data_type == "dt_timestamp"
-              !Object.keys(dataSource.filtering).includes(el.variable) &&
-              (el.required ||
-                dataSource.metadata.variables.added_vars.includes(el.variable))
+            (variable) =>
+              dataSource.metadata.variables.by_id[variable].data_type ==
+                "number" && // || el.data_type == "dt_timestamp"
+              !Object.keys(dataSource.filtering).includes(variable) &&
+              (dataSource.metadata.variables.required_vars.includes(variable) ||
+                dataSource.metadata.variables.added_vars.includes(variable)),
           )
           .map(
-            (el) =>
+            (variable) =>
               ({
-                variable: el.variable,
-                alias: el.alias,
-                bounds: el.bounds,
-              }) as FilteringOption
+                variable:
+                  dataSource.metadata.variables.by_id[variable].variable,
+                alias: dataSource.metadata.variables.by_id[variable].alias,
+              }) as FilteringOption,
           )}
         getOptionLabel={(option) =>
           option.alias ? option.alias : option.variable
@@ -134,11 +217,13 @@ export default function FilteringForm({
         size="small"
         fullWidth
         onChange={(event: SyntheticEvent, option: FilteringOption | null) => {
-          setFiltering(
-            dataSource.internal_id,
-            option?.variable,
-            option?.bounds
-          );
+          if (option) {
+            setFilter(
+              dataSource.internal_id,
+              option.variable,
+              data.byID[dataSource.internal_id].bounds[option.variable]!,
+            );
+          }
         }}
         renderInput={(params) => (
           <TextField {...params} label={t("add_filter")} />
@@ -159,7 +244,6 @@ export default function FilteringForm({
             key={"FilteringOption-" + variable + "-" + dataSource.internal_id}
             variable={variable}
             bounds={bounds}
-            setFiltering={setFiltering}
             dataSource={dataSource}
           />
         ))}

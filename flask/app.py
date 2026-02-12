@@ -486,8 +486,11 @@ def generate_event_dict(nlines=None):
     app.logger.info("getting varmaps...")
     vars = json.loads(request.args.get("vars"))
     varmaps = json.loads(request.args.get("var_maps"))
+    app.logger.debug(f"\nVars: {vars}\nVarmaps: {varmaps}")
 
     varmap = get_varmap(vars, varmaps, df.columns)
+
+    app.logger.debug(f"\nVarmap: {varmap}")
 
     required_vars = [
         var for var in vars if var in list(varmaps.keys()) if varmaps[var]
@@ -558,11 +561,35 @@ def generate_event_dict(nlines=None):
 
         app.logger.debug(df["datetime"][:10])
 
+    # INDEX MANAGING
+    app.logger.info(f"index: {index}")
+    if index == "numerical":
+        app.logger.info("Numerical index selected, ignoring id field")
+        varmap["id"] = "id"
+
+    # GENERATE BOUNDS
+    app.logger.info("getting bounds...")
+    app.logger.debug(varmap)
+    bounds = {
+        var: (
+            [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
+            if df.dtypes[varmap[var]] in (float, float64, int, int64)
+            and not (
+                isnan(float(df[varmap[var]].min()))
+                or isnan(float(df[varmap[var]].max()))
+            )
+            else None
+        )
+        for var in required_vars + optional_vars
+        if varmap[var]
+    }
+    app.logger.debug(bounds)
+
     # OPTIONAL FILTERING
 
     filtering = json.loads(request.args.get("filtering"))
 
-    if len(list(filtering.keys())) > 1:
+    if len(list(filtering.keys())) > 0:
         app.logger.info("applying filters...")
         for variable in filtering.keys():
             app.logger.info(
@@ -572,8 +599,29 @@ def generate_event_dict(nlines=None):
                 (df[varmap[variable]] > filtering[variable][0])
                 & (df[varmap[variable]] < filtering[variable][1])
             ]
+
+        # GENERATE FILTERED BOUNDS
+        app.logger.info("getting filtered bounds (storing unfiltered bounds)...")
+        app.logger.debug(varmap)
+        unfiltered_bounds = bounds
+
+        bounds = {
+            var: (
+                [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
+                if df.dtypes[varmap[var]] in (float, float64, int, int64)
+                and not (
+                    isnan(float(df[varmap[var]].min()))
+                    or isnan(float(df[varmap[var]].max()))
+                )
+                else None
+            )
+            for var in required_vars + optional_vars
+            if varmap[var]
+        }
+        app.logger.debug(bounds)
     else:
         app.logger.info("skipping filters...")
+        unfiltered_bounds = bounds
 
     # GET EXTENT
     app.logger.info("pre-calculating extent...")
@@ -594,30 +642,6 @@ def generate_event_dict(nlines=None):
         centroid = MultiPoint.centroid
 
         centroid_processed = [centroid.x, centroid.y, df[varmap["dep"]].mean()]
-
-    # GENERATE BOUNDS
-    app.logger.info("getting bounds...")
-    app.logger.debug(varmap)
-    bounds = {
-        var: (
-            [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
-            if df.dtypes[varmap[var]] in (float, float64, int, int64)
-            and not (
-                isnan(float(df[varmap[var]].min()))
-                or isnan(float(df[varmap[var]].max()))
-            )
-            else None
-        )
-        for var in required_vars + optional_vars
-        if varmap[var]
-    }
-    app.logger.debug(bounds)
-
-    # INDEX MANAGING
-    app.logger.info(f"index: {index}")
-    if index == "numerical":
-        app.logger.info("Numerical index selected, ignoring id field")
-        varmap["id"] = "id"
 
     # CONVERT TO JSON
     app.logger.info("converting to json...")
@@ -643,6 +667,7 @@ def generate_event_dict(nlines=None):
     return {
         "data": event_list,
         "bounds": bounds,
+        "unfiltered_bounds": unfiltered_bounds,
         "extent": {
             "centroid": centroid_processed if centroid_calculatable else None,
             "bounds": MultiPoint.bounds if centroid_calculatable else None,
@@ -683,12 +708,13 @@ def get_varmap(vars, varmaps, columns):
     for var in vars:
         if var in varmaps:
             if varmaps[var] is not None:
+                app.logger.info(var)
                 for mapped_var in varmaps[var]:
                     if mapped_var in columns:
                         varmap[var] = mapped_var
                         continue
 
-                    # varmap[var] = None
+                    varmap[var] = var
         else:
             varmap[var] = var
 
