@@ -61,10 +61,15 @@ export type ProjectActions = {
     setMetadata: (id: string, value: DataSourceMetaData) => void;
     setFormatting: (
       id: string,
+      type: "twoD" | "threeD" | "plot",
       keyToModify: keyof DataSourceFormatting,
       value: never,
     ) => void;
-    setColorFormatting: (id: string, value: DataSourceColorFormatting) => void;
+    setColorFormatting: (
+      id: string,
+      type: "twoD" | "threeD" | "plot",
+      value: DataSourceColorFormatting,
+    ) => void;
     setFilter: (
       id: string,
       variableToModify: string,
@@ -181,13 +186,13 @@ export const createProjectStore = (
             set((state) => {
               state.dataSources.byID[id].metadata = value;
             }),
-          setFormatting: (id, keyToModify, value) =>
+          setFormatting: (id, type, keyToModify, value) =>
             set((state) => {
-              state.dataSources.byID[id].formatting[keyToModify] = value;
+              state.dataSources.byID[id].formatting[type][keyToModify] = value;
             }),
-          setColorFormatting: (id, value) =>
+          setColorFormatting: (id, type, value) =>
             set((state) => {
-              state.dataSources.byID[id].formatting.color = value;
+              state.dataSources.byID[id].formatting[type].color = value;
             }),
           setFilter: (id, keyToModify, value) =>
             set((state) => {

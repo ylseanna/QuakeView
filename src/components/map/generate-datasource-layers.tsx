@@ -11,7 +11,7 @@ const d3Color_to_deckGLColor = (color: d3.RGBColor) =>
   [color.r, color.g, color.b] as Color;
 
 export function generateDataSourceMapLayers(
-  layer_type: "1D" | "3D",
+  layerType: "oneD" | "threeD",
   dataSource: DataSource,
   data: EarthQuake[],
   sessionInterface: SessionInterface,

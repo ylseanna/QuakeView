@@ -1,4 +1,4 @@
-import { useSuspenseQueries } from "@tanstack/react-query";
+import { useQueries } from "@tanstack/react-query";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { fetchData } from "./load-data";
@@ -25,7 +25,7 @@ export type DataCacheResult = {
 export function useData() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  return useSuspenseQueries({
+  return useQueries({
     queries: dataSources.allIDs.map((dataSourceID) => {
       return {
         queryKey: [
@@ -40,7 +40,7 @@ export function useData() {
           },
         ],
         queryFn: () => fetchData(dataSources.byID[dataSourceID]),
-        enabled: dataSources.byID[dataSourceID].interface.loadable
+        enabled: dataSources.byID[dataSourceID].interface.loadable,
       };
     }),
     combine: (results) => {

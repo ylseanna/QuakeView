@@ -1,5 +1,5 @@
-import path from "path";
 import { TinyColor } from "mui-color-input";
+import path from "path";
 
 import { DataSource, DataSourceFormatting, DataSourceMetaData } from "../types";
 
@@ -27,26 +27,70 @@ export const getInitDataSource = async (filepath: string) => {
         interface: { pickable: false, visible: true, loadable: false },
         filtering: {},
         formatting: {
-          scale: 15,
-          opacity: 100,
-          antialiasing: false,
-          positionOffset: 0,
-          color: {
-            mapping: "single",
-            single: "rgb(0, 0, 0)" as unknown as TinyColor,
-            linear: {
-              variable: "mag",
-              cmap: "Batlow",
-              inverted: false,
-              domain: Object.assign({}, ...colormapsBounds),
+          twoD: {
+            scale: 15,
+            opacity: 100,
+            antialiasing: false,
+            positionOffset: 0,
+            color: {
+              mapping: "single",
+              single: "rgb(0, 0, 0)" as unknown as TinyColor,
+              linear: {
+                variable: "mag",
+                cmap: "Batlow",
+                inverted: false,
+                domain: Object.assign({}, ...colormapsBounds),
+              },
+              categorical: {
+                variable: "",
+                cmap: "BatlowS",
+                inverted: false,
+              },
             },
-            categorical: {
-              variable: "",
-              cmap: "BatlowS",
-              inverted: false,
+          } as DataSourceFormatting,
+          threeD: {
+            scale: 25,
+            opacity: 100,
+            antialiasing: false,
+            positionOffset: 0,
+            color: {
+              mapping: "single",
+              single: "rgb(0, 0, 0)" as unknown as TinyColor,
+              linear: {
+                variable: "mag",
+                cmap: "Batlow",
+                inverted: false,
+                domain: Object.assign({}, ...colormapsBounds),
+              },
+              categorical: {
+                variable: "",
+                cmap: "BatlowS",
+                inverted: false,
+              },
             },
-          },
-        } as DataSourceFormatting,
+          } as DataSourceFormatting,
+          plot: {
+            scale: 5,
+            opacity: 100,
+            antialiasing: false,
+            positionOffset: 0,
+            color: {
+              mapping: "single",
+              single: "rgb(0, 0, 0)" as unknown as TinyColor,
+              linear: {
+                variable: "mag",
+                cmap: "Batlow",
+                inverted: false,
+                domain: Object.assign({}, ...colormapsBounds),
+              },
+              categorical: {
+                variable: "",
+                cmap: "BatlowS",
+                inverted: false,
+              },
+            },
+          } as DataSourceFormatting,
+        },
         metadata: metadata,
       } as DataSource;
 

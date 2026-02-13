@@ -67,7 +67,7 @@ export default function DeckGLlayers() {
 
   return (
     <>
-      <DeckGLOverlay layers={layers} {...{ interleaved: true }} />
+      <DeckGLOverlay useDevicePixels={false} layers={layers} {...{ interleaved: true }} />
       {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
     </>
   );

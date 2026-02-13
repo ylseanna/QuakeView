@@ -486,11 +486,8 @@ def generate_event_dict(nlines=None):
     app.logger.info("getting varmaps...")
     vars = json.loads(request.args.get("vars"))
     varmaps = json.loads(request.args.get("var_maps"))
-    app.logger.debug(f"\nVars: {vars}\nVarmaps: {varmaps}")
 
     varmap = get_varmap(vars, varmaps, df.columns)
-
-    app.logger.debug(f"\nVarmap: {varmap}")
 
     required_vars = [
         var for var in vars if var in list(varmaps.keys()) if varmaps[var]
@@ -561,12 +558,6 @@ def generate_event_dict(nlines=None):
 
         app.logger.debug(df["datetime"][:10])
 
-    # INDEX MANAGING
-    app.logger.info(f"index: {index}")
-    if index == "numerical":
-        app.logger.info("Numerical index selected, ignoring id field")
-        varmap["id"] = "id"
-
     # GENERATE BOUNDS
     app.logger.info("getting bounds...")
     app.logger.debug(varmap)
@@ -584,6 +575,12 @@ def generate_event_dict(nlines=None):
         if varmap[var]
     }
     app.logger.debug(bounds)
+
+    # INDEX MANAGING
+    app.logger.info(f"index: {index}")
+    if index == "numerical":
+        app.logger.info("Numerical index selected, ignoring id field")
+        varmap["id"] = "id"
 
     # OPTIONAL FILTERING
 
@@ -708,13 +705,12 @@ def get_varmap(vars, varmaps, columns):
     for var in vars:
         if var in varmaps:
             if varmaps[var] is not None:
-                app.logger.info(var)
                 for mapped_var in varmaps[var]:
                     if mapped_var in columns:
                         varmap[var] = mapped_var
                         continue
 
-                    varmap[var] = var
+                    # varmap[var] = None
         else:
             varmap[var] = var
 

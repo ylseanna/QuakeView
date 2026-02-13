@@ -46,22 +46,6 @@ export default function DataSelector() {
 
       <Grid container sx={{ m: 2 }}>
         <Grid>
-          {/* <MuiFileInput
-            size="small"
-            onChange={(newValue) => {
-              console.log(newValue);
-            }}
-            InputProps={{
-              inputProps: {
-                accept: ".csv",
-              },
-              startAdornment: (
-                <>
-                  <Folder sx={{ mr: 2 }} /> Insert a file
-                </>
-              ),
-            }}
-          /> */}
           <Button
             variant="contained"
             disableElevation

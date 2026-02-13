@@ -1,7 +1,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
 import { Box } from "@mui/material";
-import { OrthographicView, PickingInfo } from "deck.gl";
+import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
 import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
@@ -35,7 +35,7 @@ export default function StemPlot() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  const { data } = useData()
+  const { data } = useData();
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -363,9 +363,10 @@ export default function StemPlot() {
               viewPortScaleX.current!,
               viewPortScaleY.current!,
               viewPortScaleY.current!(minY),
-            );
+              false,
+            ) as ScatterplotLayer<EarthQuake>;
 
-            layer[1].onHover = (info: PickingInfo<EarthQuake>) => {
+            layer.onHover = (info: PickingInfo<EarthQuake>) => {
               setHoverInfo(info);
               return true;
             };
@@ -405,6 +406,7 @@ export default function StemPlot() {
             left: margin.left + "px",
             cursor: sessionInterface.pickable ? "crosshair" : "auto",
           }}
+          useDevicePixels={false}
           views={
             new OrthographicView({
               width: graphWidth,

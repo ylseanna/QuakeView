@@ -4,12 +4,8 @@ import { Close, ExpandMore, Numbers } from "@mui/icons-material";
 import {
   Autocomplete,
   Box,
-  FormControl,
   Grid,
   IconButton,
-  Input,
-  InputLabel,
-  Stack,
   TextField,
   Tooltip,
   Typography,
@@ -34,9 +30,6 @@ type FilteringOption = {
   bounds: [number, number];
 };
 
-let round10 = (v: number) => Math.pow(10, Math.floor(Math.log10(Math.abs(v)))) * Math.pow(-1, v < 0);
-
-
 const FilteringEditingRow = ({
   variable,
   bounds,
@@ -60,6 +53,7 @@ const FilteringEditingRow = ({
     (state) => state.dataSourceActions,
   );
 
+  // Math.log10(-countDecimals(minVal));
   return (
     <SubAccordion
       variant="outlined"
@@ -109,69 +103,24 @@ const FilteringEditingRow = ({
               onChange={(event: Event, newValue: number | number[]) => {
                 setLocalDomain(newValue as [number, number]);
               }}
-              onChangeCommitted={(
-                event: Event | SyntheticEvent<Element, Event>,
-                newValue: number | number[],
+              onChangeCommitted={() => {
+                setFilter(dataSource.internal_id, variable, localDomain);
+              }}
+              numberInputs
+              onChangeNumberInputsMin={(
+                event: ChangeEvent<HTMLInputElement>,
               ) => {
-                setFilter(
-                  dataSource.internal_id,
-                  variable,
-                  newValue as [number, number],
-                );
+                setLocalDomain([Number(event.target.value), localDomain[1]]);
+              }}
+              onChangeNumberInputsMax={(
+                event: ChangeEvent<HTMLInputElement>,
+              ) => {
+                setLocalDomain([localDomain[0], Number(event.target.value)]);
+              }}
+              onBlurNumberInputs={() => {
+                setFilter(dataSource.internal_id, variable, localDomain);
               }}
             />
-            <Stack direction="row" spacing={2} justifyContent="space-between">
-              <FormControl fullWidth variant="standard">
-                <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>
-                <Input
-                  value={localDomain[0]}
-                  size="small"
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    setLocalDomain([
-                      Number(event.target.value),
-                      localDomain[1],
-                    ]);
-                    setFilter(dataSource.internal_id, variable, [
-                      Number(event.target.value),
-                      localDomain[1],
-                    ]);
-                  }}
-                  sx={{ width: "100%" }}
-                  inputProps={{
-                    step: round10((data.byID[dataSource.internal_id].bounds[variable]![0]! - data.byID[dataSource.internal_id].bounds[variable]![1]) as number),
-                    min: data.byID[dataSource.internal_id].bounds[variable]![0],
-                    max: data.byID[dataSource.internal_id].bounds[variable]![1],
-                    type: "number",
-                    "aria-labelledby": "input-slider",
-                  }}
-                />
-              </FormControl>
-              <FormControl fullWidth variant="standard">
-                <InputLabel sx={{ top: "6px" }}>Maximum</InputLabel>
-                <Input
-                  value={localDomain[1]}
-                  size="small"
-                  onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                    setLocalDomain([
-                      localDomain[0],
-                      Number(event.target.value),
-                    ]);
-                    setFilter(dataSource.internal_id, variable, [
-                      localDomain[0],
-                      Number(event.target.value),
-                    ]);
-                  }}
-                  sx={{ width: "100%" }}
-                  inputProps={{
-                    step: round10((data.byID[dataSource.internal_id].bounds[variable]![0]! - data.byID[dataSource.internal_id].bounds[variable]![1]) as number),
-                    min: data.byID[dataSource.internal_id].bounds[variable]![0],
-                    max: data.byID[dataSource.internal_id].bounds[variable]![1],
-                    type: "number",
-                    "aria-labelledby": "input-slider",
-                  }}
-                />
-              </FormControl>
-            </Stack>
           </>
         )}
       </SubAccordionDetails>

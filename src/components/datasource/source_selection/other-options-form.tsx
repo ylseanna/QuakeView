@@ -1,17 +1,9 @@
-/* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
 import { ColorLens, ExpandMore, FilterAlt } from "@mui/icons-material";
 import { Box, Paper, Typography } from "@mui/material";
 
-// import {
-//   DataSource,
-//   DataSourceDataDescription,
-//   DataSourceFormatting,
-// } from "@/components/datasource/types";
 import { useTranslations } from "next-intl";
-// import { Dispatch, SetStateAction, useCallback } from "react";
-import DataSourceFormattingForm from "../formatting/formatting-form";
 
 import {
   SubAccordion,
@@ -19,10 +11,10 @@ import {
   SubAccordionSummary,
 } from "../../layout/accordion";
 import FilteringForm from "../filtering/filtering-form";
-import { useProjectStore } from "@/providers/project-store-provider";
 import { useEffect, useState } from "react";
 import { DataSource } from "../types";
 import { updatedMetaDataUrl } from "../data-source-query";
+import DataSourceFormattingForms from "../formatting/formatting-forms";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -35,88 +27,41 @@ export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
 export default function OtherOptionsForm({ dataSource }: DataTabProps) {
   const t = useTranslations();
 
-  // dataSourceSubactions
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-  const setFiltering = useProjectStore(
-    (state) => state.dataSourceActions.setFiltering,
-  );
-
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
 
   useEffect(() => {
-    const all_domains_present = dataSource.metadata.variables.required_vars
-      .concat(dataSource.metadata.variables.datetime_vars)
-      .concat(dataSource.metadata.variables.added_vars)
-      .map((variable) => {
-        console.log(variable);
+    const all_domains_present = ["twoD", "threeD", "plot"]
+      .map((formattingType) =>
+        dataSource.metadata.variables.required_vars
+          .concat(dataSource.metadata.variables.datetime_vars)
+          .concat(dataSource.metadata.variables.added_vars)
+          .map((variable) => {
+            console.log(variable);
 
-        // if (
-        //   dataSource.metadata.datetime_format == "parseable_datetime_string"
-        // ) {
-        return [
-          "dt",
-          "id",
-          "time",
-          "date",
-          "year",
-          "month",
-          "day",
-          "doy",
-          "hour",
-          "minute",
-          "second",
-        ].includes(variable)
-          ? true
-          : dataSource.formatting.color.linear.domain[variable] != null;
-        // } else if (dataSource.metadata.datetime_format == "year-month-day-hour-minute-second") {
-        //   console.log(variable)
-        //   return [
-        //     "dt",
-        //     "id",
-        //     "time",
-        //     "date",
-        //     "year",
-        //     "month",
-        //     "day",
-        //     "doy",
-        //     "hour",
-        //     "minute",
-        //     "second",
-        //   ].includes(variable)
-        //     ? true
-        //     : dataSource.formatting.color.linear.domain[variable] != null;
-        // }else if (dataSource.metadata.datetime_format == "date_string-time_string") {
-        //   console.log(variable)
-        //   return [
-        //     "dt",
-        //     "id",
-        //     "time",
-        //     "date",
-        //     "year",
-        //     "month",
-        //     "day",
-        //     "doy",
-        //     "hour",
-        //     "minute",
-        //     "second",
-        //   ].includes(variable)
-        //     ? true
-        //     : dataSource.formatting.color.linear.domain[variable] != null;
-        // } else {
-        //   return false;
-        // }
-      });
+            return [
+              "dt",
+              "id",
+              "time",
+              "date",
+              "year",
+              "month",
+              "day",
+              "doy",
+              "hour",
+              "minute",
+              "second",
+            ].includes(variable)
+              ? true
+              : dataSource.formatting[
+                  formattingType as "twoD" | "threeD" | "plot"
+                ].color.linear.domain[variable] != null;
+          })
+          .every((el) => el),
+      )
+      .every((el) => el);
 
-    console.log(all_domains_present);
-
-    setAllDomainsPresent(all_domains_present.every((el) => el));
-  }, [
-    dataSource.formatting.color.linear.domain,
-    dataSource.metadata.variables,
-  ]);
-
+    setAllDomainsPresent(all_domains_present);
+  }, [dataSource.formatting, dataSource.metadata.variables]);
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden" }}>
       <Box display="flex" sx={{ m: 2 }}>
@@ -142,10 +87,7 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
         </Box>
         <SubAccordionDetails>
           {dataSource.interface.loadable && allDomainsPresent && (
-            <DataSourceFormattingForm
-              dataSource={dataSource}
-              setFormatting={setFormatting}
-            />
+            <DataSourceFormattingForms dataSource={dataSource} />
           )}
         </SubAccordionDetails>
       </SubAccordion>
@@ -167,10 +109,7 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
         </Box>
         <SubAccordionDetails>
           {dataSource.interface.loadable && (
-            <FilteringForm
-              dataSource={dataSource}
-              setFiltering={setFiltering}
-            />
+            <FilteringForm dataSource={dataSource} />
           )}
         </SubAccordionDetails>
       </SubAccordion>

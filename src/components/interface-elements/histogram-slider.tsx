@@ -1,5 +1,5 @@
-import { Skeleton, Slider, SliderOwnProps } from "@mui/material";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { FormControl, Input, InputLabel, Skeleton, Slider, SliderOwnProps, Stack } from "@mui/material";
+import { ChangeEventHandler, useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useData } from "../datasource/use-data";
@@ -15,6 +15,10 @@ export default function HistogramSlider({
   marks,
   onChange,
   onChangeCommitted,
+  numberInputs,
+  onChangeNumberInputsMin,
+  onChangeNumberInputsMax,
+  onBlurNumberInputs,
 }: {
   id?: string;
   dataSource: DataSource;
@@ -25,6 +29,16 @@ export default function HistogramSlider({
   marks?: SliderOwnProps<number | number[]>["marks"];
   onChange: SliderOwnProps<number | number[]>["onChange"];
   onChangeCommitted: SliderOwnProps<number | number[]>["onChangeCommitted"];
+  numberInputs?: boolean;
+  onChangeNumberInputsMin?: ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement,
+    Element
+  >;
+  onChangeNumberInputsMax?: ChangeEventHandler<
+    HTMLInputElement | HTMLTextAreaElement,
+    Element
+  >;
+  onBlurNumberInputs?: () => void;
 }) {
   const { data } = useData();
 
@@ -64,7 +78,7 @@ export default function HistogramSlider({
     const x = d3
       .scaleLinear()
       .domain([min, max] as Iterable<d3.NumberValue>)
-      .range([margin.left, width - margin.right]);
+      .range([margin.left, width - margin.right]).nice();
 
     // d3.json(dataSourceDataUrl(dataSource)).then((data) => {
     //   if (!data) {
@@ -73,8 +87,8 @@ export default function HistogramSlider({
     if (data.byID[dataSource.internal_id]) {
       const bins = d3.bin().thresholds(50).domain([min!, max!])(
         (data.byID[dataSource.internal_id].data as EarthQuake[]).map(
-          (d) => d[variable]
-        ) as ArrayLike<number>
+          (d) => d[variable],
+        ) as ArrayLike<number>,
       );
 
       const y = d3
@@ -98,7 +112,7 @@ export default function HistogramSlider({
         .append("g")
         .attr("transform", `translate(0, ${height})`)
         .call(
-          d3.axisBottom(x)
+          d3.axisBottom(x),
           // .tickFormat(() => "")
         );
 
@@ -122,33 +136,83 @@ export default function HistogramSlider({
   ]);
 
   return (
-    <div style={{ position: "relative" }}>
-      <div
-        ref={parentRef}
-        id={id ? id : `chart-${dataSource.internal_id}`}
-        style={{ position: "relative" }}
-      >
-        {isLoading && (
-          <Skeleton
-            sx={{ position: "absolute" }}
-            variant="rectangular"
-            width={dimensions.width}
-            height={dimensions.width * 0.3}
-          />
-        )}
+    <>
+      <div style={{ position: "relative" }}>
+        <div
+          ref={parentRef}
+          id={id ? id : `chart-${dataSource.internal_id}`}
+          style={{ position: "relative" }}
+        >
+          {isLoading && (
+            <Skeleton
+              sx={{ position: "absolute" }}
+              variant="rectangular"
+              width={dimensions.width}
+              height={dimensions.width * 0.3}
+            />
+          )}
+        </div>
+        <Slider
+          value={value}
+          valueLabelDisplay="auto"
+          min={min}
+          max={max}
+          step={step}
+          marks={marks}
+          onChange={onChange}
+          size="small"
+          onChangeCommitted={onChangeCommitted}
+          sx={{ position: "absolute", bottom: 7, width: dimensions.width }}
+        />
       </div>
-      <Slider
-        value={value}
-        valueLabelDisplay="auto"
-        min={min}
-        max={max}
-        step={step}
-        marks={marks}
-        onChange={onChange}
-        size="small"
-        onChangeCommitted={onChangeCommitted}
-        sx={{ position: "absolute", bottom: 7, width: dimensions.width }}
-      />
-    </div>
+      {numberInputs && (
+        <Stack direction="row" spacing={2} justifyContent="space-between">
+          <FormControl fullWidth variant="standard">
+            <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>
+            <Input
+              value={value![0]}
+              size="small"
+              onChange={onChangeNumberInputsMin}
+              onBlur={onBlurNumberInputs}
+              sx={{ width: "100%" }}
+              inputProps={{
+                step: step,
+                min: min,
+                max: max,
+                type: "number",
+                "aria-labelledby": "input-slider",
+              }}
+              onKeyUp={(event) => {
+                if (event.key === "Enter") {
+                  onBlurNumberInputs!();
+                }
+              }}
+            />
+          </FormControl>
+          <FormControl fullWidth variant="standard">
+            <InputLabel sx={{ top: "6px" }}>Maximum</InputLabel>
+            <Input
+              value={value![1]}
+              size="small"
+              onChange={onChangeNumberInputsMax}
+              onBlur={onBlurNumberInputs}
+              sx={{ width: "100%" }}
+              inputProps={{
+                step: step,
+                min: min,
+                max: max,
+                type: "number",
+                "aria-labelledby": "input-slider",
+              }}
+              onKeyUp={(event) => {
+                if (event.key === "Enter") {
+                  onBlurNumberInputs!();
+                }
+              }}
+            />
+          </FormControl>
+        </Stack>
+      )}
+    </>
   );
 }

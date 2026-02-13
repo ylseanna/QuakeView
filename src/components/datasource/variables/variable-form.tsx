@@ -257,29 +257,36 @@ export default function DataSourceVariableForm({
   useEffect(() => {
     if (data) {
       data.allIDs.forEach((dataSourceID) => {
-        const boundsFromData = {} as {
-          [variable: string]: [number, number] | null;
-        };
+        ["twoD", "threeD", "plot"].forEach((type) => {
+          const formattingType = type as "twoD" | "threeD" | "plot";
 
-        dataSource.metadata.variables.required_vars
-          .concat(dataSource.metadata.variables.datetime_vars)
-          .concat(dataSource.metadata.variables.added_vars)
-          .concat(["t"])
-          .forEach((variable) => {
-            return (boundsFromData[variable] = dataSource.formatting.color
-              .linear.domain[dataSource.formatting.color.linear.variable]
-              ? dataSource.formatting.color.linear.domain[
-                  dataSource.formatting.color.linear.variable
-                ]
-              : data.byID[dataSourceID].bounds[variable]);
+          const boundsFromData = {} as {
+            [variable: string]: [number, number] | null;
+          };
+
+          dataSource.metadata.variables.required_vars
+            .concat(dataSource.metadata.variables.datetime_vars)
+            .concat(dataSource.metadata.variables.added_vars)
+            .concat(["t"])
+            .forEach((variable) => {
+              return (boundsFromData[variable] = dataSource.formatting[
+                formattingType
+              ].color.linear.domain[
+                dataSource.formatting[formattingType].color.linear.variable
+              ]
+                ? dataSource.formatting[formattingType].color.linear.domain[
+                    dataSource.formatting[formattingType].color.linear.variable
+                  ]
+                : data.byID[dataSourceID].bounds[variable]);
+            });
+
+          setColorFormatting(dataSourceID, formattingType, {
+            ...dataSources.byID[dataSourceID].formatting[formattingType].color,
+            linear: {
+              ...dataSources.byID[dataSourceID].formatting[formattingType].color.linear,
+              domain: boundsFromData,
+            },
           });
-
-        setColorFormatting(dataSourceID, {
-          ...dataSources.byID[dataSourceID].formatting.color,
-          linear: {
-            ...dataSources.byID[dataSourceID].formatting.color.linear,
-            domain: boundsFromData,
-          },
         });
       });
     }

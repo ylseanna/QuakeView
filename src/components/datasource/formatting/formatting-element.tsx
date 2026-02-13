@@ -8,51 +8,50 @@ import {
   SubAccordionDetails,
   SubAccordionSummary,
 } from "../../layout/accordion";
-import DataSourceFormattingForm from "./formatting-form";
 import { useEffect, useState } from "react";
+import DataSourceFormattingForms from "./formatting-forms";
 
 export default function DataSourceFormattingElement({
   dataSource,
-  setFormatting,
   single = false,
 }: {
   dataSource: DataSource;
-  setFormatting: CallableFunction;
   single?: boolean;
 }) {
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
 
   useEffect(() => {
-    const all_domains_present = dataSource.metadata.variables.required_vars
-      .concat(dataSource.metadata.variables.datetime_vars)
-      .concat(dataSource.metadata.variables.added_vars)
-      .map((variable) => {
-        console.log(variable);
+    const all_domains_present = ["twoD", "threeD", "plot"].map(
+      (formattingType) =>
+        dataSource.metadata.variables.required_vars
+          .concat(dataSource.metadata.variables.datetime_vars)
+          .concat(dataSource.metadata.variables.added_vars)
+          .map((variable) => {
+            console.log(variable);
 
-        return [
-          "dt",
-          "id",
-          "time",
-          "date",
-          "year",
-          "month",
-          "day",
-          "doy",
-          "hour",
-          "minute",
-          "second",
-        ].includes(variable)
-          ? true
-          : dataSource.formatting.color.linear.domain[variable] != null;
-      });
+            return [
+              "dt",
+              "id",
+              "time",
+              "date",
+              "year",
+              "month",
+              "day",
+              "doy",
+              "hour",
+              "minute",
+              "second",
+            ].includes(variable)
+              ? true
+              : dataSource.formatting[
+                  formattingType as "twoD" | "threeD" | "plot"
+                ].color.linear.domain[variable] != null;
+          })
+          .every((el) => el),
+    ).every((el) => el);
 
-    console.log(all_domains_present);
-
-    setAllDomainsPresent(all_domains_present.every((el) => el));
-  }, [
-    dataSource.formatting.color.linear.domain,
-    dataSource.metadata.variables,
-  ]);
+    setAllDomainsPresent(all_domains_present);
+  }, [dataSource.formatting, dataSource.metadata.variables]);
 
   return !single ? (
     <SubAccordion
@@ -75,21 +74,15 @@ export default function DataSourceFormattingElement({
       </Box>
       <SubAccordionDetails>
         {dataSource.interface.loadable && allDomainsPresent && (
-          <DataSourceFormattingForm
-            dataSource={dataSource}
-            setFormatting={setFormatting}
-          />
+          <DataSourceFormattingForms dataSource={dataSource} />
         )}
       </SubAccordionDetails>
     </SubAccordion>
   ) : (
     <>
-      <SubAccordionDetails>
+      <SubAccordionDetails sx={{ p: 0 }}>
         {dataSource.interface.loadable && allDomainsPresent ? (
-          <DataSourceFormattingForm
-            dataSource={dataSource}
-            setFormatting={setFormatting}
-          />
+          <DataSourceFormattingForms dataSource={dataSource} />
         ) : (
           <Alert sx={{ mt: 1 }} severity="error">
             Formatting broken

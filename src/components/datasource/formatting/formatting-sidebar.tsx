@@ -9,13 +9,11 @@ import DataSourceFormattingElement from "./formatting-element";
 import { useData } from "../use-data";
 
 interface FormattingProps {
-  setFormatting: CallableFunction;
   drawerOpen: boolean;
   single?: boolean;
 }
 
 export default function FormattingSidebar({
-  setFormatting,
   drawerOpen,
 }: FormattingProps) {
   const t = useTranslations("Formatting");
@@ -63,7 +61,6 @@ export default function FormattingSidebar({
               <DataSourceFormattingElement
                 key={id}
                 dataSource={dataSources.byID[id]}
-                setFormatting={setFormatting}
                 single={dataSources.allIDs.length > 1 ? false : true}
               />
             ))}

@@ -7,12 +7,11 @@ import {
 import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { Suspense, useState } from "react";
+import { useState } from "react";
 import Actions from "../../../../components/datasource/actions";
 import ThreeDDeckGLView from "../../../../components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useData } from "@/components/datasource/use-data";
-import LinearProgress from "@mui/material/LinearProgress";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
@@ -47,12 +46,10 @@ export default function Page() {
   return (
     <>
       <Actions />
-      <Suspense fallback={<LinearProgress />}>
         <ThreeDDeckGLView
           extent={calculateExtent()}
           positionOffset={positionOffset}
         ></ThreeDDeckGLView>
-      </Suspense>
     </>
   );
 }

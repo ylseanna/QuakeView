@@ -19,7 +19,7 @@ export default function Legend({ singleColor, sx }: LegendProps) {
   if (
     dataSources.allIDs!.length > 1 ||
     (dataSources.allIDs!.length == 1 &&
-      dataSources.byID![dataSources.allIDs[0]].formatting.color.mapping !=
+      dataSources.byID![dataSources.allIDs[0]].formatting["twoD"].color.mapping !=
         "single")
   ) {
     return (

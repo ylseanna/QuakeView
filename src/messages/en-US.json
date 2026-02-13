@@ -67,7 +67,12 @@
     "parameter": "Parameter",
     "parameter_descr": "Parameter (float) which dictates the colour mapping for the earthquakes. Custom parameters can be set in the 'Data Sources' tab (to be implemented).",
     "scale": "Scale",
-    "scale_descr": "Global radius multiplier for all points."
+    "scale_descr": "Global radius multiplier for all points.",
+    "Formatting": {
+      "map": "2D Map",
+      "plot": "plot",
+      "3D_map": "3D map"
+    }
   },
   "Layers": {
     "layers": "Layers"

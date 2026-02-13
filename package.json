@@ -95,6 +95,7 @@
     "@formatjs/intl-datetimeformat": "^7.2.0",
     "@geo-maps/countries-coastline-1m": "^0.6.0",
     "@mui/icons-material": "^7.3.7",
+    "@mui/lab": "^7.0.1-beta.22",
     "@mui/material": "^7.3.7",
     "@mui/material-nextjs": "^7.3.7",
     "@mui/types": "^7.4.10",

@@ -21,7 +21,11 @@ export type DataSource = {
   name: string;
   interface: { pickable: boolean; visible: boolean; loadable: boolean };
   filtering: DataSourceFiltering;
-  formatting: DataSourceFormatting;
+  formatting: {
+    twoD: DataSourceFormatting;
+    threeD: DataSourceFormatting;
+    plot: DataSourceFormatting;
+  };
   metadata: DataSourceMetaData;
 };
 

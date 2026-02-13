@@ -186,6 +186,7 @@ export default function ThreeDDeckGLView({
           position: "relative",
           backgroundColor: "var(--mui-palette-background-default)",
         }}
+        useDevicePixels={false}
         // onLoad={onMapLoad}
       >
         {/* {IsLoading && <LinearProgress variant="query" />} */}
