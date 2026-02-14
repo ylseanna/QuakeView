@@ -1,12 +1,36 @@
 import { Pause, PlayArrow } from "@mui/icons-material";
 import useAnimationFrame from "use-animation-frame";
-import { GradientHorizontal, Selection, SelectionOff, Speedometer } from "mdi-material-ui";
+import {
+  GradientHorizontal,
+  Selection,
+  SelectionOff,
+  Speedometer,
+} from "mdi-material-ui";
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
-import { Box, Checkbox, Divider, Grow, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, useTheme } from "@mui/material";
+import {
+  Box,
+  Checkbox,
+  Divider,
+  Grow,
+  IconButton,
+  Input,
+  MenuItem,
+  Paper,
+  Select,
+  SelectChangeEvent,
+  useTheme,
+} from "@mui/material";
 import { useTranslations } from "next-intl";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
-import { ChangeEvent, useCallback, useEffect, useMemo, useRef, useState } from "react";
+import {
+  ChangeEvent,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -424,21 +448,6 @@ export default function TimelineSlider() {
     // setIsLoading(true);
   }, [dimensions, margin.bottom, margin.left, margin.right, margin.top]);
 
-  // // set bounds
-  // useEffect(() => {
-  //   Object.keys(data).map((dataSourceID) => {
-  //     const dataSource = dataSources.byID[dataSourceID];
-
-  //     setBounds({
-  //       x: [
-  //         new Date(dataSource.metadata.variables.by_id["t"].bounds[0]),
-  //         new Date(dataSource.metadata.variables.by_id["t"].bounds[1]),
-  //       ],
-  //       y: dataSource.metadata.variables.by_id["mag"].bounds,
-  //     });
-  //   });
-  // }, [data, parentRef]);
-
   // set bounds based on ViewState
   useEffect(() => {
     if (viewPortScaleX.current && viewPortScaleY.current) {
@@ -477,26 +486,6 @@ export default function TimelineSlider() {
       });
     }
   }, [viewStateMonitor.coordPosition, viewStateMonitor.pixelPosition]);
-
-
-  useEffect(() => {
-    if (viewPortScaleX.current && viewPortScaleY.current) {
-      // time filtering (make option)
-      setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
-
-      // scale
-      scaleX.current!.domain(bounds.x);
-
-      // update X axes and grid based on scale
-      xAxes.current!.transition().duration(0.0000001).ease(d3.easeLinear).call(d3.axisBottom(scaleX.current!));
-      xAxesGrid.current!.transition().duration(0.0000001).ease(d3.easeLinear).call(
-        d3
-          .axisBottom(scaleX.current!)
-          .tickFormat(() => "")
-          .tickSize(-graphHeight),
-      );
-    }
-  }, [bounds]);
 
   const layers = useMemo(() => {
     if (data) {
@@ -586,6 +575,108 @@ export default function TimelineSlider() {
     sessionInterface,
   ]);
 
+  const resetAxes = useCallback(() => {
+    const minX = Math.min(
+      ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![0]),
+    );
+    const maxX = Math.max(
+      ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![1]),
+    );
+
+    const minY = Math.min(
+      ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![0]),
+    );
+    const maxY = Math.max(
+      ...data.allIDs.map((id) => data.byID[id]!.bounds["mag"]![1]),
+    );
+
+    setBounds({
+      x: [new Date(minX), new Date(maxX)],
+      y: [minY, maxY],
+    });
+
+    // time filtering (make option)
+    setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
+
+    // scale
+    scaleX.current!.domain(bounds.x);
+
+    // update X axes and grid based on scale
+    xAxes
+      .current!.transition()
+      .duration(0.0000001)
+      .ease(d3.easeLinear)
+      .call(d3.axisBottom(scaleX.current!));
+    xAxesGrid
+      .current!.transition()
+      .duration(0.0000001)
+      .ease(d3.easeLinear)
+      .call(
+        d3
+          .axisBottom(scaleX.current!)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
+
+    // scale
+    scaleY.current!.domain(bounds.y);
+
+    // update X axes and grid based on scale
+    yAxes
+      .current!.transition()
+      .duration(0.0000001)
+      .ease(d3.easeLinear)
+      .call(d3.axisLeft(scaleY.current!));
+    yAxesGrid
+      .current!.transition()
+      .duration(0.0000001)
+      .ease(d3.easeLinear)
+      .call(
+        d3
+          .axisLeft(scaleY.current!)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
+  }, [data]);
+
+  // initial setting
+  useEffect(() => {
+    resetAxes();
+  }, []);
+
+  // reset based on data change
+  useEffect(() => {
+    resetAxes();
+  }, [data]);
+
+  //  listen for viewport changes
+  useEffect(() => {
+    if (viewPortScaleX.current && viewPortScaleY.current) {
+      // time filtering (make option)
+      setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
+
+      // scale
+      scaleX.current!.domain(bounds.x);
+
+      // update X axes and grid based on scale
+      xAxes
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(d3.axisBottom(scaleX.current!));
+      xAxesGrid
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .tickFormat(() => "")
+            .tickSize(-graphHeight),
+        );
+    }
+  }, [bounds]);
+
   return (
     <Box
       style={{
@@ -618,7 +709,7 @@ export default function TimelineSlider() {
         }
         controller={
           {
-            scrollZoom: { speed: 0.1, smooth: true},
+            scrollZoom: { speed: 0.1, smooth: true },
             zoomAxis: "X",
             keyboard: { moveSpeed: -50 },
           } as ControllerOptions

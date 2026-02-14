@@ -7,14 +7,16 @@ import ColormapLegend from "./colormap-legend";
 
 interface LegendElementProps {
   dataSource: DataSource;
+  layerType: "twoD" | "threeD" | "plot";
   singleColor?: boolean;
 }
 
 export default function LegendElement({
   dataSource,
+  layerType,
   singleColor,
 }: LegendElementProps) {
-  return dataSource.formatting.color.mapping == "linear" && !singleColor ? (
+  return dataSource.formatting[layerType].color.mapping == "linear" && !singleColor ? (
     <>
       <Typography
         fontSize={10}
@@ -30,9 +32,9 @@ export default function LegendElement({
       >
         {dataSource.filename}
       </Typography>
-      <ColormapLegend dataSource={dataSource} />
+      <ColormapLegend dataSource={dataSource} layerType={layerType}/>
     </>
-  ) : dataSource.formatting.color.mapping == "categorical" && !singleColor ? (
+  ) : dataSource.formatting[layerType].color.mapping == "categorical" && !singleColor ? (
     <>
       <Typography
         fontSize={10}
@@ -48,10 +50,10 @@ export default function LegendElement({
       >
         {dataSource.filename}
       </Typography>
-      <CategoricalLegend dataSource={dataSource} />
+      <CategoricalLegend dataSource={dataSource} layerType={layerType}/>
     </>
   ) : (
-    (dataSource.formatting.color.mapping == "single" || singleColor) && (
+    (dataSource.formatting[layerType].color.mapping == "single" || singleColor) && (
       <Grid container alignItems="center">
         <Grid size={2} display="flex">
           <Box
@@ -60,8 +62,8 @@ export default function LegendElement({
               height: "12px",
               width: "12px",
               borderRadius: "50%",
-              backgroundColor: dataSource.formatting.color.single,
-              opacity: dataSource.formatting.opacity,
+              backgroundColor: dataSource.formatting[layerType].color.single,
+              opacity: dataSource.formatting[layerType].opacity,
             }}
           ></Box>
         </Grid>

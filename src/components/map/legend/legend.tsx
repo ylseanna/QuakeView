@@ -7,11 +7,12 @@ import { useTranslations } from "next-intl";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 interface LegendProps {
+  layerType: "twoD" | "threeD" | "plot";
   singleColor?: boolean;
   sx?: SxProps;
 }
 
-export default function Legend({ singleColor, sx }: LegendProps) {
+export default function Legend({ layerType, singleColor, sx }: LegendProps) {
   const t = useTranslations("Common");
 
   const dataSources = useProjectStore((state) => state.dataSources);
@@ -19,7 +20,7 @@ export default function Legend({ singleColor, sx }: LegendProps) {
   if (
     dataSources.allIDs!.length > 1 ||
     (dataSources.allIDs!.length == 1 &&
-      dataSources.byID![dataSources.allIDs[0]].formatting["twoD"].color.mapping !=
+      dataSources.byID![dataSources.allIDs[0]].formatting[layerType].color.mapping !=
         "single")
   ) {
     return (
@@ -54,6 +55,7 @@ export default function Legend({ singleColor, sx }: LegendProps) {
 
                 <LegendElement
                   dataSource={dataSources.byID[id]}
+                  layerType={layerType}
                   singleColor={singleColor}
                 />
               </Grid>

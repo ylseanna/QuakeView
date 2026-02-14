@@ -79,7 +79,7 @@ export default function ThreeDDeckGLView({
     if (data) {
       layers_to_set = data.allIDs.map((id: string) => {
         const layer = generateDataSourceMapLayers(
-          "3D",
+          "threeD",
           dataSources.byID[id],
           data.byID[id].data,
           sessionInterface,
@@ -120,13 +120,6 @@ export default function ThreeDDeckGLView({
 
   // eslint-disable-next-line react-hooks/exhaustive-deps
   useEffect(() => setInitialViewState(INITIAL_VIEWSTATE));
-
-  // // LOADING INDICATOR
-  // const [IsLoading, setIsLoading] = useState(true);
-
-  // const onMapLoad = () => {
-  //   setIsLoading(false);
-  // };
 
   const deckRef = useRef(null);
 

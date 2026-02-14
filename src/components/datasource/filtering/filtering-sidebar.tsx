@@ -7,7 +7,6 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import FilteringElement from "./filtering-element";
 
 interface FormattingProps {
-  setFiltering: CallableFunction;
   drawerOpen: boolean;
 }
 

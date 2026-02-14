@@ -10,18 +10,22 @@ import { DataSource, DataSourceDataDescription } from "../../datasource/types";
 
 interface LegendElementProps {
   dataSource: DataSource;
+  layerType: "twoD" | "threeD" | "plot";
 }
 
-export default function CategoricalLegend({ dataSource }: LegendElementProps) {
+export default function CategoricalLegend({
+  dataSource,
+  layerType,
+}: LegendElementProps) {
   const t = useTranslations("Common");
 
   const parentRef = useRef<HTMLInputElement>(null);
 
-  console.log(dataSource.formatting.color.categorical.variable);
+  console.log(dataSource.formatting[layerType].color.categorical.variable);
 
-  const { data: allData } = useData()
+  const { data: allData } = useData();
 
-  const data = allData.byID[dataSource.internal_id]
+  const data = allData.byID[dataSource.internal_id];
 
   const [categories, setCategories] = useState<
     {
@@ -42,26 +46,30 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
     if (data) {
       const varDataDescription =
         dataSource.metadata.variables.by_id[
-          dataSource.formatting.color.categorical.variable
+          dataSource.formatting[layerType].color.categorical.variable
         ];
 
       if (varDataDescription) {
         const colorCalc = (value: string | number) => {
           const color = ColorMapping(
             data.data.find((el) => el[varDataDescription.variable] == value)!,
-            dataSource.formatting.color,
+            dataSource.formatting[layerType].color,
           );
           return `rgb(${color![0]},${color![1]},${color![2]})`;
         };
 
         const unique_data_elements = data.data
-          .map((el) => el[dataSource.formatting.color.categorical.variable])
+          .map(
+            (el) =>
+              el[dataSource.formatting[layerType].color.categorical.variable],
+          )
           .filter((value, index, array) => array.indexOf(value) === index);
 
         const frequencies = unique_data_elements.map((element) =>
           frequency(
             data.data.map(
-              (el) => el[dataSource.formatting.color.categorical.variable],
+              (el) =>
+                el[dataSource.formatting[layerType].color.categorical.variable],
             ),
             element,
           ),
@@ -101,7 +109,7 @@ export default function CategoricalLegend({ dataSource }: LegendElementProps) {
         setVariableDataDescription(varDataDescription);
       }
     }
-  }, [data, dataSource.formatting.color, dataSource.formatting.color.categorical.variable, dataSource.metadata.variables.by_id]);
+  }, [data, dataSource.formatting, dataSource.metadata.variables.by_id, layerType]);
 
   return (
     <div ref={parentRef}>

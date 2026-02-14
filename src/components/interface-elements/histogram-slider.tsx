@@ -1,5 +1,21 @@
-import { FormControl, Input, InputLabel, Skeleton, Slider, SliderOwnProps, Stack } from "@mui/material";
-import { ChangeEventHandler, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  Box,
+  FormControl,
+  Input,
+  InputLabel,
+  Skeleton,
+  Slider,
+  SliderOwnProps,
+  Stack,
+} from "@mui/material";
+import {
+  ChangeEventHandler,
+  useEffect,
+  useLayoutEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import * as d3 from "d3";
 
 import { useData } from "../datasource/use-data";
@@ -12,6 +28,7 @@ export default function HistogramSlider({
   value,
   min,
   max,
+  timeSlider,
   marks,
   onChange,
   onChangeCommitted,
@@ -26,6 +43,7 @@ export default function HistogramSlider({
   value: SliderOwnProps<[number, number]>["value"];
   min: SliderOwnProps<number>["max"];
   max: SliderOwnProps<number>["max"];
+  timeSlider?: boolean;
   marks?: SliderOwnProps<number | number[]>["marks"];
   onChange: SliderOwnProps<number | number[]>["onChange"];
   onChangeCommitted: SliderOwnProps<number | number[]>["onChangeCommitted"];
@@ -57,28 +75,52 @@ export default function HistogramSlider({
     }
   }, []);
 
+  // constants
+  const margin = { top: 8, right: 16, bottom: 20, left: 16 },
+    height_to_width_ration = 0.4;
+
+  const width = useMemo(() => dimensions.width, [dimensions.width]);
+  const height = useMemo(
+    () => dimensions.width * height_to_width_ration,
+    [dimensions.width],
+  );
+
+  const graphWidth = useMemo(
+    () => width - margin.left - margin.right,
+    [margin.left, margin.right, width],
+  );
+  const graphHeight = useMemo(
+    () => height - margin.top - margin.bottom,
+    [height, margin.bottom, margin.top],
+  );
+
   useEffect(() => {
     d3.select(id ? "#" + id : `#chart-${dataSource.internal_id}`)
       .select("svg")
       .remove();
     // set the dimensions and margins of the graph
-    const margin = { top: 0, right: 0, bottom: 20, left: 0 },
-      width = dimensions.width,
-      height = dimensions.width * 0.3;
 
     // append the svg object to the body of the page
     const svg = d3
       .select(id ? "#" + id : `#chart-${dataSource.internal_id}`)
       .append("svg")
-      .attr("width", width + margin.left + margin.right)
-      .attr("height", height + margin.top + margin.bottom)
+      .attr("width", width)
+      .attr("height", height)
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
     const x = d3
       .scaleLinear()
       .domain([min, max] as Iterable<d3.NumberValue>)
-      .range([margin.left, width - margin.right]).nice();
+      .range([0, graphWidth]);
+
+    const xAxes = svg
+      .append("g")
+      .attr("transform", `translate(0, ${graphHeight})`)
+      .call(
+        d3.axisBottom(x),
+        // .tickFormat(() => "")
+      );
 
     // d3.json(dataSourceDataUrl(dataSource)).then((data) => {
     //   if (!data) {
@@ -94,7 +136,7 @@ export default function HistogramSlider({
       const y = d3
         .scaleLinear()
         .domain([0, d3.max(bins, (d) => d.length)] as Iterable<d3.NumberValue>)
-        .range([height, margin.top]);
+        .range([graphHeight, margin.top]);
 
       svg
         .append("g")
@@ -107,14 +149,6 @@ export default function HistogramSlider({
         .attr("height", (d) => y(0) - y(d.length))
         .attr("fill", "var(--mui-palette-text-primary)")
         .attr("fill-opacity", 0.4);
-
-      const xAxes = svg
-        .append("g")
-        .attr("transform", `translate(0, ${height})`)
-        .call(
-          d3.axisBottom(x),
-          // .tickFormat(() => "")
-        );
 
       xAxes.selectAll("line").attr("stroke-opacity", 0.6);
       xAxes.selectAll("path").remove();
@@ -136,7 +170,7 @@ export default function HistogramSlider({
   ]);
 
   return (
-    <>
+    <Box>
       <div style={{ position: "relative" }}>
         <div
           ref={parentRef}
@@ -145,13 +179,15 @@ export default function HistogramSlider({
         >
           {isLoading && (
             <Skeleton
-              sx={{ position: "absolute" }}
+              sx={{ position: "absolute", top: margin.top, left: margin.left }}
               variant="rectangular"
-              width={dimensions.width}
-              height={dimensions.width * 0.3}
+              width={graphWidth}
+              height={graphHeight}
+              
             />
           )}
         </div>
+
         <Slider
           value={value}
           valueLabelDisplay="auto"
@@ -162,57 +198,64 @@ export default function HistogramSlider({
           onChange={onChange}
           size="small"
           onChangeCommitted={onChangeCommitted}
-          sx={{ position: "absolute", bottom: 7, width: dimensions.width }}
+          sx={{
+            position: "absolute",
+            bottom: 7,
+            left: margin.left,
+            width: graphWidth,
+          }}
         />
       </div>
-      {numberInputs && (
-        <Stack direction="row" spacing={2} justifyContent="space-between">
-          <FormControl fullWidth variant="standard">
-            <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>
-            <Input
-              value={value![0]}
-              size="small"
-              onChange={onChangeNumberInputsMin}
-              onBlur={onBlurNumberInputs}
-              sx={{ width: "100%" }}
-              inputProps={{
-                step: step,
-                min: min,
-                max: max,
-                type: "number",
-                "aria-labelledby": "input-slider",
-              }}
-              onKeyUp={(event) => {
-                if (event.key === "Enter") {
-                  onBlurNumberInputs!();
-                }
-              }}
-            />
-          </FormControl>
-          <FormControl fullWidth variant="standard">
-            <InputLabel sx={{ top: "6px" }}>Maximum</InputLabel>
-            <Input
-              value={value![1]}
-              size="small"
-              onChange={onChangeNumberInputsMax}
-              onBlur={onBlurNumberInputs}
-              sx={{ width: "100%" }}
-              inputProps={{
-                step: step,
-                min: min,
-                max: max,
-                type: "number",
-                "aria-labelledby": "input-slider",
-              }}
-              onKeyUp={(event) => {
-                if (event.key === "Enter") {
-                  onBlurNumberInputs!();
-                }
-              }}
-            />
-          </FormControl>
-        </Stack>
-      )}
-    </>
+      <Box sx={{ mx: 2, mb: 2 }}>
+        {numberInputs && (
+          <Stack direction="row" spacing={2} justifyContent="space-between">
+            <FormControl fullWidth variant="standard">
+              <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>
+              <Input
+                value={value![0]}
+                size="small"
+                onChange={onChangeNumberInputsMin}
+                onBlur={onBlurNumberInputs}
+                sx={{ width: "100%" }}
+                inputProps={{
+                  step: step,
+                  min: min,
+                  max: max,
+                  type: "number",
+                  "aria-labelledby": "input-slider",
+                }}
+                onKeyUp={(event) => {
+                  if (event.key === "Enter") {
+                    onBlurNumberInputs!();
+                  }
+                }}
+              />
+            </FormControl>
+            <FormControl fullWidth variant="standard">
+              <InputLabel sx={{ top: "6px" }}>Maximum</InputLabel>
+              <Input
+                value={value![1]}
+                size="small"
+                onChange={onChangeNumberInputsMax}
+                onBlur={onBlurNumberInputs}
+                sx={{ width: "100%" }}
+                inputProps={{
+                  step: step,
+                  min: min,
+                  max: max,
+                  type: "number",
+                  "aria-labelledby": "input-slider",
+                }}
+                onKeyUp={(event) => {
+                  if (event.key === "Enter") {
+                    onBlurNumberInputs!();
+                  }
+                }}
+              />
+            </FormControl>
+          </Stack>
+        )}
+      </Box>
+    </Box>
   );
 }

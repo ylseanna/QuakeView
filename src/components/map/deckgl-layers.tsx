@@ -39,7 +39,7 @@ export default function DeckGLlayers() {
     if (data) {
       layers_to_set = data.allIDs.map((id: string) => {
         const layer = generateDataSourceMapLayers(
-          "1D",
+          "twoD",
           dataSources.byID[id],
           data.byID[id].data,
           sessionInterface,

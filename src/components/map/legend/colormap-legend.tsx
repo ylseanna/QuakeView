@@ -8,9 +8,10 @@ import { colormaps } from "../crameri-colormaps";
 
 interface LegendElementProps {
   dataSource: DataSource;
+  layerType: "twoD" | "threeD" | "plot";
 }
 
-export default function ColormapLegend({ dataSource }: LegendElementProps) {
+export default function ColormapLegend({ dataSource, layerType }: LegendElementProps) {
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
@@ -25,7 +26,7 @@ export default function ColormapLegend({ dataSource }: LegendElementProps) {
   }, []);
 
   const n = 512;
-  const colorFormatting = dataSource.formatting.color;
+  const colorFormatting = dataSource.formatting[layerType].color;
 
   const colorScale = d3
     .scaleSequential(

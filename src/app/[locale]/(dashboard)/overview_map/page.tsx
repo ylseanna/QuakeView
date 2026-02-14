@@ -13,6 +13,7 @@ import {
   MenuItem,
   Paper,
   Select,
+  Typography,
   useTheme,
 } from "@mui/material";
 import { ViewState } from "react-map-gl/maplibre";
@@ -24,10 +25,12 @@ import Actions from "../../../../components/datasource/actions";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import { useTranslations } from "next-intl";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
   const theme = useTheme();
+  const t = useTranslations();
 
   const { overViewState, setOverViewState } = useProjectStore(
     useShallow((state) => ({
@@ -85,12 +88,12 @@ export default function Page() {
                   top: "calc(8px + 32px + 80px)",
                   left: "48px",
                   width: "200px",
-                  height: "120px",
                   p: 2,
                   backGroundColor: theme.palette.background.paper,
                   zIndex: theme.zIndex.appBar,
                 }}
               >
+                <Typography variant="h6" sx={{mb: 1}}>{t("Map.styling")}</Typography>
                 <Select
                   value={mapTheme}
                   fullWidth

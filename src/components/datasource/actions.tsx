@@ -52,12 +52,6 @@ export default function Actions() {
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-  const setFiltering = useProjectStore(
-    (state) => state.dataSourceActions.setFiltering,
-  );
   const setVisible = useProjectStore(
     (state) => state.dataSourceActions.setVisible,
   );
@@ -110,58 +104,9 @@ export default function Actions() {
 
   // LAYERS SIDEBAR
 
-  // const toggleLayersSidebar = () => {
-  //   if (sidebarOpen == "layers") {
-  //     setSidebarOpen(null);
-  //   } else {
-  //     setSidebarOpen("layers");
-  //   }
-  // };
-
-  // Filtering
-
-  // const setFiltering = (
-  //   id: string,
-  //   variableToModify: string,
-  //   value: [number, number] | null
-  // ) => {
-  //   const indexToModify = dataSources?.findIndex(
-  //     (dataSource) => dataSource.internal_id === id
-  //   );
-
-  //   const modifiedDataSource = dataSources[indexToModify];
-
-  //   if (value) {
-  //     modifiedDataSource.filtering = {
-  //       ...modifiedDataSource.filtering,
-  //       [variableToModify]: value,
-  //     };
-  //   } else {
-  //     delete modifiedDataSource.filtering[variableToModify];
-  //   }
-
-  //   dataSources[indexToModify] = modifiedDataSource;
-
-  //   setDataSources(dataSources);
-  // };
-
   // LAYER TAB
 
   const [layersVisible, setLayersVisible] = useState(false);
-
-  // const setVisible = (id: string, value: boolean) => {
-  //   const indexToModify = dataSources?.findIndex(
-  //     (dataSource) => dataSource.internal_id === id
-  //   );
-
-  //   const modifiedDataSource = dataSources[indexToModify];
-
-  //   modifiedDataSource.interface.visible = value;
-
-  //   dataSources[indexToModify] = modifiedDataSource;
-
-  //   setDataSources(dataSources);
-  // };
 
   // CLICK-AWAY
 
@@ -296,18 +241,12 @@ export default function Actions() {
           </Paper>
         )}
 
-        <FormattingSidebar
-          setFormatting={setFormatting}
-          drawerOpen={sidebarOpen == "formatting"}
-        />
-        <FilteringSidebar
-          // setDataSources={setDataSources}
-          setFiltering={setFiltering}
-          drawerOpen={sidebarOpen == "filtering"}
-        />
+        <FormattingSidebar drawerOpen={sidebarOpen == "formatting"} />
+        <FilteringSidebar drawerOpen={sidebarOpen == "filtering"} />
 
         {dataSources && (
           <Legend
+            layerType="twoD"
             sx={{
               transform: `translate(-${panelPosition}px, -${bottombarPosition}px)`,
               transition: "transform.225s",
@@ -347,7 +286,6 @@ export default function Actions() {
           )}
 
           <BottomBar
-            setFiltering={setFiltering}
             drawerOpen={bottombarOpen}
             parentRef={actionsRef as RefObject<HTMLElement>}
           />

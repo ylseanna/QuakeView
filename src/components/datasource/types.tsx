@@ -19,7 +19,7 @@ export type DataSource = {
   filename: string;
   filepath: string;
   name: string;
-  interface: { pickable: boolean; visible: boolean; loadable: boolean };
+  interface: { visible: boolean; loadable: boolean };
   filtering: DataSourceFiltering;
   formatting: {
     twoD: DataSourceFormatting;

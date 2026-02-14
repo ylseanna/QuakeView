@@ -141,5 +141,8 @@
   "Source": {
     "parsed_preview_option": "parsed",
     "raw_preview_option": "raw"
+  },
+  "Map": {
+    "styling": "Map styling"
   }
 }

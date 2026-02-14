@@ -7,7 +7,6 @@ export default function BottomBar({
   drawerOpen,
   parentRef,
 }: {
-  setFiltering: CallableFunction;
   drawerOpen: boolean;
   parentRef?: RefObject<HTMLElement>;
 }) {

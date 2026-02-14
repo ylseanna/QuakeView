@@ -6,6 +6,7 @@ import {
   Box,
   Grid,
   IconButton,
+  LinearProgress,
   TextField,
   Tooltip,
   Typography,
@@ -82,46 +83,38 @@ const FilteringEditingRow = ({
           </Box>
         </Tooltip>
       </Box>
-      <SubAccordionDetails>
+      <SubAccordionDetails sx={{ p: 0 }}>
+        {!data.byID[dataSource.internal_id] && <LinearProgress />}
         {data.byID[dataSource.internal_id] && (
-          <>
-            <HistogramSlider
-              dataSource={dataSource}
-              variable={variable}
-              id={`filter-chart-${dataSource.internal_id}-${variable}`}
-              value={localDomain}
-              min={
-                data.byID[dataSource.internal_id].unfiltered_bounds[
-                  variable
-                ]![0]
-              }
-              max={
-                data.byID[dataSource.internal_id].unfiltered_bounds[
-                  variable
-                ]![1]
-              }
-              onChange={(event: Event, newValue: number | number[]) => {
-                setLocalDomain(newValue as [number, number]);
-              }}
-              onChangeCommitted={() => {
-                setFilter(dataSource.internal_id, variable, localDomain);
-              }}
-              numberInputs
-              onChangeNumberInputsMin={(
-                event: ChangeEvent<HTMLInputElement>,
-              ) => {
-                setLocalDomain([Number(event.target.value), localDomain[1]]);
-              }}
-              onChangeNumberInputsMax={(
-                event: ChangeEvent<HTMLInputElement>,
-              ) => {
-                setLocalDomain([localDomain[0], Number(event.target.value)]);
-              }}
-              onBlurNumberInputs={() => {
-                setFilter(dataSource.internal_id, variable, localDomain);
-              }}
-            />
-          </>
+          <HistogramSlider
+            dataSource={dataSource}
+            variable={variable}
+            id={`filter-chart-${dataSource.internal_id}-${variable}`}
+            value={localDomain}
+            timeSlider={variable == "t"}
+            min={
+              data.byID[dataSource.internal_id].unfiltered_bounds[variable]![0]
+            }
+            max={
+              data.byID[dataSource.internal_id].unfiltered_bounds[variable]![1]
+            }
+            onChange={(event: Event, newValue: number | number[]) => {
+              setLocalDomain(newValue as [number, number]);
+            }}
+            onChangeCommitted={() => {
+              setFilter(dataSource.internal_id, variable, localDomain);
+            }}
+            numberInputs
+            onChangeNumberInputsMin={(event: ChangeEvent<HTMLInputElement>) => {
+              setLocalDomain([Number(event.target.value), localDomain[1]]);
+            }}
+            onChangeNumberInputsMax={(event: ChangeEvent<HTMLInputElement>) => {
+              setLocalDomain([localDomain[0], Number(event.target.value)]);
+            }}
+            onBlurNumberInputs={() => {
+              setFilter(dataSource.internal_id, variable, localDomain);
+            }}
+          />
         )}
       </SubAccordionDetails>
     </SubAccordion>
@@ -152,6 +145,7 @@ export default function FilteringForm({
               (dataSource.metadata.variables.required_vars.includes(variable) ||
                 dataSource.metadata.variables.added_vars.includes(variable)),
           )
+          .concat("t")
           .map(
             (variable) =>
               ({
@@ -167,11 +161,13 @@ export default function FilteringForm({
         fullWidth
         onChange={(event: SyntheticEvent, option: FilteringOption | null) => {
           if (option) {
-            setFilter(
-              dataSource.internal_id,
-              option.variable,
-              data.byID[dataSource.internal_id].bounds[option.variable]!,
-            );
+            if (data.byID[dataSource.internal_id].bounds) {
+              setFilter(
+                dataSource.internal_id,
+                option.variable,
+                data.byID[dataSource.internal_id].bounds[option.variable]!,
+              );
+            }
           }
         }}
         renderInput={(params) => (

@@ -11,7 +11,7 @@ const d3Color_to_deckGLColor = (color: d3.RGBColor) =>
   [color.r, color.g, color.b] as Color;
 
 export function generateDataSourceMapLayers(
-  layerType: "oneD" | "threeD",
+  layerType: "twoD" | "threeD",
   dataSource: DataSource,
   data: EarthQuake[],
   sessionInterface: SessionInterface,
@@ -22,34 +22,34 @@ export function generateDataSourceMapLayers(
     .scaleSequential(
       d3.piecewise(
         d3.interpolateRgb,
-        !dataSource.formatting.color.linear.inverted
+        !dataSource.formatting[layerType].color.linear.inverted
           ? colormaps[
-              dataSource.formatting.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting[layerType].color.linear.cmap as keyof typeof colormaps
             ]
           : colormaps[
-              dataSource.formatting.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting[layerType].color.linear.cmap as keyof typeof colormaps
             ].toReversed(),
       ),
     )
     .domain(
-      dataSource.formatting.color.linear.domain[
-        dataSource.formatting.color.linear.variable
+      dataSource.formatting[layerType].color.linear.domain[
+        dataSource.formatting[layerType].color.linear.variable
       ]!,
     );
 
   const categoricalColorScale = d3
     .scaleOrdinal()
     .range(
-      !dataSource.formatting.color.categorical.inverted
-        ? colormaps_categorical[dataSource.formatting.color.categorical.cmap]
+      !dataSource.formatting[layerType].color.categorical.inverted
+        ? colormaps_categorical[dataSource.formatting[layerType].color.categorical.cmap]
         : colormaps_categorical[
-            dataSource.formatting.color.categorical.cmap
+            dataSource.formatting[layerType].color.categorical.cmap
           ].toReversed(),
     )
     .domain(
       d3
         .range(
-          colormaps_categorical[dataSource.formatting.color.categorical.cmap]
+          colormaps_categorical[dataSource.formatting[layerType].color.categorical.cmap]
             .length,
         )
         .map((i) => String(i)),
@@ -89,36 +89,36 @@ export function generateDataSourceMapLayers(
   };
 
   return new ScatterplotLayer<EarthQuake, DataFilterExtensionProps>({
-    id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+    id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting[layerType].color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
     // stroked: true,
     visible: dataSource.interface.visible,
     getPosition:
-      layer_type === "3D"
+      layerType === "threeD"
         ? (d: EarthQuake) => [d.lon, d.lat, (d.dep + positionOffset) * -1000]
-        : layer_type === "1D"
+        : layerType === "twoD"
           ? (d: EarthQuake) => [d.lon, d.lat]
           : undefined,
     getRadius: 1,
-    radiusScale: dataSource.formatting.scale,
+    radiusScale: dataSource.formatting[layerType].scale,
     getFillColor:
-      dataSource.formatting.color.mapping == "single"
+      dataSource.formatting[layerType].color.mapping == "single"
         ? d3Color_to_deckGLColor(
             d3.color(
-              dataSource.formatting.color.single as unknown as string,
+              dataSource.formatting[layerType].color.single as unknown as string,
             ) as d3.RGBColor,
           )
         : (d: EarthQuake) =>
-            ColorMapping(d, dataSource.formatting.color) as Color,
+            ColorMapping(d, dataSource.formatting[layerType].color) as Color,
     autoHighlight: true,
     highlightColor: [255, 255, 255, 140],
     colorFormat: "RGB",
-    opacity: dataSource.formatting.opacity / 100,
+    opacity: dataSource.formatting[layerType].opacity / 100,
     stroked: false,
     getLineColor: [255, 255, 255, 0.5 * 255],
     lineWidthUnits: "pixels",
     billboard: true,
-    antialiasing: dataSource.formatting.antialiasing,
+    antialiasing: dataSource.formatting[layerType].antialiasing,
     pickable: sessionInterface.pickable,
     updateTriggers: {
       getPosition: [positionOffset],
@@ -163,34 +163,34 @@ export function StemPlotLayers(
     .scaleSequential(
       d3.piecewise(
         d3.interpolateRgb,
-        !dataSource.formatting.color.linear.inverted
+        !dataSource.formatting.plot.color.linear.inverted
           ? colormaps[
-              dataSource.formatting.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting.plot.color.linear.cmap as keyof typeof colormaps
             ]
           : colormaps[
-              dataSource.formatting.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting.plot.color.linear.cmap as keyof typeof colormaps
             ].toReversed(),
       ),
     )
     .domain(
-      dataSource.formatting.color.linear.domain[
-        dataSource.formatting.color.linear.variable
+      dataSource.formatting.plot.color.linear.domain[
+        dataSource.formatting.plot.color.linear.variable
       ]!,
     );
 
   const categoricalColorScale = d3
     .scaleOrdinal()
     .range(
-      !dataSource.formatting.color.categorical.inverted
-        ? colormaps_categorical[dataSource.formatting.color.categorical.cmap]
+      !dataSource.formatting.plot.color.categorical.inverted
+        ? colormaps_categorical[dataSource.formatting.plot.color.categorical.cmap]
         : colormaps_categorical[
-            dataSource.formatting.color.categorical.cmap
+            dataSource.formatting.plot.color.categorical.cmap
           ].toReversed(),
     )
     .domain(
       d3
         .range(
-          colormaps_categorical[dataSource.formatting.color.categorical.cmap]
+          colormaps_categorical[dataSource.formatting.plot.color.categorical.cmap]
             .length,
         )
         .map((i) => String(i)),
@@ -230,29 +230,29 @@ export function StemPlotLayers(
   };
 
   const scatterplotLayer = new ScatterplotLayer<EarthQuake>({
-    id: `DotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+    id: `DotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.plot.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
     getRadius: 0.1,
-    radiusScale: dataSource.formatting.scale,
+    radiusScale: dataSource.formatting.plot.scale,
     getPosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
     getFillColor:
-      dataSource.formatting.color.mapping == "single"
+      dataSource.formatting.plot.color.mapping == "single"
         ? d3Color_to_deckGLColor(
             d3.color(
-              dataSource.formatting.color.single as unknown as string,
+              dataSource.formatting.plot.color.single as unknown as string,
             ) as d3.RGBColor,
           )
         : (d: EarthQuake) =>
-            ColorMapping(d, dataSource.formatting.color) as Color,
+            ColorMapping(d, dataSource.formatting.plot.color) as Color,
     autoHighlight: true,
     highlightColor: [255, 255, 255, 140],
     colorFormat: "RGB",
-    opacity: dataSource.formatting.opacity / 100,
+    opacity: dataSource.formatting.plot.opacity / 100,
     stroked: false,
     getLineColor: [255, 255, 255, 0.5 * 255],
     lineWidthUnits: "pixels",
     billboard: true,
-    antialiasing: dataSource.formatting.antialiasing,
+    antialiasing: dataSource.formatting.plot.antialiasing,
     pickable: sessionInterface.pickable,
     fp64: true,
     transitions: {
@@ -263,14 +263,14 @@ export function StemPlotLayers(
   if (include_stem) {
     return [
       new LineLayer<EarthQuake>({
-        id: `StemLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
+        id: `StemLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.plot.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
         data: data,
         getWidth: 0.05,
-        widthScale: dataSource.formatting.scale,
+        widthScale: dataSource.formatting.plot.scale,
         getSourcePosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
         getTargetPosition: (d: EarthQuake) => [scaleX(d.t), baseLineY],
         // getColor: (d: EarthQuake) =>
-        //   ColorMapping(d, dataSource.formatting.color) as Color,
+        //   ColorMapping(d, dataSource.formatting.plot.color) as Color,
         getColor: [0, 0, 0],
         autoHighlight: true,
         highlightColor: [255, 255, 255, 140],
