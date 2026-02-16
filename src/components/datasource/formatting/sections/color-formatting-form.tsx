@@ -22,14 +22,19 @@ import {
 import { styled } from "@mui/material/styles";
 
 import { DataSource } from "@/components/datasource/types";
-import { SyntheticEvent, useState } from "react";
+import { ChangeEvent, SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import { MuiColorInput, TinyColor } from "mui-color-input";
 import HistogramSlider from "../../../interface-elements/histogram-slider";
-import { colormaps, colormaps_categorical } from "../../../map/crameri-colormaps";
+import {
+  colormaps,
+  colormaps_categorical,
+} from "../../../map/crameri-colormaps";
 import { SwapHoriz } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useData } from "../../use-data";
+import { Dayjs } from "dayjs";
+import { PickerValue } from "@mui/x-date-pickers/internals";
 
 const NoMaxWidthTooltip = styled(({ className, ...props }: TooltipProps) => (
   <Tooltip {...props} classes={{ popper: className }} />
@@ -54,10 +59,10 @@ const formToolTipSlotProps = (offset: number) => ({
 
 export default function ColorFormattingForm({
   dataSource,
-  type
+  type,
 }: {
   dataSource: DataSource;
-  type: "twoD" | "threeD" | "plot"
+  type: "twoD" | "threeD" | "plot";
 }) {
   const t = useTranslations("Formatting");
 
@@ -117,10 +122,10 @@ export default function ColorFormattingForm({
           </ToggleButtonGroup>
         </Grid>
 
-        <Paper variant="outlined" sx={{ p: 2 }}>
+        <Paper variant="outlined" sx={{ p: 0 }}>
           <Grid container direction="column" spacing={2}>
             {dataSource.formatting[type].color.mapping == "single" ? (
-              <Grid container direction="row" alignItems="center" sx={{ m: 0 }}>
+              <Grid container direction="row" alignItems="center" sx={{ m: 2 }}>
                 <Grid size={2}>
                   <NoMaxWidthTooltip
                     title={t("antialiasing_descr")}
@@ -155,7 +160,7 @@ export default function ColorFormattingForm({
                   container
                   direction="row"
                   alignItems="center"
-                  sx={{ m: 0 }}
+                  sx={{ mt: 2, mx: 2 }}
                 >
                   <Grid size={3}>
                     <Tooltip
@@ -191,7 +196,10 @@ export default function ColorFormattingForm({
                         .map((variable: string) => {
                           const dataDescription =
                             dataSource.metadata.variables.by_id[variable];
-                          if (dataDescription.data_type == "number") {
+                          if (
+                            dataDescription.data_type == "number" ||
+                            variable == "t"
+                          ) {
                             return (
                               <MenuItem
                                 key={`MenuItemVariable-${dataDescription.variable}`}
@@ -212,7 +220,7 @@ export default function ColorFormattingForm({
                   container
                   direction="row"
                   alignItems="center"
-                  sx={{ m: 0 }}
+                  sx={{ mx: 2 }}
                   spacing={1}
                 >
                   <Grid size="grow">
@@ -346,28 +354,96 @@ export default function ColorFormattingForm({
                         },
                       });
                     }}
+                    timeSlider={
+                      dataSource.formatting[type].color.linear.variable == "t"
+                    }
+                    numberInputs
+                    onChangeNumberInputsMin={(
+                      event: ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      setLocalValues({
+                        ...localValues,
+                        localLinearDomain: [
+                          Number(event.target.value),
+                          localValues.localLinearDomain[1],
+                        ] as [number, number],
+                      });
+                    }}
+                    onChangeDateTimeInputsMin={(value: PickerValue) => {
+                      setLocalValues({
+                        ...localValues,
+                        localLinearDomain: [
+                          (value as Dayjs)!.valueOf(),
+                          localValues.localLinearDomain[1],
+                        ] as [number, number],
+                      });
+                    }}
+                    onAcceptDateTimeInputsMin={(value: PickerValue) => {
+                      setColorFormatting(dataSource.internal_id, type, {
+                        ...dataSource.formatting[type].color,
+                        linear: {
+                          ...dataSource.formatting[type].color.linear,
+                          domain: {
+                            ...dataSource.formatting[type].color.linear.domain,
+                            [dataSource.formatting[type].color.linear.variable]:
+                              [
+                                (value as Dayjs)!.valueOf(),
+                                localValues.localLinearDomain[1],
+                              ] as [number, number],
+                          },
+                        },
+                      });
+                    }}
+                    onChangeNumberInputsMax={(
+                      event: ChangeEvent<HTMLInputElement>,
+                    ) => {
+                      setLocalValues({
+                        ...localValues,
+                        localLinearDomain: [
+                          localValues.localLinearDomain[0],
+                          Number(event.target.value),
+                        ] as [number, number],
+                      });
+                    }}
+                    onChangeDateTimeInputsMax={(value: PickerValue) => {
+                      setLocalValues({
+                        ...localValues,
+                        localLinearDomain: [
+                          localValues.localLinearDomain[0],
+                          (value as Dayjs)!.valueOf(),
+                        ] as [number, number],
+                      });
+                    }}
+                    onAcceptDateTimeInputsMax={(value: PickerValue) => {
+                      setColorFormatting(dataSource.internal_id, type, {
+                        ...dataSource.formatting[type].color,
+                        linear: {
+                          ...dataSource.formatting[type].color.linear,
+                          domain: {
+                            ...dataSource.formatting[type].color.linear.domain,
+                            [dataSource.formatting[type].color.linear.variable]:
+                              [
+                                localValues.localLinearDomain[0],
+                                (value as Dayjs)!.valueOf(),
+                              ] as [number, number],
+                          },
+                        },
+                      });
+                    }}
+                    onBlurNumberInputs={() => {
+                      setColorFormatting(dataSource.internal_id, type, {
+                        ...dataSource.formatting[type].color,
+                        linear: {
+                          ...dataSource.formatting[type].color.linear,
+                          domain: {
+                            ...dataSource.formatting[type].color.linear.domain,
+                            [dataSource.formatting[type].color.linear.variable]:
+                              localValues.localLinearDomain as [number, number],
+                          },
+                        },
+                      });
+                    }}
                   />
-                  <Grid container sx={{ mt: 0.2 }}>
-                    <Typography fontSize={14}>
-                      {"Min: " +
-                        Math.round(
-                          dataSource.formatting[type].color.linear.domain[
-                            dataSource.formatting[type].color.linear.variable
-                          ]![0] * 100,
-                        ) /
-                          100}
-                    </Typography>
-                    <Grid size="grow"></Grid>
-                    <Typography fontSize={14}>
-                      {"Max: " +
-                        Math.round(
-                          dataSource.formatting[type].color.linear.domain[
-                            dataSource.formatting[type].color.linear.variable
-                          ]![1] * 100,
-                        ) /
-                          100}
-                    </Typography>
-                  </Grid>
                 </Grid>
               </Grid>
             ) : dataSource.formatting[type].color.mapping == "categorical" ? (
@@ -376,7 +452,7 @@ export default function ColorFormattingForm({
                   container
                   direction="row"
                   alignItems="center"
-                  sx={{ m: 0 }}
+                  sx={{ mt: 2, mx: 2 }}
                 >
                   <Grid size={3}>
                     <Tooltip
@@ -392,7 +468,9 @@ export default function ColorFormattingForm({
                   <Divider sx={{ mt: 1, mb: 1 }} />
                   <Grid size="grow">
                     <Select
-                      value={dataSource.formatting[type].color.categorical.variable}
+                      value={
+                        dataSource.formatting[type].color.categorical.variable
+                      }
                       displayEmpty
                       inputProps={{ "aria-label": "Without label" }}
                       size="small"
@@ -433,7 +511,7 @@ export default function ColorFormattingForm({
                   container
                   direction="row"
                   alignItems="center"
-                  sx={{ m: 0 }}
+                  sx={{ mx: 2, mb: 2 }}
                   spacing={1}
                 >
                   <Grid size="grow">
@@ -513,7 +591,9 @@ export default function ColorFormattingForm({
                     ></Autocomplete>
                   </Grid>
                   <Checkbox
-                    checked={dataSource.formatting[type].color.categorical.inverted}
+                    checked={
+                      dataSource.formatting[type].color.categorical.inverted
+                    }
                     icon={<SwapHoriz />}
                     checkedIcon={<SwapHoriz />}
                     onChange={(event: SyntheticEvent, checked) => {

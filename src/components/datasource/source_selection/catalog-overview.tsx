@@ -32,6 +32,7 @@ import { updatedMetaDataUrl } from "../data-source-query";
 import { DataGrid } from "@mui/x-data-grid/DataGrid";
 import { Folder } from "mdi-material-ui";
 import { useGridApiRef } from "@mui/x-data-grid/hooks/utils/useGridApiRef";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -84,6 +85,8 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
     expand: true,
   };
 
+  const { setName } = useProjectStore((state) => state.dataSourceActions);
+
   const [amEditingName, setAmEditingName] = useState(false);
   const [previewType, setPreviewType] = useState("parsed");
 
@@ -131,6 +134,9 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
                   variant="standard"
                   value={dataSource.name}
                   fullWidth
+                  onChange={(event) => {
+                    setName(dataSource.internal_id, event.target!.value);
+                  }}
                 />
               ) : (
                 <Typography

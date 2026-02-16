@@ -58,6 +58,7 @@ export type ProjectActions = {
   dataSourceActions: {
     addDataSource: (dataSource: DataSource) => void;
     removeDataSource: (id: string) => void;
+    setName: (id: string, value: string) => void;
     setMetadata: (id: string, value: DataSourceMetaData) => void;
     setFormatting: (
       id: string,
@@ -181,6 +182,10 @@ export const createProjectStore = (
                 state.dataSources.allIDs.findIndex((iid) => iid === id),
                 1,
               );
+            }),
+          setName: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].name = value;
             }),
           setMetadata: (id, value) =>
             set((state) => {

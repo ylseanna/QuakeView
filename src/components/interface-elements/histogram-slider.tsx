@@ -17,9 +17,15 @@ import {
   useState,
 } from "react";
 import * as d3 from "d3";
+import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
 
 import { useData } from "../datasource/use-data";
 import { DataSource, EarthQuake } from "../datasource/types";
+
+import dayjs from "dayjs";
+import { PickerValue } from "@mui/x-date-pickers/internals";
+import { useAppStateStore } from "@/providers/app-state-provider";
+import { useTranslations } from "next-intl";
 
 export default function HistogramSlider({
   id,
@@ -34,7 +40,12 @@ export default function HistogramSlider({
   onChangeCommitted,
   numberInputs,
   onChangeNumberInputsMin,
+  onChangeDateTimeInputsMin,
+  onAcceptDateTimeInputsMin,
+
   onChangeNumberInputsMax,
+  onChangeDateTimeInputsMax,
+  onAcceptDateTimeInputsMax,
   onBlurNumberInputs,
 }: {
   id?: string;
@@ -52,10 +63,14 @@ export default function HistogramSlider({
     HTMLInputElement | HTMLTextAreaElement,
     Element
   >;
+  onChangeDateTimeInputsMin?: (value: PickerValue) => void;
+  onAcceptDateTimeInputsMin?: (value: PickerValue) => void;
   onChangeNumberInputsMax?: ChangeEventHandler<
     HTMLInputElement | HTMLTextAreaElement,
     Element
   >;
+  onChangeDateTimeInputsMax?: (value: PickerValue) => void;
+  onAcceptDateTimeInputsMax?: (value: PickerValue) => void;
   onBlurNumberInputs?: () => void;
 }) {
   const { data } = useData();
@@ -63,6 +78,10 @@ export default function HistogramSlider({
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
   const [isLoading, setIsLoading] = useState(true);
+
+  const { signalPopperOpen, signalPopperClosed } = useAppStateStore(
+    (state) => state.appInterfaceActions,
+  );
 
   const step = Number((max! - min!).toPrecision(1)) / 100;
 
@@ -109,16 +128,24 @@ export default function HistogramSlider({
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const x = d3
-      .scaleLinear()
-      .domain([min, max] as Iterable<d3.NumberValue>)
-      .range([0, graphWidth]);
+    const x = timeSlider
+      ? d3
+          .scaleTime()
+          .domain([
+            new Date(min as number),
+            new Date(max as number),
+          ] as Iterable<d3.NumberValue>)
+          .range([0, graphWidth])
+      : d3
+          .scaleLinear()
+          .domain([min, max] as Iterable<d3.NumberValue>)
+          .range([0, graphWidth]);
 
     const xAxes = svg
       .append("g")
       .attr("transform", `translate(0, ${graphHeight})`)
       .call(
-        d3.axisBottom(x),
+        d3.axisBottom(x).ticks(5),
         // .tickFormat(() => "")
       );
 
@@ -169,6 +196,8 @@ export default function HistogramSlider({
     data,
   ]);
 
+  const t = useTranslations();
+
   return (
     <Box>
       <div style={{ position: "relative" }}>
@@ -183,14 +212,13 @@ export default function HistogramSlider({
               variant="rectangular"
               width={graphWidth}
               height={graphHeight}
-              
             />
           )}
         </div>
 
         <Slider
           value={value}
-          valueLabelDisplay="auto"
+          // valueLabelDisplay="auto"
           min={min}
           max={max}
           step={step}
@@ -198,6 +226,9 @@ export default function HistogramSlider({
           onChange={onChange}
           size="small"
           onChangeCommitted={onChangeCommitted}
+          valueLabelFormat={
+            timeSlider ? (value) => new Date(value).toISOString() : undefined
+          }
           sx={{
             position: "absolute",
             bottom: 7,
@@ -206,8 +237,46 @@ export default function HistogramSlider({
           }}
         />
       </div>
-      <Box sx={{ mx: 2, mb: 2 }}>
-        {numberInputs && (
+      <Box sx={{ m: 2 }}>
+        {numberInputs && timeSlider ? (
+          <Stack direction="column" spacing={2} justifyContent="space-between">
+            <DateTimePicker
+              value={dayjs(value![0])}
+              onChange={onChangeDateTimeInputsMin}
+              onAccept={onAcceptDateTimeInputsMin}
+              onOpen={signalPopperOpen}
+              onClose={signalPopperClosed}
+              slotProps={{
+                textField: {
+                  size: "small",
+                },
+              }}
+              views={["year", "month", "day", "hours", "minutes", "seconds"]}
+              format="YYYY-MM-DD HH:mm:ss"
+              ampm={false}
+              label={t("Slider.start_time")}
+            />
+
+            <DateTimePicker
+              value={dayjs(value![1])}
+              onChange={onChangeDateTimeInputsMax}
+              onAccept={onAcceptDateTimeInputsMax}
+              onOpen={signalPopperOpen}
+              onClose={signalPopperClosed}
+              slotProps={{
+                textField: {
+                  size: "small",
+                },
+                popper: { className: "NoClickAwayActionPanel" },
+                desktopPaper: { className: "NoClickAwayActionPanel" },
+              }}
+              views={["year", "month", "day", "hours", "minutes", "seconds"]}
+              format="YYYY-MM-DD HH:mm:ss"
+              ampm={false}
+              label={t("Slider.end_time")}
+            />
+          </Stack>
+        ) : (
           <Stack direction="row" spacing={2} justifyContent="space-between">
             <FormControl fullWidth variant="standard">
               <InputLabel sx={{ top: "6px" }}>Minimum</InputLabel>

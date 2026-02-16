@@ -11,6 +11,12 @@ import DebugWindow from "@/components/interface/debug-window";
 
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import "dayjs/locale/en-gb";
+
+import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+
+
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const [debugVisible, setDebugVisible] = useState(false);
 
@@ -43,10 +49,12 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
         {queryClient.isFetching() > 0 && (
           <LinearProgress sx={{ position: "absolute" }} />
         )}
+        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
         <QueryClientProvider client={queryClient}>
           {debugVisible && <DebugWindow />}
           {props.children}
         </QueryClientProvider>
+        </LocalizationProvider>
       </Box>
     </>
   );

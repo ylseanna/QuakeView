@@ -3,6 +3,7 @@
 import {
   IcelandDEMStyle,
   USDEMStyle,
+  WorldCoastLines,
 } from "../../../../components/map/map_styles/default";
 
 import "maplibre-gl/dist/maplibre-gl.css";
@@ -39,7 +40,9 @@ export default function Page() {
     })),
   );
 
-  const [mapTheme, setMapTheme] = useState<"US" | "Iceland">("Iceland");
+  const [mapTheme, setMapTheme] = useState<"US" | "Iceland" | "WorldCountries">(
+    "Iceland",
+  );
 
   const onMapLoad = () => {
     setIsLoading(false);
@@ -62,7 +65,13 @@ export default function Page() {
           reuseMaps
           {...(overViewState as object)}
           onMove={(evt) => setViewStateandLocalStorage(evt.viewState)}
-          mapStyle={mapTheme == "Iceland" ? IcelandDEMStyle : USDEMStyle}
+          mapStyle={
+            mapTheme == "Iceland"
+              ? IcelandDEMStyle
+              : mapTheme == "US"
+                ? USDEMStyle
+                : WorldCoastLines
+          }
           // maxBounds={[
           //   [180, 90],
           //   [-180, -90],
@@ -93,18 +102,28 @@ export default function Page() {
                   zIndex: theme.zIndex.appBar,
                 }}
               >
-                <Typography variant="h6" sx={{mb: 1}}>{t("Map.styling")}</Typography>
+                <Typography variant="h6" sx={{ mb: 1 }}>
+                  {t("Map.styling")}
+                </Typography>
                 <Select
                   value={mapTheme}
                   fullWidth
                   onChange={(event) => {
-                    setMapTheme(event.target!.value as "Iceland" | "US");
+                    setMapTheme(
+                      event.target!.value as
+                        | "Iceland"
+                        | "US"
+                        | "WorldCountries",
+                    );
                   }}
                 >
                   <MenuItem value={"Iceland"}>
                     DEM Iceland (Náttúrufræðistofnun)
                   </MenuItem>
                   <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
+                  <MenuItem value={"WorldCountries"}>
+                    World country outlines
+                  </MenuItem>
                 </Select>
               </Paper>
             </>

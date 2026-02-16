@@ -37,7 +37,9 @@ export default function ViewMenu() {
 
   const t = useTranslations();
 
-  const { appInterface, appInterfaceActions } = useAppStateStore((state) => state);
+  const { appInterface, appInterfaceActions } = useAppStateStore(
+    (state) => state,
+  );
 
   return (
     <PopupState variant="popover" popupId="view-popup-menu">
@@ -85,25 +87,50 @@ export default function ViewMenu() {
                 <ThemeSwitcher />
               </MenuItem>
               <Divider />
-              <MenuItem onClick={()=>appInterfaceActions.toggleSideBarsVisible()}>
+              <MenuItem
+                onClick={() => appInterfaceActions.toggleSideBarsVisible()}
+              >
                 <ListItemIcon>
                   {appInterface.sideBarsVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.show_sidebar")}</ListItemText>
               </MenuItem>
-              <MenuItem onClick={()=>appInterfaceActions.toggleMapToolsVisible()}>
+              <MenuItem
+                onClick={() => appInterfaceActions.toggleMapToolsVisible()}
+              >
                 <ListItemIcon>
                   {appInterface.mapToolsVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.map_tools")}</ListItemText>
               </MenuItem>
-              <MenuItem onClick={()=>appInterfaceActions.toggleAnimationControlsVisible()}>
+              <MenuItem
+                onClick={() =>
+                  appInterfaceActions.toggleAnimationControlsVisible()
+                }
+              >
                 <ListItemIcon>
                   {appInterface.animationControlsVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>
                   {t("Titlebar.show_animation_controls")}
                 </ListItemText>
+              </MenuItem>
+              <Divider />
+              <MenuItem
+                onClick={() => appInterfaceActions.toggleTimelineBarVisible()}
+              >
+                <ListItemIcon>
+                  {appInterface.timelineBarVisible && <Check />}
+                </ListItemIcon>
+                <ListItemText>{t("Titlebar.show_timeline_bar")}</ListItemText>
+              </MenuItem>
+              <MenuItem
+                onClick={() => appInterfaceActions.toggleLegendVisible()}
+              >
+                <ListItemIcon>
+                  {appInterface.legendVisible && <Check />}
+                </ListItemIcon>
+                <ListItemText>{t("Titlebar.show_legend")}</ListItemText>
               </MenuItem>
             </MenuList>
           </Menu>

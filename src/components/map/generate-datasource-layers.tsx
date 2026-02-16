@@ -1,9 +1,16 @@
-import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
+import {
+  DataFilterExtension,
+  DataFilterExtensionProps,
+} from "@deck.gl/extensions";
 import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
 import { Color } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import { DataSource, DataSourceColorFormatting, EarthQuake } from "@/components/datasource/types";
+import {
+  DataSource,
+  DataSourceColorFormatting,
+  EarthQuake,
+} from "@/components/datasource/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 import { colormaps, colormaps_categorical } from "./crameri-colormaps";
 
@@ -24,10 +31,12 @@ export function generateDataSourceMapLayers(
         d3.interpolateRgb,
         !dataSource.formatting[layerType].color.linear.inverted
           ? colormaps[
-              dataSource.formatting[layerType].color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting[layerType].color.linear
+                .cmap as keyof typeof colormaps
             ]
           : colormaps[
-              dataSource.formatting[layerType].color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting[layerType].color.linear
+                .cmap as keyof typeof colormaps
             ].toReversed(),
       ),
     )
@@ -41,7 +50,9 @@ export function generateDataSourceMapLayers(
     .scaleOrdinal()
     .range(
       !dataSource.formatting[layerType].color.categorical.inverted
-        ? colormaps_categorical[dataSource.formatting[layerType].color.categorical.cmap]
+        ? colormaps_categorical[
+            dataSource.formatting[layerType].color.categorical.cmap
+          ]
         : colormaps_categorical[
             dataSource.formatting[layerType].color.categorical.cmap
           ].toReversed(),
@@ -49,8 +60,9 @@ export function generateDataSourceMapLayers(
     .domain(
       d3
         .range(
-          colormaps_categorical[dataSource.formatting[layerType].color.categorical.cmap]
-            .length,
+          colormaps_categorical[
+            dataSource.formatting[layerType].color.categorical.cmap
+          ].length,
         )
         .map((i) => String(i)),
     );
@@ -105,7 +117,8 @@ export function generateDataSourceMapLayers(
       dataSource.formatting[layerType].color.mapping == "single"
         ? d3Color_to_deckGLColor(
             d3.color(
-              dataSource.formatting[layerType].color.single as unknown as string,
+              dataSource.formatting[layerType].color
+                .single as unknown as string,
             ) as d3.RGBColor,
           )
         : (d: EarthQuake) =>
@@ -130,7 +143,8 @@ export function generateDataSourceMapLayers(
     filterSoftRange: [
       filtering.mag as [number, number],
       [
-        sessionInterface.animation.timeline.tapered
+        sessionInterface.animation.timeline.tapered &&
+        sessionInterface.animation.timeline.enabled
           ? (filtering.t[1] as number)
           : (filtering.t[0] as number),
         filtering.t[1] as number,
@@ -165,10 +179,12 @@ export function StemPlotLayers(
         d3.interpolateRgb,
         !dataSource.formatting.plot.color.linear.inverted
           ? colormaps[
-              dataSource.formatting.plot.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting.plot.color.linear
+                .cmap as keyof typeof colormaps
             ]
           : colormaps[
-              dataSource.formatting.plot.color.linear.cmap as keyof typeof colormaps
+              dataSource.formatting.plot.color.linear
+                .cmap as keyof typeof colormaps
             ].toReversed(),
       ),
     )
@@ -182,7 +198,9 @@ export function StemPlotLayers(
     .scaleOrdinal()
     .range(
       !dataSource.formatting.plot.color.categorical.inverted
-        ? colormaps_categorical[dataSource.formatting.plot.color.categorical.cmap]
+        ? colormaps_categorical[
+            dataSource.formatting.plot.color.categorical.cmap
+          ]
         : colormaps_categorical[
             dataSource.formatting.plot.color.categorical.cmap
           ].toReversed(),
@@ -190,8 +208,9 @@ export function StemPlotLayers(
     .domain(
       d3
         .range(
-          colormaps_categorical[dataSource.formatting.plot.color.categorical.cmap]
-            .length,
+          colormaps_categorical[
+            dataSource.formatting.plot.color.categorical.cmap
+          ].length,
         )
         .map((i) => String(i)),
     );

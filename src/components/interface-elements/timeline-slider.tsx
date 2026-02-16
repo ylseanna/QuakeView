@@ -1,47 +1,30 @@
-import { Pause, PlayArrow } from "@mui/icons-material";
 import useAnimationFrame from "use-animation-frame";
-import {
-  GradientHorizontal,
-  Selection,
-  SelectionOff,
-  Speedometer,
-} from "mdi-material-ui";
+
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
-import {
-  Box,
-  Checkbox,
-  Divider,
-  Grow,
-  IconButton,
-  Input,
-  MenuItem,
-  Paper,
-  Select,
-  SelectChangeEvent,
-  useTheme,
-} from "@mui/material";
-import { useTranslations } from "next-intl";
+import { Box } from "@mui/material";
+import * as d3 from "d3";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
 import {
-  ChangeEvent,
+  Dispatch,
   useCallback,
   useEffect,
   useMemo,
   useRef,
   useState,
 } from "react";
-import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
-import { useAppStateStore } from "@/providers/app-state-provider";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
-import { useData } from "../datasource/use-data";
+import { SetStateAction } from "react";
 import { EarthQuake } from "../datasource/types";
+import { useData } from "../datasource/use-data";
+import { minorTimeFormat } from "../interface/time-format";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
+// import { useKeyPressed } from "@react-hooks-library/core";
 
 interface Bounds {
   x: [Date, Date];
@@ -60,13 +43,19 @@ interface ViewStateMonitor {
 
 type D3Earthquake = EarthQuake & { date: Date };
 
-export default function TimelineSlider() {
-  const t = useTranslations();
-  const theme = useTheme();
+export default function TimelineSlider({
+  isPlaying,
+  setIsPlaying,
+}: {
+  isPlaying: "playing" | "paused" | "stopped";
+  setIsPlaying: Dispatch<SetStateAction<"playing" | "paused" | "stopped">>;
+}) {
+  // const t = useTranslations();
+  // const theme = useTheme();
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
 
-  const { appInterface } = useAppStateStore((state) => state);
+  // const { appInterface } = useAppStateStore((state) => state);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
   // app stores
@@ -83,16 +72,9 @@ export default function TimelineSlider() {
 
   // animation
 
-  const {
-    enabled: animationEnabled,
-    tapered,
-    speed: animationSpeed,
-  } = useProjectStore((state) => state.sessionInterface.animation.timeline);
-  const {
-    toggleEnabled: toggleAnimationEnabled,
-    setTapered,
-    setSpeed: setAnimationSpeed,
-  } = useProjectStore((state) => state.interfaceActions.animation.timeline);
+  const { enabled: animationEnabled, speed: animationSpeed } = useProjectStore(
+    (state) => state.sessionInterface.animation.timeline,
+  );
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -103,6 +85,14 @@ export default function TimelineSlider() {
     coordPosition: [new Date(1970, 1, 1), 0],
     zoom: [0, 0],
   });
+
+  // useKeyPressed("space", () => {
+  //   if (isPlaying == "paused" || isPlaying == "stopped") {
+  //     setIsPlaying("playing");
+  //   } else {
+  //     setIsPlaying("stopped");
+  //   }
+  // });
 
   // graph bounds and viewstate (for compare to deck.gl instance)
   // const [graphViewState, setGraphViewState] = useState<ViewStateMonitor>({
@@ -117,7 +107,7 @@ export default function TimelineSlider() {
   });
 
   // graph constants
-  const margin = { top: 16, right: 16, bottom: 36, left: 52 };
+  const margin = { top: 16, right: 16, bottom: 40, left: 44 };
 
   const graphWidth = useMemo(
     () => dimensions.width - margin.left - margin.right,
@@ -138,6 +128,12 @@ export default function TimelineSlider() {
     bounds.x[1].getTime(),
   ]);
 
+  const minorFormat = useMemo(
+    () =>
+      minorTimeFormat((bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000),
+    [bounds.x],
+  );
+
   useEffect(() => {
     if (GPUfiltering.t[0] == 0 && GPUfiltering.t[1] == 2147483647) {
       setLocalDomain([bounds.x[0].getTime(), bounds.x[1].getTime()]);
@@ -149,7 +145,7 @@ export default function TimelineSlider() {
 
   // ANIMATION
 
-  const [isPlaying, setIsPlaying] = useState<string>("stopped");
+  // const [isPlaying, setIsPlaying] = useState<string>("stopped");
 
   const speed = useMemo(() => {
     if (animationSpeed) {
@@ -254,8 +250,6 @@ export default function TimelineSlider() {
           scaleX.current!.invert(selection[1] as number).getTime(),
         ];
 
-        console.log("brush call", newValue);
-
         setLocalDomain(newValue as [number, number]);
         setTimeFiltering(newValue as [number, number]);
       }
@@ -287,7 +281,6 @@ export default function TimelineSlider() {
 
   const moveBrush = useCallback(
     (newDomain: [number, number]) => {
-      // console.log("Brush Move", newDomain)
       const brush = brushRef.current;
       if (brush) {
         SVG.current!.select(".brush").call(brush.move as never, [
@@ -327,6 +320,32 @@ export default function TimelineSlider() {
     }
   }, [localDomain]);
 
+  useEffect(() => {
+    if (!animationEnabled) {
+      // setLocalDomain([bounds.x[0].getTime(), bounds.x[1].getTime()]);
+      setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
+      if (isPlaying == "playing") {
+        setIsPlaying("paused");
+      }
+      // setTapered(false);
+
+      if (brushG.current) {
+        brushG.current.call(brushRef.current!.move, null);
+      }
+    } else {
+      if (
+        Math.round(localDomain[0]) != Math.round(bounds.x[0].valueOf()) ||
+        Math.round(localDomain[1]) != Math.round(bounds.x[1].valueOf())
+      ) {
+        setTimeFiltering(localDomain);
+        moveBrush(localDomain);
+      }
+      if (isPlaying == "paused") {
+        setIsPlaying("playing");
+      }
+    }
+  }, [animationEnabled]);
+
   // init graph
   useEffect(() => {
     const width = dimensions.width,
@@ -349,24 +368,25 @@ export default function TimelineSlider() {
     scaleY.current = d3
       .scaleLinear()
       .domain([bounds.y[0], bounds.y[1]] as Iterable<d3.NumberValue>)
-      .range([height - margin.bottom, margin.top]);
+      .range([height - margin.bottom, margin.top])
+      .nice();
 
     // x axes
     xAxes.current = SVG.current
       .append("g")
       .attr("transform", `translate(0, ${height - margin.bottom})`)
       .style("font-size", ".9rem")
-      .call(d3.axisBottom(scaleX.current));
+      .call(d3.axisBottom(scaleX.current).tickFormat(minorFormat));
 
-    // x axes label
+    // // x axes label
     SVG.current
       .append("text")
       .attr("x", graphWidth / 2)
-      .attr("y", height - 7)
+      .attr("y", height - 5)
       .attr("dx", margin.left)
-      .attr("font-size", "1rem")
+      .attr("font-size", ".95rem")
       .attr("text-anchor", "middle")
-      .text("Time");
+      .text("Year");
 
     // y axes
     yAxes.current = SVG.current
@@ -380,7 +400,7 @@ export default function TimelineSlider() {
       .append("text")
       .attr("class", "axis-label")
       .attr("transform", "rotate(-90)")
-      .attr("x", -(margin.top + height / 2))
+      .attr("x", -(graphHeight / 2 + margin.top))
       .attr("y", 3) // Relative to the y axis.
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
@@ -566,14 +586,7 @@ export default function TimelineSlider() {
         return layers_to_set;
       }
     }
-  }, [
-    dimensions,
-    dataSources.byID,
-    data.allIDs,
-    scaleX,
-    scaleY,
-    sessionInterface,
-  ]);
+  }, [dimensions, dataSources.byID, data, scaleX, scaleY, sessionInterface]);
 
   const resetAxes = useCallback(() => {
     const minX = Math.min(
@@ -595,6 +608,8 @@ export default function TimelineSlider() {
       y: [minY, maxY],
     });
 
+    console.log(bounds);
+
     // time filtering (make option)
     setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
 
@@ -606,7 +621,7 @@ export default function TimelineSlider() {
       .current!.transition()
       .duration(0.0000001)
       .ease(d3.easeLinear)
-      .call(d3.axisBottom(scaleX.current!));
+      .call(d3.axisBottom(scaleX.current!).tickFormat(minorFormat));
     xAxesGrid
       .current!.transition()
       .duration(0.0000001)
@@ -614,26 +629,6 @@ export default function TimelineSlider() {
       .call(
         d3
           .axisBottom(scaleX.current!)
-          .tickFormat(() => "")
-          .tickSize(-graphHeight),
-      );
-
-    // scale
-    scaleY.current!.domain(bounds.y);
-
-    // update X axes and grid based on scale
-    yAxes
-      .current!.transition()
-      .duration(0.0000001)
-      .ease(d3.easeLinear)
-      .call(d3.axisLeft(scaleY.current!));
-    yAxesGrid
-      .current!.transition()
-      .duration(0.0000001)
-      .ease(d3.easeLinear)
-      .call(
-        d3
-          .axisLeft(scaleY.current!)
           .tickFormat(() => "")
           .tickSize(-graphHeight),
       );
@@ -657,13 +652,14 @@ export default function TimelineSlider() {
 
       // scale
       scaleX.current!.domain(bounds.x);
+      scaleY.current!.domain(bounds.y);
 
       // update X axes and grid based on scale
       xAxes
         .current!.transition()
         .duration(0.0000001)
         .ease(d3.easeLinear)
-        .call(d3.axisBottom(scaleX.current!));
+        .call(d3.axisBottom(scaleX.current!).tickFormat(minorFormat));
       xAxesGrid
         .current!.transition()
         .duration(0.0000001)
@@ -675,7 +671,24 @@ export default function TimelineSlider() {
             .tickSize(-graphHeight),
         );
     }
-  }, [bounds]);
+  }, [bounds.x]);
+
+  //  listen for viewport changes
+  useEffect(() => {
+    if (viewPortScaleX.current && viewPortScaleY.current) {
+      // scale
+      scaleY.current!.domain(bounds.y).nice();
+
+      // update X axes and grid based on scale
+      yAxes.current!.transition().call(d3.axisLeft(scaleY.current!));
+      yAxesGrid.current!.transition().call(
+        d3
+          .axisLeft(scaleY.current!)
+          .tickFormat(() => "")
+          .tickSize(-graphWidth),
+      );
+    }
+  }, [bounds.y]);
 
   return (
     <Box
@@ -769,135 +782,6 @@ export default function TimelineSlider() {
       >
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
       </DeckGL>
-      <Grow
-        in={
-          appInterface.animationControlsVisible // &&
-          //   (GPUfiltering.t[0] != bounds.x[0].getTime() ||
-          //     GPUfiltering.t[1] != bounds.x[1].getTime())
-        }
-        style={{ transformOrigin: "bottom center" }}
-        unmountOnExit
-        mountOnEnter
-      >
-        <Paper
-          sx={{
-            p: 0.5,
-            position: "absolute",
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            zIndex: 1000,
-            left: theme.spacing(2),
-            bottom: `calc(100% + ${theme.spacing(2)})`,
-          }}
-        >
-          <Checkbox
-            size="small"
-            checked={animationEnabled}
-            onChange={() => {
-              toggleAnimationEnabled();
-            }}
-            icon={<SelectionOff />}
-            checkedIcon={<Selection />}
-          />
-          <IconButton
-            onClick={() => {
-              if (isPlaying == "stopped") {
-                setIsPlaying("playing");
-              } else {
-                setIsPlaying("stopped");
-              }
-            }}
-            size="small"
-          >
-            {isPlaying == "stopped" ? <PlayArrow /> : <Pause />}
-          </IconButton>
-          <Divider orientation="vertical" sx={{ m: 0.5, mr: 1 }} flexItem />
-          <Speedometer sx={{ mr: 1 }} />
-          <Input
-            value={animationSpeed.multiplier}
-            size="small"
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setAnimationSpeed({
-                multiplier: Number(event.target.value),
-                unit: animationSpeed.unit,
-              });
-            }}
-            sx={{ width: 36, alignSelf: "end", mb: "2px" }}
-            inputProps={{
-              step: 1,
-              min: 0,
-              max: 100,
-              type: "number",
-              "aria-labelledby": "input-slider",
-            }}
-          />
-          <Select
-            labelId="demo-simple-select-autowidth-label"
-            id="demo-simple-select-autowidth"
-            value={animationSpeed.unit}
-            onChange={(event: SelectChangeEvent) => {
-              setAnimationSpeed({
-                multiplier: animationSpeed.multiplier,
-                unit: event.target.value as
-                  | "second"
-                  | "minute"
-                  | "hour"
-                  | "day"
-                  | "week"
-                  | "year",
-              });
-            }}
-            autoWidth
-            label="Age"
-            size="small"
-            variant="standard"
-            sx={{ alignSelf: "end", mb: "2px" }}
-          >
-            <MenuItem value="second">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.seconds")
-                : t("Animation.second")}
-            </MenuItem>
-            <MenuItem value="minute">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.minutes")
-                : t("Animation.minute")}
-            </MenuItem>
-            <MenuItem value="hour">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.hours")
-                : t("Animation.hour")}
-            </MenuItem>
-            <MenuItem value="day">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.days")
-                : t("Animation.day")}
-            </MenuItem>
-            <MenuItem value="week">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.weeks")
-                : t("Animation.week")}
-            </MenuItem>
-            <MenuItem value="year">
-              {animationSpeed.multiplier != 1
-                ? t("Animation.years")
-                : t("Animation.year")}
-            </MenuItem>
-          </Select>
-          {" /s"}
-          <Divider orientation="vertical" sx={{ m: 0.5, ml: 1 }} flexItem />
-          <Checkbox
-            size="small"
-            checked={tapered}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setTapered(event.target.checked);
-            }}
-            icon={<GradientHorizontal />}
-            checkedIcon={<GradientHorizontal />}
-          />
-        </Paper>
-      </Grow>
     </Box>
   );
 }

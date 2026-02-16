@@ -30,7 +30,7 @@ export default function LegendElement({
           textOverflow: "ellipsis",
         }}
       >
-        {dataSource.filename}
+        {dataSource.name}
       </Typography>
       <ColormapLegend dataSource={dataSource} layerType={layerType}/>
     </>
@@ -85,7 +85,7 @@ export default function LegendElement({
               textOverflow: "ellipsis",
             }}
           >
-            {dataSource.filename}
+            {dataSource.name}
           </Typography>
         </Grid>
       </Grid>

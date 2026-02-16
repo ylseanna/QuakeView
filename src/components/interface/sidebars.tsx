@@ -25,6 +25,8 @@ import FilteringSidebar from "../datasource/filtering/filtering-sidebar";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
 
+export const DRAWER_WIDTH = 360;
+
 export default function Sidebars() {
   const t = useTranslations();
 
@@ -44,12 +46,6 @@ export default function Sidebars() {
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const setFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setFormatting,
-  );
-  const setFiltering = useProjectStore(
-    (state) => state.dataSourceActions.setFiltering,
-  );
   const setVisible = useProjectStore(
     (state) => state.dataSourceActions.setVisible,
   );
@@ -211,12 +207,10 @@ export default function Sidebars() {
         )}
 
         <FormattingSidebar
-          setFormatting={setFormatting}
           drawerOpen={sidebarOpen == "formatting"}
         />
         <FilteringSidebar
           // setDataSources={setDataSources}
-          setFiltering={setFiltering}
           drawerOpen={sidebarOpen == "filtering"}
         />
       </Box>

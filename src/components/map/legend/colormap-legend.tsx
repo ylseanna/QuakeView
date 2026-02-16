@@ -1,9 +1,16 @@
-import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  useCallback,
+  useEffect,
+  useLayoutEffect,
+  useRef,
+  useState,
+} from "react";
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
 
 import { DataSource } from "../../datasource/types";
 import { colormaps } from "../crameri-colormaps";
+import { useData } from "@/components/datasource/use-data";
 // import { ReImg } from "reimg";
 
 interface LegendElementProps {
@@ -11,10 +18,14 @@ interface LegendElementProps {
   layerType: "twoD" | "threeD" | "plot";
 }
 
-export default function ColormapLegend({ dataSource, layerType }: LegendElementProps) {
+export default function ColormapLegend({
+  dataSource,
+  layerType,
+}: LegendElementProps) {
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
+  const { data } = useData();
 
   useLayoutEffect(() => {
     if (parentRef.current) {
@@ -67,28 +78,39 @@ export default function ColormapLegend({ dataSource, layerType }: LegendElementP
       .append("g")
       .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-    const x = d3
-      .scaleLinear()
-      .domain(colorFormatting.linear.domain[colorFormatting.linear.variable]!)
-      .range([0, width - 1]);
+    if (data.byID[dataSource.internal_id]) {
+      const x =
+        colorFormatting.linear.variable == "t"
+          ? d3
+              .scaleTime()
+              .domain([
+                new Date(data.byID[dataSource.internal_id].bounds[colorFormatting.linear.variable]![0] as number),
+                new Date(data.byID[dataSource.internal_id].bounds[colorFormatting.linear.variable]![1] as number),
+              ] as Iterable<d3.NumberValue>)
+              .range([0, width])
+          : d3
+              .scaleLinear()
+              .domain(data.byID[dataSource.internal_id].bounds[colorFormatting.linear.variable]! as Iterable<d3.NumberValue>)
+              .range([0, width]);
 
-    svg
-      .append("g")
-      .attr("transform", `translate(0, ${height + margin.top})`)
-      .call(d3.axisBottom(x).tickValues(x.ticks(5)));
+      svg
+        .append("g")
+        .attr("transform", `translate(0, ${height + margin.top})`)
+        .call(d3.axisBottom(x).tickValues(x.ticks(4)));
 
-    svg
-      .append("text")
-      .attr("text-anchor", "middle")
-      .attr("alignment-baseline", "text-bottom")
-      .attr("font-size", 10)
-      .attr("fill", "var(--mui-palette-text-primary)")
-      .attr("x", width / 2)
-      .attr("y", height + margin.top + margin.bottom - 2)
-      .text(
-        dataSource.metadata.variables.by_id[colorFormatting.linear.variable]
-          .alias,
-      );
+      svg
+        .append("text")
+        .attr("text-anchor", "middle")
+        .attr("alignment-baseline", "text-bottom")
+        .attr("font-size", 10)
+        .attr("fill", "var(--mui-palette-text-primary)")
+        .attr("x", width / 2)
+        .attr("y", height + margin.top + margin.bottom - 2)
+        .text(
+          dataSource.metadata.variables.by_id[colorFormatting.linear.variable]
+            .alias,
+        );
+    }
   });
 
   const Canvas = () => {

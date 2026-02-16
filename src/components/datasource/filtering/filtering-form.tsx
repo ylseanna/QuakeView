@@ -24,6 +24,8 @@ import { useTranslations } from "next-intl";
 import HistogramSlider from "../../interface-elements/histogram-slider";
 import { useData } from "../use-data";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { PickerValue } from "@mui/x-date-pickers/internals";
+import { Dayjs } from "dayjs";
 
 type FilteringOption = {
   variable: string;
@@ -108,8 +110,20 @@ const FilteringEditingRow = ({
             onChangeNumberInputsMin={(event: ChangeEvent<HTMLInputElement>) => {
               setLocalDomain([Number(event.target.value), localDomain[1]]);
             }}
+            onChangeDateTimeInputsMin={(value: PickerValue) => {
+              setLocalDomain([(value as Dayjs)!.valueOf(), localDomain[1]]);
+            }}
+            onAcceptDateTimeInputsMin={(value: PickerValue) => {
+              setFilter(dataSource.internal_id, variable, [(value as Dayjs)!.valueOf(), localDomain[1]]);
+            }}
             onChangeNumberInputsMax={(event: ChangeEvent<HTMLInputElement>) => {
               setLocalDomain([localDomain[0], Number(event.target.value)]);
+            }}
+            onChangeDateTimeInputsMax={(value: PickerValue) => {
+              setLocalDomain([localDomain[0], (value as Dayjs)!.valueOf()]);
+            }}
+            onAcceptDateTimeInputsMax={(value: PickerValue) => {
+              setFilter(dataSource.internal_id, variable, [localDomain[0], (value as Dayjs)!.valueOf()]);
             }}
             onBlurNumberInputs={() => {
               setFilter(dataSource.internal_id, variable, localDomain);

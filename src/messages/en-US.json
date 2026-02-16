@@ -130,7 +130,9 @@
     "show_map_tools": "Show map tools",
     "show_animation_controls": "Show animation controls",
     "debug_window": "Show debug window",
-    "map_tools": "Map tools"
+    "map_tools": "Map tools",
+    "show_timeline_bar": "Show timeline bar",
+    "show_legend": "Show legend"
   },
   "Navbar": {
     "GR_plot": "GR plot",
@@ -144,5 +146,15 @@
   },
   "Map": {
     "styling": "Map styling"
+  },
+  "Slider": {
+    "start_time": "Start time",
+    "end_time": "End time",
+    "selection_start_time": "Selection start",
+    "selection_end_time": "Selection end"
+  },
+  "Bottombar": {
+    "selection": "Selection",
+    "animation": "Animation"
   }
 }

@@ -3,7 +3,6 @@
 // import { useTranslations } from "next-intl";
 import {
   Box,
-  Button,
   Checkbox,
   Divider,
   Grid,
@@ -26,9 +25,11 @@ import FormattingSidebar from "./formatting/formatting-sidebar";
 import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "./filtering/filtering-sidebar";
 import Legend from "../map/legend/legend";
-import BottomBar from "./GPU_filtering/bottom-bar";
+import BottomBar from "../interface/bottom-bar";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import { DRAWER_WIDTH } from "../interface/sidebars";
+import { DRAWER_HEIGHT, BOTTOMBAR_HEIGHT } from "../interface/bottom-bar";
 
 export default function Actions() {
   const t = useTranslations();
@@ -36,15 +37,10 @@ export default function Actions() {
   const { appInterface } = useAppStateStore((state) => state);
 
   const [panelPosition, setPanelPosition] = useState(0);
-  const [bottombarPosition, setBottombarPosition] = useState(0);
-
-  const DRAWER_WIDTH = 360;
-  const DRAWER_HEIGHT = 200;
 
   const actionsRef = useRef<HTMLElement | null>(null);
 
   const [sidebarOpen, setSidebarOpen] = useState<string | null>(null);
-  const [bottombarOpen, setBottombarOpen] = useState<boolean>(false);
 
   const { sessionInterface, interfaceActions } = useProjectStore(
     (state) => state,
@@ -64,15 +60,6 @@ export default function Actions() {
       setPanelPosition(0);
     }
   }, [sidebarOpen]);
-
-  // if any sidebar open, also move panel
-  useEffect(() => {
-    if (bottombarOpen) {
-      setBottombarPosition(DRAWER_HEIGHT);
-    } else {
-      setBottombarPosition(0);
-    }
-  }, [bottombarOpen]);
 
   // FORMATTING SIDEBAR
 
@@ -94,13 +81,6 @@ export default function Actions() {
     }
   };
 
-  const toggleBottomBar = () => {
-    if (bottombarOpen) {
-      setBottombarOpen(false);
-    } else {
-      setBottombarOpen(true);
-    }
-  };
 
   // LAYERS SIDEBAR
 
@@ -110,23 +90,30 @@ export default function Actions() {
 
   // CLICK-AWAY
 
+  // check for opened poppers (then disable clickAway)
+
+  const { popperOpen } = useAppStateStore((state) => state.appInterface);
+
   useClickOutside(actionsRef, (evt: PointerEvent) => {
     const { target } = evt;
-    if (target instanceof HTMLElement) {
-      const classList = target.classList;
-      if (
-        classList.contains("NoClickAwayActionPanel") ||
-        classList.contains("MuiColorInput-ColorSpace") ||
-        classList.contains("MuiBackdrop-invisible") ||
-        classList.contains("MuiButtonBase-root") ||
-        classList.contains("MuiAutocomplete-listbox") ||
-        classList.contains("MuiAutocomplete-option")
-      ) {
-        return;
+    if (!popperOpen) {
+      if (target instanceof HTMLElement) {
+        const classList = target.classList;
+        if (
+          classList.contains("NoClickAwayActionPanel") ||
+          classList.contains("MuiPopper-root") ||
+          classList.contains("MuiColorInput-ColorSpace") ||
+          classList.contains("MuiBackdrop-invisible") ||
+          classList.contains("MuiButtonBase-root") ||
+          classList.contains("MuiAutocomplete-listbox") ||
+          classList.contains("MuiAutocomplete-option")
+        ) {
+          return;
+        }
       }
+      setSidebarOpen(null);
+      setLayersVisible(false);
     }
-    setSidebarOpen(null);
-    setLayersVisible(false);
   });
 
   return (
@@ -244,11 +231,17 @@ export default function Actions() {
         <FormattingSidebar drawerOpen={sidebarOpen == "formatting"} />
         <FilteringSidebar drawerOpen={sidebarOpen == "filtering"} />
 
-        {dataSources && (
+        {dataSources && appInterface.legendVisible && (
           <Legend
             layerType="twoD"
             sx={{
-              transform: `translate(-${panelPosition}px, -${bottombarPosition}px)`,
+              transform: appInterface.timelineBarVisible
+                ? appInterface.animationControlsVisible
+                  ? `translate(-${panelPosition}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
+                  : `translate(-${panelPosition}px, -${DRAWER_HEIGHT}px)`
+                : appInterface.animationControlsVisible
+                  ? `translate(-${panelPosition}px, -${BOTTOMBAR_HEIGHT}px)`
+                  : `translate(-${panelPosition}px, 0)`,
               transition: "transform.225s",
             }}
           />
@@ -258,13 +251,15 @@ export default function Actions() {
 
       {dataSources.allIDs.length > 0 && (
         <>
-          {appInterface.animationControlsVisible && (
+          {/* {appInterface.animationControlsVisible && (
             <Paper
               sx={{
                 position: "fixed",
                 display: "flex",
                 flexDirection: "column",
-                transform: `translateY(-${bottombarPosition}px)`,
+                transform: appInterface.timelineBarVisible
+                  ? `translateY(-${DRAWER_HEIGHT}px)`
+                  : "translateY(0)",
                 transition: "transform.225s",
                 alignSelf: "center",
                 bottom: 0,
@@ -283,12 +278,9 @@ export default function Actions() {
                 </Button>
               </Tooltip>
             </Paper>
-          )}
+          )} */}
 
-          <BottomBar
-            drawerOpen={bottombarOpen}
-            parentRef={actionsRef as RefObject<HTMLElement>}
-          />
+          <BottomBar parentRef={actionsRef as RefObject<HTMLElement>} />
         </>
       )}
     </>

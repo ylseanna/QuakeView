@@ -1,4 +1,5 @@
 import mask from "@turf/mask";
+import combine from "@turf/combine";
 
 import type { MapStyle } from "react-map-gl/maplibre";
 
@@ -6,10 +7,15 @@ import calderas from "./geojsonfiles/calderas.geojson" with { type: "json" };
 import coastline from "./geojsonfiles/coastline.geojson" with { type: "json" };
 import centralvolc from "./geojsonfiles/centralvolc.geojson" with { type: "json" };
 import joklar from "./geojsonfiles/joklar.geojson" with { type: "json" };
+
+import all_countries from "./geojsonfiles/countries.geojson" with { type: "json" };
 // import lakes from "./geojsonfiles/lakes.geojson" with { type: "json" };
 // import thjodvegur from "./geojsonfiles/road1.geojson" with { type: "json" };
 
 const ocean = mask(coastline);
+
+const all_ocean = mask(combine(all_countries));
+
 
 export const IcelandDEMStyle: MapStyle = {
   version: 8,
@@ -113,16 +119,6 @@ export const IcelandDEMStyle: MapStyle = {
         "line-width": 0.8,
       },
     },
-    //   {
-    //     id: "coast",
-    //     type: "line",
-    //     source: "coast",
-    //     paint: {
-    //       "line-color": "#000",
-    //       "line-opacity" : 1,
-    //       "line-width": 1.2
-    //     },
-    //   }
     // {
     //     id: "thjodvegur",
     //     type: "line",
@@ -146,6 +142,14 @@ export const USDEMStyle: MapStyle = {
       ],
       tileSize: 256,
       attribution: "USGS",
+    },
+    ocean: {
+      type: "geojson",
+      data: all_ocean,
+    },
+    countries: {
+      type: "geojson",
+      data: all_countries,
     },
     // coastline: {
     //   type: "geojson",
@@ -202,6 +206,26 @@ export const USDEMStyle: MapStyle = {
         "raster-opacity": 0.5,
       },
     },
+    
+      {
+      id: "ocean",
+      type: "fill",
+      source: "ocean",
+      paint: {
+        "fill-color": "#ffffff",
+        "fill-opacity": 1,
+      },
+    },
+    // {
+    //     id: "countries",
+    //     type: "line",
+    //     source: "countries",
+    //     paint: {
+    //       "line-color": "#000",
+    //       "line-opacity" : .8,
+    //       "line-width": .8
+    //     },
+    //   },
     // {
     //   id: "coastline",
     //   type: "line",
@@ -285,5 +309,27 @@ export const USDEMStyle: MapStyle = {
     //       "line-width": 0.8,
     //     },
     //   },
+  ],
+};
+
+export const WorldCoastLines: MapStyle = {
+  version: 8,
+  sources: {
+    countries: {
+      type: "geojson",
+      data: all_countries,
+    },
+  },
+  layers: [
+      {
+        id: "countries",
+        type: "line",
+        source: "countries",
+        paint: {
+          "line-color": "#000",
+          "line-opacity" : 1,
+          "line-width": 1.2
+        },
+      }
   ],
 };

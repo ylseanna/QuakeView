@@ -10,6 +10,9 @@ export type AppState = {
     mapToolsVisible: boolean;
     sideBarsVisible: boolean;
     animationControlsVisible: boolean;
+    timelineBarVisible: boolean;
+    legendVisible: boolean;
+    popperOpen: boolean;
   };
 };
 
@@ -18,6 +21,10 @@ export type AppActions = {
     toggleMapToolsVisible: () => void;
     toggleSideBarsVisible: () => void;
     toggleAnimationControlsVisible: () => void;
+    toggleTimelineBarVisible: () => void;
+    toggleLegendVisible: () => void;
+    signalPopperOpen: () => void;
+    signalPopperClosed: () => void;
   };
 };
 
@@ -28,6 +35,9 @@ export const defaultInitState: AppState = {
     mapToolsVisible: true,
     sideBarsVisible: true,
     animationControlsVisible: true,
+    timelineBarVisible: false,
+    legendVisible: true,
+    popperOpen: false,
   },
 };
 
@@ -51,6 +61,24 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
             set((state) => {
               state.appInterface.animationControlsVisible =
                 !state.appInterface.animationControlsVisible;
+            }),
+          toggleTimelineBarVisible: () =>
+            set((state) => {
+              state.appInterface.timelineBarVisible =
+                !state.appInterface.timelineBarVisible;
+            }),
+          toggleLegendVisible: () =>
+            set((state) => {
+              state.appInterface.legendVisible =
+                !state.appInterface.legendVisible;
+            }),
+          signalPopperOpen: () =>
+            set((state) => {
+              state.appInterface.popperOpen = true;
+            }),
+          signalPopperClosed: () =>
+            set((state) => {
+              state.appInterface.popperOpen = false;
             }),
         },
       })),

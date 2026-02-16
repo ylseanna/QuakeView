@@ -29,6 +29,7 @@ import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
 import { AppStateStoreProvider } from "@/providers/app-state-provider";
 
+
 declare module "@mui/material/styles" {
   interface TypographyVariants {
     formlabel: React.CSSProperties;
