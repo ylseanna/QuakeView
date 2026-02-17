@@ -46,7 +46,7 @@ export function minorTimeFormat(dateIntervalSeconds: number) {
             ? formatDayHour
             : dateIntervalSeconds < 31 * 24 * 60 * 60
               ? formatDay
-              : dateIntervalSeconds < 365.25 * 24 * 60 * 60
+              : dateIntervalSeconds < 5 * 365.25 * 24 * 60 * 60
                 ? formatMonth
                 : formatYear;
 }

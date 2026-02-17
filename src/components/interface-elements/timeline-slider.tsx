@@ -1,27 +1,19 @@
 import useAnimationFrame from "use-animation-frame";
-
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
 import { Box } from "@mui/material";
-import * as d3 from "d3";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
-import {
-  Dispatch,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-
-import { useProjectStore } from "@/providers/project-store-provider";
-import { StemPlotLayers } from "../map/generate-datasource-layers";
+import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
 import { SetStateAction } from "react";
-import { EarthQuake } from "../datasource/types";
-import { useData } from "../datasource/use-data";
+import * as d3 from "d3";
+
+import { useProjectStore } from "@/providers/project-store-provider";
+import { StemPlotLayers } from "../map/generate-datasource-layers";
 import { minorTimeFormat } from "../interface/time-format";
+import { useData } from "../datasource/use-data";
+import { EarthQuake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
 // import { useKeyPressed } from "@react-hooks-library/core";
@@ -334,8 +326,8 @@ export default function TimelineSlider({
       }
     } else {
       if (
-        Math.round(localDomain[0]) != Math.round(bounds.x[0].valueOf()) ||
-        Math.round(localDomain[1]) != Math.round(bounds.x[1].valueOf())
+        Math.round(localDomain[0]) > Math.round(bounds.x[0].valueOf()) ||
+        Math.round(localDomain[1]) < Math.round(bounds.x[1].valueOf())
       ) {
         setTimeFiltering(localDomain);
         moveBrush(localDomain);
@@ -466,7 +458,7 @@ export default function TimelineSlider({
     brushRef.current = brush;
 
     // setIsLoading(true);
-  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top]);
+  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
 
   // set bounds based on ViewState
   useEffect(() => {

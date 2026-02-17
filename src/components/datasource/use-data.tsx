@@ -1,19 +1,21 @@
-import { useQueries } from "@tanstack/react-query";
+import { useQueries, UseQueryResult } from "@tanstack/react-query";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { fetchData } from "./load-data";
 import { DataSourceFiltering, EarthQuake, Extent } from "./types";
 
-export type DataCache = {
-  byID: {
-    [id: string]: {
+export type DataQueryResponse = {
       data: EarthQuake[];
       addedVars: string[];
       bounds: { [variable: string]: [number, number] | null };
       unfiltered_bounds: { [variable: string]: [number, number] | null };
       extent: Extent;
       filters: DataSourceFiltering;
-    };
+    }
+
+export type DataCache = {
+  byID: {
+    [id: string]: DataQueryResponse;
   };
   allIDs: string[];
 };
@@ -25,7 +27,7 @@ export type DataCacheResult = {
 export function useData() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  return useQueries({
+  const queryOptions = {
     queries: dataSources.allIDs.map((dataSourceID) => {
       return {
         queryKey: [
@@ -43,7 +45,7 @@ export function useData() {
         enabled: dataSources.byID[dataSourceID].interface.loadable,
       };
     }),
-    combine: (results) => {
+    combine: (results: UseQueryResult<DataQueryResponse, Error>[]) => {
       return {
         data: {
           byID: Object.fromEntries(
@@ -59,5 +61,7 @@ export function useData() {
         pending: results.some((result) => result.isPending),
       };
     },
-  }) as DataCacheResult;
+  };
+
+  return useQueries(queryOptions) as DataCacheResult;
 }
