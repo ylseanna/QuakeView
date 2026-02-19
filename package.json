@@ -45,8 +45,8 @@
     "files": [
       "out",
       {
-        "from": "./next/",
-        "to": "next/",
+        "from": "./.next/",
+        "to": ".next/",
         "filter": [
           "**/*"
         ]

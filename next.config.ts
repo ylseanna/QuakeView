@@ -17,7 +17,6 @@ module.exports = withBundleAnalyzer(
   withNextIntl({
     reactStrictMode: false,
     basePath: basePath,
-    distDir: 'next',
     env: {
       HOST: "localhost:8090",
       API_HOST: "localhost:8100",
