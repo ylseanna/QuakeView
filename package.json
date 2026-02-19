@@ -31,54 +31,6 @@
     "dist": "run-s electron:dist",
     "dev": "npm-run-all --parallel next:dev flask:dev vite:dev"
   },
-  "build": {
-    "asar": true,
-    "extends": null,
-    "productName": "QuakeView",
-    "appId": "frl.ylse.quakeview",
-    "asarUnpack": [
-      "node_modules/next",
-      "node_modules/@img",
-      "node_modules/sharp",
-      "**\\*.{node,dll}"
-    ],
-    "files": [
-      "out",
-      "public",
-      {
-        "from": "./.next/",
-        "to": ".next/",
-        "filter": [
-          "**/*",
-          "!**/cache",
-          "!**/dev"
-        ]
-      }
-    ],
-    "linux": {
-      "target": [
-        "deb",
-        "appImage"
-      ],
-      "artifactName": "quakeview_${version}_${env.OS}.${ext}",
-      "category": "Science"
-    },
-    "win": {
-      "target": [
-        "nsis"
-      ]
-    },
-    "extraResources": [
-      {
-        "from": "flask/dist",
-        "to": "flask"
-      }
-    ],
-    "directories": {
-      "buildResources": "resources",
-      "output": "release"
-    }
-  },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",
     "@base-ui/react": "^1.2.0",

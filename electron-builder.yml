@@ -1,35 +1,30 @@
 asar: true
 productName: "QuakeView"
 appId: "frl.ylse.quakeview"
-asarUnpack: [
-  "node_modules/next",
-  "node_modules/@img",
-  "node_modules/sharp",
-  "**\\*.{node,dll}"
-]
-files:
-  - out
-  - next
-linux: {
-  target: [
-    "deb",
-    "appImage"
-  ],
-  artifactName: "quakeview_${version}_${env.OS}.${ext}",
-  category: "Science"
-}
-win: {
-  target: [
-    "nsis"
+asarUnpack:
+  [
+    "node_modules/next",
+    "node_modules/@img",
+    "node_modules/sharp",
+    "**\\*.{node,dll}",
   ]
-}
-extraResources: [
+files:
+  [
+    "out",
+    "next",
+    "public",
+    {
+      "from": "./.next/",
+      "to": ".next/",
+      "filter": ["**/*", "!**/cache", "!**/dev"],
+    },
+  ]
+linux:
   {
-    from: "flask/dist",
-    to: "flask"
+    target: ["deb"],
+    artifactName: "quakeview_${version}_${env.OS}.${ext}",
+    category: "Science",
   }
-]
-directories: {
-  buildResources: "resources",
-  output: "release"
-}
+win: { target: ["nsis"] }
+extraResources: [{ from: "flask/dist", to: "flask" }]
+directories: { buildResources: "resources", output: "release" }

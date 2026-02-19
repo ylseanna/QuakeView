@@ -48,7 +48,7 @@
     "src/components/map/map-style-hook.tsx_disable",
     "next/types/**/*.ts",
     "next/dev/types/**/*.ts"
-  ],
+, "src/proxy.ts"  ],
   "exclude": [
     "node_modules"
   ]

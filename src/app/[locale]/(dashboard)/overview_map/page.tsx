@@ -4,7 +4,7 @@ import {
   IcelandDEMStyle,
   USDEMStyle,
   WorldCoastLines,
-} from "../../../../components/map/map_styles/default";
+} from "@/components/map/map_styles/default";
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import Map, { ScaleControl, NavigationControl } from "react-map-gl/maplibre";
@@ -19,10 +19,10 @@ import {
 } from "@mui/material";
 import { ViewState } from "react-map-gl/maplibre";
 
-import DeckGLlayers from "../../../../components/map/deckgl-layers";
+import DeckGLlayers from "@/components/map/deckgl-layers";
 
 import { AttributionControl } from "react-map-gl";
-import Actions from "../../../../components/datasource/actions";
+import Actions from "@/components/datasource/actions";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
 import { useAppStateStore } from "@/providers/app-state-provider";

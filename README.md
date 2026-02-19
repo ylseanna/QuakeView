@@ -12,6 +12,7 @@ QuakeView is an open-source program written in react/next.js, with a python back
 - GPU acceleration of 3D maps and plots
 
 ## To build from source
+
 Create a python environment for running the flask backend, by installing all the requirements in requirement.txt.
 
 Then run "npm i".
