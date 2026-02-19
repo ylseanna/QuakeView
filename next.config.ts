@@ -27,17 +27,16 @@ module.exports = withBundleAnalyzer(
       proxyTimeout: 600000,
       optimizePackageImports: ["@mui/material", "@mui/icons-material" ],
     },
-    // Redirect basePath to path with locale due to next-intl not supporting basePath
-    async redirects() {
-      return [
-        {
-          source: "/",
-          destination: `/${defaultLocale}`,
-          permanent: true,
-          basePath: false,
-        },
-      ];
-    },
+    // // Redirect basePath to path with locale due to next-intl not supporting basePath
+    // async redirects() {
+    //   return [
+    //     {
+    //       source: "/",
+    //       destination: `/${defaultLocale}`,
+    //       permanent: true,
+    //     },
+    //   ];
+    // },
     async rewrites() {
       return [
         {

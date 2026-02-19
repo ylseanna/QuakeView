@@ -4,12 +4,8 @@ import { defineRouting } from "next-intl/routing";
 export const routing = defineRouting({
   // A list of all locales that are supported
   locales: ["en-US", "is"],
-  localePrefix: {
-    mode: "always",
-    prefixes: {
-      "en-US": "/en",
-    },
-  },
+  localePrefix: "always",
+
 
   // Used when no locale matches
   defaultLocale: "en-US",
