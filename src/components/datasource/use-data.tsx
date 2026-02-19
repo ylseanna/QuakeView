@@ -2,10 +2,10 @@ import { useQueries, UseQueryResult } from "@tanstack/react-query";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { fetchData } from "./load-data";
-import { DataSourceFiltering, EarthQuake, Extent } from "./types";
+import { DataSourceFiltering, Earthquake, Extent } from "./types";
 
 export type DataQueryResponse = {
-      data: EarthQuake[];
+      data: Earthquake[];
       addedVars: string[];
       bounds: { [variable: string]: [number, number] | null };
       unfiltered_bounds: { [variable: string]: [number, number] | null };

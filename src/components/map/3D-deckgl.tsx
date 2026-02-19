@@ -3,7 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { EarthQuake, Extent } from "@/components/datasource/types";
+import { Earthquake, Extent } from "@/components/datasource/types";
 
 import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
@@ -67,12 +67,12 @@ export default function ThreeDDeckGLView({
 
   // TOOLTIP
 
-  const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
+  const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
 
   // LAYERS
   const layers = useMemo(() => {
     let layers_to_set = [] as ScatterplotLayer<
-      EarthQuake,
+      Earthquake,
       DataFilterExtensionProps
     >[];
 
@@ -87,7 +87,7 @@ export default function ThreeDDeckGLView({
           positionOffset,
         );
 
-        layer.onHover = (info: PickingInfo<EarthQuake>) => {
+        layer.onHover = (info: PickingInfo<Earthquake>) => {
           setHoverInfo(info);
           return true;
         };

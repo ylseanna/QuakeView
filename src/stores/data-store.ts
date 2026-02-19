@@ -1,12 +1,12 @@
 import { immer } from "zustand/middleware/immer";
 import { createStore } from "zustand/vanilla";
 
-import { DataSourceFiltering, EarthQuake, Extent } from "../components/datasource/types";
+import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 
 export type DataState = {
   data: {
     [id: string]: {
-      data: EarthQuake[];
+      data: Earthquake[];
       addedVars: string[];
       bounds: { [variable: string]: [number, number] | null };
       extent: Extent;
@@ -19,7 +19,7 @@ export type DataState = {
 export type DataActions = {
   addData: (
     id: string,
-    data: EarthQuake[],
+    data: Earthquake[],
     addedVars: string[],
     bounds: { [variable: string]: [number, number] | null },
     extent: Extent,

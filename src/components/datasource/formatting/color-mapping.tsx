@@ -2,10 +2,10 @@ import { Color } from "@deck.gl/core";
 import * as d3 from "d3";
 
 import { colormaps, colormaps_categorical } from "../../map/crameri-colormaps";
-import { DataSourceColorFormatting, EarthQuake } from "../types";
+import { DataSourceColorFormatting, Earthquake } from "../types";
 
 export const ColorMapping = (
-  d: EarthQuake,
+  d: Earthquake,
   colorFormatting: DataSourceColorFormatting
 ) => {
   if (colorFormatting.mapping == "single") {

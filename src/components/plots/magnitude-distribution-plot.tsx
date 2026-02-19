@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useData } from "../datasource/use-data";
-import { EarthQuake } from "../datasource/types";
+import { Earthquake } from "../datasource/types";
 
 export default function MagnitudeDistributionPlot() {
   const { dataSources } = useProjectStore((state) => state);
@@ -49,7 +49,7 @@ export default function MagnitudeDistributionPlot() {
         const xbounds = data.byID[id].bounds["mag"]!;
 
         const bins = d3.bin().thresholds(50).domain([xbounds[0], xbounds[1]])(
-          (data.byID[id].data as EarthQuake[]).map(
+          (data.byID[id].data as Earthquake[]).map(
             (d) => d["mag"],
           ) as ArrayLike<number>,
         );
@@ -61,7 +61,7 @@ export default function MagnitudeDistributionPlot() {
 
         dataSourcesBins.push({
           id: id,
-          color: dataSource.formatting.color.single as unknown as string,
+          color: dataSource.formatting.plot.color.single as unknown as string,
           bins: bins,
           xbounds: xbounds,
           ybounds: ybounds,

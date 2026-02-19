@@ -4,7 +4,7 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useData } from "../datasource/use-data";
-import { EarthQuake } from "../datasource/types";
+import { Earthquake } from "../datasource/types";
 
 export default function GutenbergRichterPlot() {
   const { dataSources } = useProjectStore((state) => state);
@@ -46,7 +46,7 @@ export default function GutenbergRichterPlot() {
       const dataSourceID = dataSources.allIDs[i];
 
       if (data.byID[dataSourceID]) {
-        const mags = (data.byID[dataSourceID].data as EarthQuake[])
+        const mags = (data.byID[dataSourceID].data as Earthquake[])
           .map((d) => d["mag"])
           .toSorted((a, b) => a - b)
           .reverse() as number[];
@@ -224,7 +224,7 @@ export default function GutenbergRichterPlot() {
         .attr("cx", (d) => x(d))
         .attr("cy", (d, i) => y(i + 1))
         .attr("r", 1.5)
-        .style("fill", dataSource.formatting.color.single as unknown as string);
+        .style("fill", dataSource.formatting.plot.color.single as unknown as string);
 
       setIsLoading(false);
     }

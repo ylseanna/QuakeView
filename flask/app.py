@@ -3,17 +3,15 @@ import json
 # from obspy import UTCDateTime
 from datetime import datetime
 from itertools import islice
+from logging.config import dictConfig
 from mmap import mmap
 from pathlib import Path
 
 import pandas as pd
 from numpy import concatenate, float64, int64, isnan
-from obspy import UTCDateTime
 from shapely import multipoints
 
 from flask import Flask, Response, request, send_file
-
-from logging.config import dictConfig
 
 dictConfig(
     {

@@ -2,13 +2,13 @@
 
 import { PickingInfo } from "@deck.gl/core";
 // import { useTranslations } from "next-intl";
-import { EarthQuake, DataSourceDataDescription } from "../datasource/types";
+import { Earthquake, DataSourceDataDescription } from "../datasource/types";
 import { Grid, Paper, SxProps, Typography } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useMemo } from "react";
 
 interface MapToolTipProps {
-  pickingInfo: PickingInfo<EarthQuake>;
+  pickingInfo: PickingInfo<Earthquake>;
 }
 
 const TOOLTIP_WIDTH = 280;

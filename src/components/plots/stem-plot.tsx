@@ -10,7 +10,7 @@ import { StemPlotLayers } from "../map/generate-datasource-layers";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
 import { useData } from "../datasource/use-data";
-import { EarthQuake } from "../datasource/types";
+import { Earthquake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
 interface Bounds {
@@ -32,7 +32,7 @@ export default function StemPlot() {
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
 
-  const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
+  const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
   const { data } = useData();
@@ -364,9 +364,9 @@ export default function StemPlot() {
               viewPortScaleY.current!,
               viewPortScaleY.current!(minY),
               false,
-            ) as ScatterplotLayer<EarthQuake>;
+            ) as ScatterplotLayer<Earthquake>;
 
-            layer.onHover = (info: PickingInfo<EarthQuake>) => {
+            layer.onHover = (info: PickingInfo<Earthquake>) => {
               setHoverInfo(info);
               return true;
             };

@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-// import { DataSourceFiltering, EarthQuake, Extent } from "../components/datasource/types";
+// import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 
 export type AppState = {
   appInterface: {

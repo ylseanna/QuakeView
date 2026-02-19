@@ -6,7 +6,7 @@ import { useMemo, useState } from "react";
 import { DeckProps, PickingInfo } from "@deck.gl/core";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { useControl } from "react-map-gl";
-import { EarthQuake } from "@/components/datasource/types";
+import { Earthquake } from "@/components/datasource/types";
 
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
@@ -30,11 +30,11 @@ export default function DeckGLlayers() {
 
   // TOOLTIP
 
-  const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
+  const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
 
   // LAYERS
   const layers = useMemo(() => {
-    let layers_to_set = [] as ScatterplotLayer<EarthQuake, DataFilterExtensionProps>[];
+    let layers_to_set = [] as ScatterplotLayer<Earthquake, DataFilterExtensionProps>[];
 
     if (data) {
       layers_to_set = data.allIDs.map((id: string) => {
@@ -46,7 +46,7 @@ export default function DeckGLlayers() {
           GPUfiltering,
         );
 
-        layer.onHover = (info: PickingInfo<EarthQuake>) => {
+        layer.onHover = (info: PickingInfo<Earthquake>) => {
           setHoverInfo(info);
           return true;
         };

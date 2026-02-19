@@ -1,21 +1,23 @@
-import mask from "@turf/mask";
-import combine from "@turf/combine";
-
 import type { MapStyle } from "react-map-gl/maplibre";
+import combine from "@turf/combine";
+import mask from "@turf/mask";
+import { FeatureCollection, GeoJsonProperties, MultiPolygon, Polygon } from "geojson";
 
-import calderas from "./geojsonfiles/calderas.geojson" with { type: "json" };
-import coastline from "./geojsonfiles/coastline.geojson" with { type: "json" };
 import centralvolc from "./geojsonfiles/centralvolc.geojson" with { type: "json" };
-import joklar from "./geojsonfiles/joklar.geojson" with { type: "json" };
-
+import coastline from "./geojsonfiles/coastline.geojson" with { type: "json" };
 import all_countries from "./geojsonfiles/countries.geojson" with { type: "json" };
+import calderas from "./geojsonfiles/calderas.geojson" with { type: "json" };
+import joklar from "./geojsonfiles/joklar.geojson" with { type: "json" };
 // import lakes from "./geojsonfiles/lakes.geojson" with { type: "json" };
 // import thjodvegur from "./geojsonfiles/road1.geojson" with { type: "json" };
 
 const ocean = mask(coastline);
 
-const all_ocean = mask(combine(all_countries));
-
+const all_ocean = mask(
+  combine(
+    all_countries as FeatureCollection<MultiPolygon, GeoJsonProperties>,
+  ) as FeatureCollection<MultiPolygon>,
+);
 
 export const IcelandDEMStyle: MapStyle = {
   version: 8,
@@ -206,8 +208,8 @@ export const USDEMStyle: MapStyle = {
         "raster-opacity": 0.5,
       },
     },
-    
-      {
+
+    {
       id: "ocean",
       type: "fill",
       source: "ocean",
@@ -321,15 +323,15 @@ export const WorldCoastLines: MapStyle = {
     },
   },
   layers: [
-      {
-        id: "countries",
-        type: "line",
-        source: "countries",
-        paint: {
-          "line-color": "#000",
-          "line-opacity" : 1,
-          "line-width": 1.2
-        },
-      }
+    {
+      id: "countries",
+      type: "line",
+      source: "countries",
+      paint: {
+        "line-color": "#000",
+        "line-opacity": 1,
+        "line-width": 1.2,
+      },
+    },
   ],
 };

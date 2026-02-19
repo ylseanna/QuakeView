@@ -27,13 +27,13 @@
     "electron:build_watch": "tsup --watch",
     "electron:dev": "npm-run-all --parallel electron:build_watch electron:watch",
     "electron:watch": "cross-env NODE_ENV='development' nodemon",
-    "build": "run-s next:build flask:build",
+    "build": "run-s next:build flask:build vite:prebuild",
     "dist": "run-s electron:dist",
     "dev": "npm-run-all --parallel next:dev flask:dev vite:dev"
   },
   "build": {
     "asar": true,
-    "executableName": "QuakeView",
+    "productName": "QuakeView",
     "appId": "frl.ylse.quakeview",
     "asarUnpack": [
       "node_modules/next",
@@ -44,24 +44,13 @@
     "files": [
       "out",
       {
-        "from": ".next/standalone",
-        "to": "app",
+        "from": "next",
+        "to": "next",
         "filter": [
-          "!**/.env",
-          "!**/package.json"
+          "dev",
+          "diagnostics",
+          "cache"
         ]
-      },
-      {
-        "from": ".next/static",
-        "to": "app/.next/static"
-      },
-      {
-        "from": "public",
-        "to": "app/public"
-      },
-      {
-        "from": "flask/dist",
-        "to": "app/flask"
       }
     ],
     "linux": {
@@ -77,6 +66,12 @@
         "nsis"
       ]
     },
+    "extraResources": [
+      {
+        "from": "flask/dist",
+        "to": "flask"
+      }
+    ],
     "directories": {
       "buildResources": "resources",
       "output": "release"
@@ -109,11 +104,12 @@
     "@turf/combine": "^7.3.4",
     "@turf/mask": "^7.3.2",
     "@types/d3": "^7.4.3",
+    "@types/geojson": "^7946.0.16",
     "@types/web": "^0.0.228",
     "custom-event-polyfill": "^1.0.7",
     "d3": "^7.9.0",
     "dayjs": "^1.11.19",
-    "deck.gl": "^9.2.6",
+    "deck.gl": "^9.2.3",
     "electron-router-dom": "^2.1.0",
     "electron-vite": "^5.0.0",
     "get-port-please": "^3.2.0",
@@ -134,7 +130,8 @@
     "react-map-gl": "^7.1.9",
     "strftime": "^0.10.3",
     "use-animation-frame": "^0.2.1",
-    "zustand": "^5.0.10"
+    "zustand": "^5.0.10",
+    "typescript": "^5.9.3"
   },
   "devDependencies": {
     "@esbuild/linux-x64": "^0.25.4",
@@ -145,13 +142,12 @@
     "@types/react-dom": "^19.2.3",
     "cross-env": "7.0.3",
     "electron": "^37.10.3",
-    "electron-builder": "^26.4.0",
-    "eslint": "^9.39.2",
-    "eslint-config-next": "15.1.8",
+    "electron-builder": "^21.1.4",
+    "eslint": "^4.1.1",
+    "eslint-config-next": "^0.2.4",
     "npm-run-all": "4.1.5",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19",
-    "typescript": "^5.9.3",
     "vite": "^7.3.1"
   }
 }

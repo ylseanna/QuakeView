@@ -11,7 +11,7 @@ import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 export default function Page() {
   return (
     <Box sx={{h: "100%", w: "100%", ...ScrollBarStyling}}>
-      <Legend/>
+      <Legend layerType="plot"/>
       <Sidebars />
       <Container sx={{ mt: 2, mb: 2, pb: 2}}>
         <Paper sx={{ p: 4 }}>

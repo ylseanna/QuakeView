@@ -74,10 +74,10 @@ const createWindow = () => {
 };
 
 const startFlaskServer = () => {
-  let backend = join(app.getAppPath(), "..", "..", "app", "flask", "app");
+  let backend = join(process.resourcesPath, "flask", "app");
 
   if (process.platform == "win32") {
-    backend = join(app.getAppPath(), "..", "..", "app", "flask", "app.exe");
+    backend = join(process.resourcesPath, "flask", "app.exe");
   }
 
   console.log("Starting flask server: " + backend + ", port 8100");
@@ -103,7 +103,7 @@ const startFlaskServer = () => {
 };
 
 const closeFlaskServer = () => {
-  console.log("Killing flask server");
+  console.log("Killing flask server, port 8100");
   if (process.platform == "win32") {
     exec("taskkill /f /t /im app.exe", (err, stdout, stderr) => {
       if (err) {
@@ -126,9 +126,9 @@ const closeFlaskServer = () => {
 };
 
 const startNextJSServer = async () => {
-  const frontend = join(app.getAppPath(), "..", "..", "app");
+  const frontend = join(app.getAppPath(), "next");
 
-  console.log("Starting next server: " + frontend + ", port 8100");
+  console.log("Starting next server: " + frontend + ", port 8090");
   // Use server-side rendering for both dev and production builds
   const nextApp = next({
     dev: is.dev,

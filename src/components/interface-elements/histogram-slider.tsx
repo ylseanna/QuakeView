@@ -1,31 +1,14 @@
-import {
-  Box,
-  FormControl,
-  Input,
-  InputLabel,
-  Skeleton,
-  Slider,
-  SliderOwnProps,
-  Stack,
-} from "@mui/material";
-import {
-  ChangeEventHandler,
-  useEffect,
-  useLayoutEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
-import * as d3 from "d3";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
-
-import { useData } from "../datasource/use-data";
-import { DataSource, EarthQuake } from "../datasource/types";
-
-import dayjs from "dayjs";
 import { PickerValue } from "@mui/x-date-pickers/internals";
-import { useAppStateStore } from "@/providers/app-state-provider";
+import { Box, FormControl, Input, InputLabel, Skeleton, Slider, SliderOwnProps, Stack } from "@mui/material";
 import { useTranslations } from "next-intl";
+import dayjs from "dayjs";
+import { ChangeEventHandler, useEffect, useLayoutEffect, useMemo, useRef, useState } from "react";
+import * as d3 from "d3";
+
+import { useAppStateStore } from "@/providers/app-state-provider";
+import { useData } from "../datasource/use-data";
+import { DataSource, Earthquake } from "../datasource/types";
 
 export default function HistogramSlider({
   id,
@@ -155,7 +138,7 @@ export default function HistogramSlider({
     //   } else {
     if (data.byID[dataSource.internal_id]) {
       const bins = d3.bin().thresholds(50).domain([min!, max!])(
-        (data.byID[dataSource.internal_id].data as EarthQuake[]).map(
+        (data.byID[dataSource.internal_id].data as Earthquake[]).map(
           (d) => d[variable],
         ) as ArrayLike<number>,
       );

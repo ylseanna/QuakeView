@@ -13,7 +13,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
 import { minorTimeFormat } from "../interface/time-format";
 import { useData } from "../datasource/use-data";
-import { EarthQuake } from "../datasource/types";
+import { Earthquake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
 // import { useKeyPressed } from "@react-hooks-library/core";
@@ -33,7 +33,7 @@ interface ViewStateMonitor {
   zoom: [number, number];
 }
 
-type D3Earthquake = EarthQuake & { date: Date };
+type D3Earthquake = Earthquake & { date: Date };
 
 export default function TimelineSlider({
   isPlaying,
@@ -49,7 +49,7 @@ export default function TimelineSlider({
 
   // const { appInterface } = useAppStateStore((state) => state);
 
-  const [hoverInfo, setHoverInfo] = useState<PickingInfo<EarthQuake>>();
+  const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
   const { data } = useData();
@@ -567,7 +567,7 @@ export default function TimelineSlider({
               false,
             ) as ScatterplotLayer;
 
-            layer.onHover = (info: PickingInfo<EarthQuake>) => {
+            layer.onHover = (info: PickingInfo<Earthquake>) => {
               setHoverInfo(info);
               return true;
             };

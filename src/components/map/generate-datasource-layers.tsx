@@ -1,16 +1,9 @@
-import {
-  DataFilterExtension,
-  DataFilterExtensionProps,
-} from "@deck.gl/extensions";
-import { LineLayer, ScatterplotLayer } from "@deck.gl/layers";
-import { Color } from "@deck.gl/core";
+import { DataFilterExtension, DataFilterExtensionProps } from "@deck.gl/extensions";
+import { LineLayer, ScatterplotLayer, ScatterplotLayerProps } from "@deck.gl/layers";
+import { Color, LayerProps } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import {
-  DataSource,
-  DataSourceColorFormatting,
-  EarthQuake,
-} from "@/components/datasource/types";
+import { DataSource, DataSourceColorFormatting, Earthquake } from "@/components/datasource/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 import { colormaps, colormaps_categorical } from "./crameri-colormaps";
 
@@ -20,7 +13,7 @@ const d3Color_to_deckGLColor = (color: d3.RGBColor) =>
 export function generateDataSourceMapLayers(
   layerType: "twoD" | "threeD",
   dataSource: DataSource,
-  data: EarthQuake[],
+  data: Earthquake[],
   sessionInterface: SessionInterface,
   filtering: GPU_filtering,
   positionOffset: number = 0,
@@ -68,7 +61,7 @@ export function generateDataSourceMapLayers(
     );
 
   const ColorMapping = (
-    d: EarthQuake,
+    d: Earthquake,
     colorFormatting: DataSourceColorFormatting,
   ) => {
     if (colorFormatting.mapping == "linear") {
@@ -100,16 +93,16 @@ export function generateDataSourceMapLayers(
     }
   };
 
-  return new ScatterplotLayer<EarthQuake, DataFilterExtensionProps>({
+  return new ScatterplotLayer<Earthquake, DataFilterExtensionProps>({
     id: `mapLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting[layerType].color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
     // stroked: true,
     visible: dataSource.interface.visible,
     getPosition:
       layerType === "threeD"
-        ? (d: EarthQuake) => [d.lon, d.lat, (d.dep + positionOffset) * -1000]
+        ? (d: Earthquake) => [d.lon, d.lat, (d.dep + positionOffset) * -1000]
         : layerType === "twoD"
-          ? (d: EarthQuake) => [d.lon, d.lat]
+          ? (d: Earthquake) => [d.lon, d.lat]
           : undefined,
     getRadius: 1,
     radiusScale: dataSource.formatting[layerType].scale,
@@ -121,7 +114,7 @@ export function generateDataSourceMapLayers(
                 .single as unknown as string,
             ) as d3.RGBColor,
           )
-        : (d: EarthQuake) =>
+        : (d: Earthquake) =>
             ColorMapping(d, dataSource.formatting[layerType].color) as Color,
     autoHighlight: true,
     highlightColor: [255, 255, 255, 140],
@@ -139,7 +132,7 @@ export function generateDataSourceMapLayers(
     // transitions: {
     //   getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
     // },
-    getFilterValue: (d) => [d.mag, d.t],
+    getFilterValue: (d: Earthquake) => [d.mag, d.t],
     filterSoftRange: [
       filtering.mag as [number, number],
       [
@@ -163,7 +156,7 @@ export function generateDataSourceMapLayers(
 export function StemPlotLayers(
   // layer_type: "1D" | "3D",
   dataSource: DataSource,
-  data: EarthQuake[],
+  data: Earthquake[],
   sessionInterface: SessionInterface,
   scaleX: d3.ScaleTime<number, number, never>,
   scaleY: d3.ScaleLinear<number, number, never>,
@@ -216,7 +209,7 @@ export function StemPlotLayers(
     );
 
   const ColorMapping = (
-    d: EarthQuake,
+    d: Earthquake,
     colorFormatting: DataSourceColorFormatting,
   ) => {
     if (colorFormatting.mapping == "linear") {
@@ -248,12 +241,12 @@ export function StemPlotLayers(
     }
   };
 
-  const scatterplotLayer = new ScatterplotLayer<EarthQuake>({
+  const scatterplotLayer = new ScatterplotLayer<Earthquake>({
     id: `DotLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.plot.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
     data: data,
     getRadius: 0.1,
     radiusScale: dataSource.formatting.plot.scale,
-    getPosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
+    getPosition: (d: Earthquake) => [scaleX(d.t), scaleY(d.mag)],
     getFillColor:
       dataSource.formatting.plot.color.mapping == "single"
         ? d3Color_to_deckGLColor(
@@ -261,7 +254,7 @@ export function StemPlotLayers(
               dataSource.formatting.plot.color.single as unknown as string,
             ) as d3.RGBColor,
           )
-        : (d: EarthQuake) =>
+        : (d: Earthquake) =>
             ColorMapping(d, dataSource.formatting.plot.color) as Color,
     autoHighlight: true,
     highlightColor: [255, 255, 255, 140],
@@ -277,18 +270,18 @@ export function StemPlotLayers(
     transitions: {
       getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
     },
-  });
+  } as Partial<Required<ScatterplotLayerProps<Earthquake>> & Required<LayerProps>> );
 
   if (include_stem) {
     return [
-      new LineLayer<EarthQuake>({
+      new LineLayer<Earthquake>({
         id: `StemLayer_${dataSource.internal_id}_${JSON.stringify(dataSource.formatting.plot.color)}`, // absolutely stupid way of making it listen to a color state update and forcing a rerender
         data: data,
         getWidth: 0.05,
         widthScale: dataSource.formatting.plot.scale,
-        getSourcePosition: (d: EarthQuake) => [scaleX(d.t), scaleY(d.mag)],
-        getTargetPosition: (d: EarthQuake) => [scaleX(d.t), baseLineY],
-        // getColor: (d: EarthQuake) =>
+        getSourcePosition: (d: Earthquake) => [scaleX(d.t), scaleY(d.mag)],
+        getTargetPosition: (d: Earthquake) => [scaleX(d.t), baseLineY],
+        // getColor: (d: Earthquake) =>
         //   ColorMapping(d, dataSource.formatting.plot.color) as Color,
         getColor: [0, 0, 0],
         autoHighlight: true,

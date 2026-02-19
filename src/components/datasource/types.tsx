@@ -3,7 +3,7 @@ import { TinyColor } from "mui-color-input";
 import { colormaps } from "../map/crameri-colormaps";
 import { colormaps_categorical } from "../map/crameri-colormaps";
 
-export type EarthQuake = {
+export type Earthquake = {
   id: string;
   dt: string;
   t: number;
