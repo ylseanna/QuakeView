@@ -126,7 +126,7 @@ const closeFlaskServer = () => {
 };
 
 const startNextJSServer = async () => {
-  const frontend = join(app.getAppPath(), "next");
+  const frontend = join(app.getAppPath());
 
   console.log("Starting next server: " + frontend + ", port 8090");
   // Use server-side rendering for both dev and production builds

@@ -44,11 +44,14 @@
     ],
     "files": [
       "out",
+      "public",
       {
         "from": "./.next/",
         "to": ".next/",
         "filter": [
-          "**/*"
+          "**/*",
+          "!**/cache",
+          "!**/dev"
         ]
       }
     ],
