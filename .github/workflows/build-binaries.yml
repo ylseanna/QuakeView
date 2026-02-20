@@ -46,5 +46,7 @@ jobs:
 
       - name: Create binaries
         run: npm run dist:msi
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - run: echo "Job status is ${{ job.status }}."
