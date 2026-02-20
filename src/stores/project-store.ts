@@ -19,6 +19,9 @@ export type ProjectState = {
 export type SessionInterface = {
   overViewState: ViewState;
   pickable: boolean;
+  table: {
+    dataSourceID: string | null;
+  };
   animation: {
     timeline: {
       enabled: boolean;
@@ -40,6 +43,9 @@ export type ProjectActions = {
   interfaceActions: {
     setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
+    table: {
+      setDataSourceID: (id: string | null) => void;
+    };
     animation: {
       timeline: {
         toggleEnabled: () => void;
@@ -113,6 +119,9 @@ export const defaultInitState: ProjectState = {
       },
     },
     pickable: false,
+    table: {
+      dataSourceID: null,
+    },
     animation: {
       timeline: {
         enabled: false,
@@ -141,6 +150,12 @@ export const createProjectStore = (
             set((state) => {
               state.sessionInterface.pickable = value;
             }),
+          table: {
+            setDataSourceID: (id) =>
+              set((state) => {
+                state.sessionInterface.table.dataSourceID = id;
+              }),
+          },
           animation: {
             timeline: {
               toggleEnabled: () =>

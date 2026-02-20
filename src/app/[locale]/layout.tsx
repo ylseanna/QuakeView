@@ -28,7 +28,7 @@ import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
 import { AppStateStoreProvider } from "@/providers/app-state-provider";
-
+import Box from "@mui/material/Box";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
@@ -73,7 +73,7 @@ export default async function LocaleLayout({
 }) {
   const { locale } = await params;
 
-  console.log(locale)
+  console.log(locale);
 
   // // Ensure that the incoming `locale` is valid
   // if (!routing.locales.includes(locale as never)) {

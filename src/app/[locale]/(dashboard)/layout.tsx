@@ -16,7 +16,6 @@ import "dayjs/locale/en-gb";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 
-
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const [debugVisible, setDebugVisible] = useState(false);
 
@@ -50,10 +49,10 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
           <LinearProgress sx={{ position: "absolute" }} />
         )}
         <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-        <QueryClientProvider client={queryClient}>
-          {debugVisible && <DebugWindow />}
-          {props.children}
-        </QueryClientProvider>
+          <QueryClientProvider client={queryClient}>
+            {debugVisible && <DebugWindow />}
+            {props.children}
+          </QueryClientProvider>
         </LocalizationProvider>
       </Box>
     </>

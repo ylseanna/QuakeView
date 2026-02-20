@@ -29,9 +29,8 @@ import { useFormatter, useTranslations } from "next-intl";
 import { useState } from "react";
 import { DataSource } from "../types";
 import { updatedMetaDataUrl } from "../data-source-query";
-import { DataGrid } from "@mui/x-data-grid/DataGrid";
+import { DataGrid } from "@mui/x-data-grid";
 import { Folder } from "mdi-material-ui";
-import { useGridApiRef } from "@mui/x-data-grid/hooks/utils/useGridApiRef";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 interface DataTabProps {
@@ -77,7 +76,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   const format = useFormatter();
 
-  const previewGridApiRef = useGridApiRef();
 
   const autosizeOptions = {
     includeHeaders: true,
@@ -245,7 +243,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
           </Paper>
         ) : (
           <DataGrid
-            apiRef={previewGridApiRef}
             disableColumnMenu
             disableColumnSorting
             columnHeaderHeight={36}

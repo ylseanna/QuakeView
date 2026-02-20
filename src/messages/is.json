@@ -94,7 +94,8 @@
     "dep": "Dýpi (km)",
     "lat": "Lengdargráða",
     "lon": "Breiddargráða",
-    "time": "Tími"
+    "time": "Tími",
+    "mag": "Stærð"
   },
   "Variables": {
     "alias": "Læsilegt nafn",

@@ -111,7 +111,8 @@
     "dep": "Depth (km)",
     "lat": "Latitude (degrees)",
     "lon": "Longitude (degrees)",
-    "time": "Time"
+    "time": "Time",
+    "mag": "Magnitude"
   },
   "Variables": {
     "alias": "Display name",

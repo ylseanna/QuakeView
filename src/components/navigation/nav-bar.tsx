@@ -14,7 +14,7 @@ export default function NavBar() {
   const NavigationSections = [
     {
       section: "import",
-      title: t("Common.data"),
+      title: t("Common.input"),
       sections: [
         {
           segment: "/",
@@ -25,15 +25,10 @@ export default function NavBar() {
       ],
     },
     {
-      section: "data_overview",
-      title: t("Common.data_overview"),
+      section: "data",
+      title: t("Common.data"),
       sections: [
-        {
-          segment: "/overview_map",
-          title: t("Common.overview_map"),
-          icon: <Public />,
-          enabled: true,
-        },
+        
         {
           segment: "/overview_table",
           title: t("Common.overview_table"),
@@ -47,15 +42,15 @@ export default function NavBar() {
       title: t("Common.views"),
       sections: [
         {
-          segment: "/3D_map",
-          title: t("Common.3D_map"),
-          icon: <RotateOrbit />,
+          segment: "/overview_map",
+          title: t("Common.overview_map"),
+          icon: <Public />,
           enabled: true,
         },
         {
-          segment: "/plots",
-          title: t("Common.all_plots"),
-          icon: <ChartMultiple />,
+          segment: "/3D_map",
+          title: t("Common.3D_map"),
+          icon: <RotateOrbit />,
           enabled: true,
         },
       ],

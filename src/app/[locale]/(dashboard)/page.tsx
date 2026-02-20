@@ -3,12 +3,14 @@
 import * as React from "react";
 import DataSelector from "@/components/datasource/source_selection/datasource-selector";
 import DataSourceBrowser from "@/components/datasource/source_selection/datasource-browser";
-import { Box, Container } from "@mui/material";
+import { Box, Container, useTheme } from "@mui/material";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 
 export default function Page() {
+  const theme = useTheme();
+
   return (
-    <Box sx={{ h: "100%", w: "100%", pb: 2, ...ScrollBarStyling }}>
+    <Box sx={{ backgroundColor: theme.palette.background.default, h: "100%", w: "100%", pb: 2, ...ScrollBarStyling }}>
       <Container sx={{ pt: 2, pb: 4 }}>
         <DataSelector />
         <DataSourceBrowser />

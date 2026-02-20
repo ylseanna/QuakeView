@@ -1,12 +1,226 @@
 "use client";
 
-import { Paper, LinearProgress } from "@mui/material";
-import { DataGrid, GridColDef, GridToolbar } from "@mui/x-data-grid";
-import { useEffect, useState } from "react";
+import { styled } from "@mui/material/styles";
+import {
+  Paper,
+  Box,
+  Typography,
+  Tooltip,
+  Badge,
+  Divider,
+  TextField,
+  InputAdornment,
+  MenuItem,
+  Menu,
+} from "@mui/material";
+import {
+  DataGrid,
+  Toolbar,
+  ToolbarButton,
+  ColumnsPanelTrigger,
+  FilterPanelTrigger,
+  ExportCsv,
+  ExportPrint,
+  QuickFilter,
+  QuickFilterControl,
+  QuickFilterClear,
+  QuickFilterTrigger,
+  GridColDef,
+  GridSearchIcon,
+} from "@mui/x-data-grid";
+import { useEffect, useRef, useState } from "react";
 import { isIS, enUS } from "@mui/x-data-grid/locales";
 import { useLocale, useTranslations } from "next-intl";
+import { useData } from "@/components/datasource/use-data";
+import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import CancelIcon from "@mui/icons-material/Cancel";
+import SearchIcon from "@mui/icons-material/Search";
+import FileDownloadIcon from "@mui/icons-material/FileDownload";
+import FilterListIcon from "@mui/icons-material/FilterList";
+import ViewColumnIcon from "@mui/icons-material/ViewColumn";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 const paginationModel = { page: 0, pageSize: 10 };
+
+type OwnerState = {
+  expanded: boolean;
+};
+
+const StyledQuickFilter = styled(QuickFilter)({
+  display: "grid",
+  alignItems: "center",
+});
+
+const StyledToolbarButton = styled(ToolbarButton)<{ ownerState: OwnerState }>(
+  ({ theme, ownerState }) => ({
+    gridArea: "1 / 1",
+    width: "min-content",
+    height: "min-content",
+    zIndex: 1,
+    opacity: ownerState.expanded ? 0 : 1,
+    pointerEvents: ownerState.expanded ? "none" : "auto",
+    transition: theme.transitions.create(["opacity"]),
+  }),
+);
+
+const StyledTextField = styled(TextField)<{
+  ownerState: OwnerState;
+}>(({ theme, ownerState }) => ({
+  gridArea: "1 / 1",
+  overflowX: "clip",
+  width: ownerState.expanded ? 260 : "var(--trigger-width)",
+  opacity: ownerState.expanded ? 1 : 0,
+  transition: theme.transitions.create(["width", "opacity"]),
+}));
+
+function CustomToolbar() {
+  const [exportMenuOpen, setExportMenuOpen] = useState(false);
+  const exportMenuTriggerRef = useRef<HTMLButtonElement>(null);
+
+  const { data } = useData();
+
+  const { dataSources, sessionInterface } = useProjectStore((state) => state);
+
+  return (
+    <Toolbar>
+      <Typography fontWeight="medium" sx={{ flex: 1, mx: 0.5 }}>
+        Toolbar
+      </Typography>
+
+      <Tooltip title="Columns">
+        <ColumnsPanelTrigger render={<ToolbarButton />}>
+          <ViewColumnIcon fontSize="small" />
+        </ColumnsPanelTrigger>
+      </Tooltip>
+
+      {/* <Tooltip title="Filters">
+        <FilterPanelTrigger
+          render={(props, state) => (
+            <ToolbarButton {...props} color="default">
+              <Badge
+                badgeContent={state.filterCount}
+                color="primary"
+                variant="dot"
+              >
+                <FilterListIcon fontSize="small" />
+              </Badge>
+            </ToolbarButton>
+          )}
+        />
+      </Tooltip> */}
+
+      <Divider
+        orientation="vertical"
+        variant="middle"
+        flexItem
+        sx={{ mx: 0.5 }}
+      />
+
+      <Tooltip title="Export">
+        <ToolbarButton
+          ref={exportMenuTriggerRef}
+          id="export-menu-trigger"
+          aria-controls="export-menu"
+          aria-haspopup="true"
+          aria-expanded={exportMenuOpen ? "true" : undefined}
+          onClick={() => setExportMenuOpen(true)}
+        >
+          <FileDownloadIcon fontSize="small" />
+        </ToolbarButton>
+      </Tooltip>
+
+      <Menu
+        id="export-menu"
+        anchorEl={exportMenuTriggerRef.current}
+        open={exportMenuOpen}
+        onClose={() => setExportMenuOpen(false)}
+        anchorOrigin={{ vertical: "bottom", horizontal: "right" }}
+        transformOrigin={{ vertical: "top", horizontal: "right" }}
+        slotProps={{
+          list: {
+            "aria-labelledby": "export-menu-trigger",
+          },
+        }}
+      >
+        <ExportPrint
+          render={<MenuItem />}
+          onClick={() => setExportMenuOpen(false)}
+        >
+          Print
+        </ExportPrint>
+        <ExportCsv
+          render={<MenuItem />}
+          onClick={() => setExportMenuOpen(false)}
+        >
+          Download as CSV
+        </ExportCsv>
+        {/* Available to MUI X Premium users */}
+        {/* <ExportExcel render={<MenuItem />}>
+          Download as Excel
+        </ExportExcel> */}
+      </Menu>
+
+      <Divider
+        orientation="vertical"
+        variant="middle"
+        flexItem
+        sx={{ mx: 0.5 }}
+      />
+
+      <StyledQuickFilter>
+        <QuickFilterTrigger
+          render={(triggerProps, state) => (
+            <Tooltip title="Search" enterDelay={0}>
+              <StyledToolbarButton
+                {...triggerProps}
+                ownerState={{ expanded: state.expanded }}
+                color="default"
+                aria-disabled={state.expanded}
+              >
+                <GridSearchIcon fontSize="small" />
+              </StyledToolbarButton>
+            </Tooltip>
+          )}
+        />
+        <QuickFilterControl
+          render={({ ref, ...controlProps }, state) => (
+            <StyledTextField
+              {...controlProps}
+              ownerState={{ expanded: state.expanded }}
+              inputRef={ref}
+              aria-label="Search"
+              placeholder="Search..."
+              size="small"
+              slotProps={{
+                input: {
+                  startAdornment: (
+                    <InputAdornment position="start">
+                      <SearchIcon fontSize="small" />
+                    </InputAdornment>
+                  ),
+                  endAdornment: state.value ? (
+                    <InputAdornment position="end">
+                      <QuickFilterClear
+                        edge="end"
+                        size="small"
+                        aria-label="Clear search"
+                        material={{ sx: { marginRight: -0.75 } }}
+                      >
+                        <CancelIcon fontSize="small" />
+                      </QuickFilterClear>
+                    </InputAdornment>
+                  ) : null,
+                  ...controlProps.slotProps?.input,
+                },
+                ...controlProps.slotProps,
+              }}
+            />
+          )}
+        />
+      </StyledQuickFilter>
+    </Toolbar>
+  );
+}
 
 export default function Page() {
   // locale and translations
@@ -30,77 +244,67 @@ export default function Page() {
       flex: 1,
     },
     {
-      field: "DT",
+      field: "dt",
       headerName: t("time"),
       type: "string",
       minWidth: 150,
       flex: 1,
-      valueFormatter: (value : string) => value.replace(" ", "T"),
+      valueFormatter: (value: string) => value.replace(" ", "T"),
       width: 90,
     },
     {
-      field: "X",
+      field: "lon",
       headerName: t("lon"),
       type: "number",
       minWidth: 150,
       flex: 1,
     },
     {
-      field: "Y",
+      field: "lat",
       headerName: t.raw("lat"),
       type: "number",
       minWidth: 150,
       flex: 1,
     },
     {
-      field: "Z",
+      field: "dep",
       headerName: t("dep"),
       type: "number",
       minWidth: 150,
       flex: 1,
     },
     {
-      field: "ML",
-      renderHeader: () => (
-        <span>
-          {"M"}
-          <sub>{"L"}</sub>
-        </span>
-      ),
+      field: "mag",
+      headerName: t("mag"),
       type: "number",
       minWidth: 150,
       flex: 1,
     },
   ];
+  // const [isLoading, setLoading] = useState(true);
 
-  const [eventJSON, setData] = useState(null);
-  const [isLoading, setLoading] = useState(true);
+  const { dataSources, sessionInterface } = useProjectStore((state) => state);
 
-  useEffect(() => {
-    fetch(`${process.env.NEXT_PUBLIC_APP_BASE_PATH}/api/testdata`)
-      .then((res) => res.json())
-      .then((data) => {
-        setData(data);
-        setLoading(false);
-      });
-  }, []);
+  useEffect(()=>{}, [sessionInterface.table.dataSourceID])
 
-  if (isLoading) return <LinearProgress />;
-  if (!eventJSON) return <p>No data</p>;
+  const { data } = useData();
 
   return (
-    <Paper sx={{ m: 2, height:"calc(100% - 32px)"
-    }}>
-      <DataGrid
-        localeText={locale_text}
-        rows={eventJSON}
-        columns={columns}
-        initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[10, 50, 100]}
-        sx={{ border: 0 }}
-        slots={{ toolbar: GridToolbar }}
-        autoPageSize
-      />
-    </Paper>
+    <Box sx={{ ...ScrollBarStyling, p: 2, pb: 4 }}>
+      <Paper sx={{}}>
+        {data.byID[data.allIDs[0]] && (
+          <DataGrid
+            localeText={locale_text}
+            rows={data.byID[data.allIDs[0]].data}
+            columns={columns}
+            initialState={{ pagination: { paginationModel } }}
+            pageSizeOptions={[10, 20, 50, 100]}
+            sx={{ border: 0 }}
+            slots={{ toolbar: CustomToolbar }}
+            showToolbar
+          />
+        )}
+      </Paper>
+    </Box>
   );
 }

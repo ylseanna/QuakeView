@@ -11,6 +11,10 @@ export const theme: ThemeOptions = createTheme({
   colorSchemes: {
     light: {
       palette: {
+        background: {
+          paper: "#fafafa",
+          default: "#fafafa",
+        },
         primary: {
           main: "#10099f",
         },
@@ -33,6 +37,10 @@ export const theme: ThemeOptions = createTheme({
     },
     dark: {
       palette: {
+        background: {
+          paper: "rgb(26, 26, 26)",
+          default: "#1a1a1a",
+        },
         primary: {
           main: "#ffffff",
         },
@@ -109,10 +117,11 @@ export const theme: ThemeOptions = createTheme({
       },
     },
     MuiInputBase: {
-      styleOverrides:{root: {
-        height: '40px',
-      }},
+      styleOverrides: {
+        root: {
+          height: "40px",
+        },
+      },
     },
   },
-
 });
