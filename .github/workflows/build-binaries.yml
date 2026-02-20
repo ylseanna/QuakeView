@@ -48,5 +48,6 @@ jobs:
         run: npm run dist:msi
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          OS: win32-x64
 
       - run: echo "Job status is ${{ job.status }}."
