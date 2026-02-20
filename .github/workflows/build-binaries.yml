@@ -22,9 +22,6 @@ jobs:
           cache: "npm"
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
 
-      - name: Remove linux dev esbuild instance
-        run: npm prune @esbuild/linux-x64
-
       - run: npm ci --only=prod # or yarn install
 
       - name: Setup esbuild
