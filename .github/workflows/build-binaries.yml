@@ -23,6 +23,8 @@ jobs:
           cache-dependency-path: ${{ github.workspace }}/package-lock.json
       - run: npm ci --only=prod # or yarn install
 
+      - run: npm prune @esbuild/linux-x64
+
       - name: Setup esbuild
         run: npm install @esbuild/win32-x64
 
