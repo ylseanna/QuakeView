@@ -81,7 +81,6 @@
     "typescript": "^5.9.3"
   },
   "devDependencies": {
-    "@esbuild/linux-x64": "^0.25.4",
     "@eslint/eslintrc": "^3.3.3",
     "@types/lodash": "^4.17.23",
     "@types/node": "^20.19.29",
