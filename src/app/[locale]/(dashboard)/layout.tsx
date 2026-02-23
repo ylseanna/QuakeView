@@ -15,9 +15,18 @@ import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/en-gb";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
+import { theme } from "../theme";
+import BottomBar from "@/components/interface/bottom-bar";
+import TimelineBar from "@/components/interface/timeline-bar";
+import { usePathname } from "@/i18n/routing";
+import Sidebars from "@/components/interface/sidebars";
+import Toolbar from "@/components/interface/toolbar";
+import Legend from "@/components/map/legend/legend";
 
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const [debugVisible, setDebugVisible] = useState(false);
+
+  const pathname = usePathname();
 
   useKeyStroke(["F3"], () => {
     setDebugVisible(!debugVisible);
@@ -43,6 +52,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
           height: "calc(100vh - 32px - 64px)",
           display: "flex",
           flexDirection: "column",
+          backgroundColor: theme.palette?.background?.default,
         }}
       >
         {queryClient.isFetching() > 0 && (
@@ -52,6 +62,34 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
           <QueryClientProvider client={queryClient}>
             {debugVisible && <DebugWindow />}
             {props.children}
+
+            {["/overview_map", "/3D_map"].includes(pathname) && (
+              <>
+                <BottomBar />
+                <TimelineBar />
+              </>
+            )}
+            {[
+              "/overview_map",
+              "/3D_map",
+              "/plots/distribution_plot",
+              "/plots/GR_plot",
+              "/plots/stem_plot",
+            ].includes(pathname) && (
+              <>
+                <Legend
+                  layerType={
+                    pathname === "/overview_map"
+                      ? "twoD"
+                      : pathname === "/3D_map"
+                        ? "threeD"
+                        : "plot"
+                  }
+                />
+                <Sidebars />
+                <Toolbar />
+              </>
+            )}
           </QueryClientProvider>
         </LocalizationProvider>
       </Box>

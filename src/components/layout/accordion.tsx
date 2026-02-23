@@ -39,7 +39,7 @@ export const SubAccordionSummary = styled((props: AccordionSummaryProps) => (
 }));
 
 export const SubAccordionDetails = styled(MuiAccordionDetails)(({ theme }) => ({
-  padding: theme.spacing(2),
+  padding: 0,
   paddingTop: theme.spacing(1),
   borderTop: `1px solid ${theme.palette.divider}`,
   backgroundColor: "rgba(0, 0, 0, .02)",

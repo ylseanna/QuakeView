@@ -5,6 +5,8 @@ import { useRef } from "react";
 
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { BOTTOMBAR_HEIGHT, DRAWER_HEIGHT } from "@/components/interface/bottom-bar";
+import { useAppStateStore } from "@/providers/app-state-provider";
 import DataSourceFormattingElement from "./formatting-element";
 import { useData } from "../use-data";
 
@@ -13,9 +15,7 @@ interface FormattingProps {
   single?: boolean;
 }
 
-export default function FormattingSidebar({
-  drawerOpen,
-}: FormattingProps) {
+export default function FormattingSidebar({ drawerOpen }: FormattingProps) {
   const t = useTranslations("Formatting");
   const theme = useTheme();
 
@@ -28,8 +28,10 @@ export default function FormattingSidebar({
 
   const ref = useRef(null);
 
-  const { data } = useData()
+  const { data } = useData();
   const dataSources = useProjectStore((state) => state.dataSources);
+
+  const appInterface = useAppStateStore((state) => state.appInterface);
 
   return (
     <>
@@ -40,6 +42,7 @@ export default function FormattingSidebar({
         open={drawerOpen}
         sx={{
           width: DRAWER_WIDTH,
+
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
@@ -48,6 +51,15 @@ export default function FormattingSidebar({
             overflowX: "hidden",
             ...ScrollBarStyling,
             top: "calc(80px + 32px)",
+            maxHeight: `calc(100vh - 80px - 32px - ${
+              appInterface.timelineBarVisible
+                ? appInterface.bottombarVisible
+                  ? `${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px`
+                  : `${DRAWER_HEIGHT}px`
+                : appInterface.bottombarVisible
+                  ? `${BOTTOMBAR_HEIGHT}px`
+                  : `0`
+            })`,
           },
         }}
       >

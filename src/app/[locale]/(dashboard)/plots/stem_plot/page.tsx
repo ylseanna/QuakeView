@@ -12,7 +12,6 @@ export default function Page() {
   return (
     <Box sx={{h: "100%", w: "100%", pb: 2, ...ScrollBarStyling}}>
       <Legend layerType="plot" singleColor/>
-      <Sidebars />
       <Toolbar/>
       <Box  sx={{ m: 2, maxWidth: "100%" }}>
         <Paper sx={{ p: 2 }}>

@@ -22,11 +22,14 @@ import { ViewState } from "react-map-gl/maplibre";
 import DeckGLlayers from "@/components/map/deckgl-layers";
 
 import { AttributionControl } from "react-map-gl";
-import Actions from "@/components/datasource/actions";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useTranslations } from "next-intl";
+import {
+  BOTTOMBAR_HEIGHT,
+  DRAWER_HEIGHT,
+} from "@/components/interface/bottom-bar";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
@@ -78,14 +81,38 @@ export default function Page() {
           // ]}
           style={{
             width: "100%",
-            height: "calc(100vh - 80px - 32px)",
+            height: `calc(100vh - 80px - 32px)`,
             position: "absolute",
           }}
           maxPitch={0}
           attributionControl={false}
         >
-          <ScaleControl position="bottom-left" />
-          <AttributionControl position="bottom-left" />
+          <ScaleControl
+            position="bottom-left"
+            style={{
+              transform: appInterface.timelineBarVisible
+                ? appInterface.bottombarVisible
+                  ? `translateY(-${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
+                  : `translateY(-${DRAWER_HEIGHT}px)`
+                : appInterface.bottombarVisible
+                  ? `translateY(-${BOTTOMBAR_HEIGHT}px)`
+                  : `translateY( 0)`,
+              transition: "transform.225s",
+            }}
+          />
+          <AttributionControl
+            position="bottom-left"
+            style={{
+              transform: appInterface.timelineBarVisible
+                ? appInterface.bottombarVisible
+                  ? `translateY(-${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
+                  : `translateY(-${DRAWER_HEIGHT}px)`
+                : appInterface.bottombarVisible
+                  ? `translateY(-${BOTTOMBAR_HEIGHT}px)`
+                  : `translateY( 0)`,
+              transition: "transform.225s",
+            }}
+          />
           {/* <FullscreenControl position="top-left" /> */}
           {appInterface.mapToolsVisible && (
             <>
@@ -131,9 +158,6 @@ export default function Page() {
 
           <DeckGLlayers />
         </Map>
-      </>
-      <>
-        <Actions />
       </>
     </>
   );

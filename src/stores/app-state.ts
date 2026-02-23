@@ -9,8 +9,9 @@ export type AppState = {
   appInterface: {
     mapToolsVisible: boolean;
     sideBarsVisible: boolean;
-    animationControlsVisible: boolean;
+    bottombarVisible: boolean;
     timelineBarVisible: boolean;
+    sidebarOpen: "formatting" | "filtering" | "layers" | null;
     legendVisible: boolean;
     popperOpen: boolean;
   };
@@ -20,8 +21,11 @@ export type AppActions = {
   appInterfaceActions: {
     toggleMapToolsVisible: () => void;
     toggleSideBarsVisible: () => void;
-    toggleAnimationControlsVisible: () => void;
+    togglebottombarVisible: () => void;
     toggleTimelineBarVisible: () => void;
+    setSidebarOpen: (
+      value: "formatting" | "filtering" | "layers" | null,
+    ) => void;
     toggleLegendVisible: () => void;
     signalPopperOpen: () => void;
     signalPopperClosed: () => void;
@@ -34,8 +38,9 @@ export const defaultInitState: AppState = {
   appInterface: {
     mapToolsVisible: true,
     sideBarsVisible: true,
-    animationControlsVisible: true,
+    bottombarVisible: true,
     timelineBarVisible: false,
+    sidebarOpen: null,
     legendVisible: true,
     popperOpen: false,
   },
@@ -57,10 +62,10 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
               state.appInterface.sideBarsVisible =
                 !state.appInterface.sideBarsVisible;
             }),
-          toggleAnimationControlsVisible: () =>
+          togglebottombarVisible: () =>
             set((state) => {
-              state.appInterface.animationControlsVisible =
-                !state.appInterface.animationControlsVisible;
+              state.appInterface.bottombarVisible =
+                !state.appInterface.bottombarVisible;
             }),
           toggleTimelineBarVisible: () =>
             set((state) => {
@@ -71,6 +76,10 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
             set((state) => {
               state.appInterface.legendVisible =
                 !state.appInterface.legendVisible;
+            }),
+          setSidebarOpen: (value) =>
+            set((state) => {
+              state.appInterface.sidebarOpen = value;
             }),
           signalPopperOpen: () =>
             set((state) => {

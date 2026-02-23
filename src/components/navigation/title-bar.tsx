@@ -75,6 +75,7 @@ export default function TitleBar() {
                     variant: "outlined",
                   },
                 }}
+                transitionDuration={150}
               >
                 <MenuList dense disablePadding>
                   <MenuItem onClick={popupState.close} disabled>
@@ -107,6 +108,7 @@ export default function TitleBar() {
                     sx: { width: 280, maxWidth: "100%" },
                   },
                 }}
+                transitionDuration={150}
               >
                 <MenuList dense disablePadding>
                   <MenuItem onClick={popupState.close}>

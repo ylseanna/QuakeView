@@ -28,12 +28,11 @@ export default function NavBar() {
       section: "data",
       title: t("Common.data"),
       sections: [
-        
         {
           segment: "/overview_table",
           title: t("Common.overview_table"),
           icon: <TableRows />,
-          enabled: false,
+          enabled: true,
         },
       ],
     },
@@ -49,7 +48,7 @@ export default function NavBar() {
         },
         {
           segment: "/3D_map",
-          title: t("Common.3D_map"),
+          title: t("Common.3D"),
           icon: <RotateOrbit />,
           enabled: true,
         },
@@ -171,7 +170,6 @@ export default function NavBar() {
                         slotProps={{
                           paper: { variant: "outlined", sx: { padding: 0 } },
                         }}
-
                       >
                         <MenuList dense disablePadding sx={{ margin: 0 }}>
                           <MenuItem onClick={popupState.close} disabled>

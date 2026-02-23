@@ -25,6 +25,7 @@ export type SessionInterface = {
   animation: {
     timeline: {
       enabled: boolean;
+      isPlaying: "playing" | "paused" | "stopped";
       tapered: boolean;
       speed: {
         multiplier: number;
@@ -49,6 +50,7 @@ export type ProjectActions = {
     animation: {
       timeline: {
         toggleEnabled: () => void;
+        setIsPlaying: (value: "playing" | "paused" | "stopped") => void;
         setTapered: (value: boolean) => void;
         setSpeed: (value: {
           multiplier: number;
@@ -125,6 +127,7 @@ export const defaultInitState: ProjectState = {
     animation: {
       timeline: {
         enabled: false,
+        isPlaying: "stopped",
         tapered: false,
         speed: { multiplier: 1, unit: "day" },
       },
@@ -162,6 +165,10 @@ export const createProjectStore = (
                 set((state) => {
                   state.sessionInterface.animation.timeline.enabled =
                     !state.sessionInterface.animation.timeline.enabled;
+                }),
+              setIsPlaying: (value) =>
+                set((state) => {
+                  state.sessionInterface.animation.timeline.isPlaying = value;
                 }),
               setTapered: (value) =>
                 set((state) => {

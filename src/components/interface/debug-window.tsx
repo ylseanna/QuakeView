@@ -7,10 +7,7 @@ import { ScrollBarStyling } from "../layout/scrollbar-styling";
 import { useData } from "../datasource/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useState } from "react";
-import {
-  ChevronLeft,
-  ChevronRight,
-} from "mdi-material-ui";
+import { ChevronLeft, ChevronRight } from "mdi-material-ui";
 
 export default function DebugWindow() {
   const { sessionInterface, GPUfiltering, dataSources } = useProjectStore(

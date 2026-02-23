@@ -60,6 +60,7 @@ export default function ViewMenu() {
                 sx: { width: 280, maxWidth: "100%" },
               },
             }}
+            transitionDuration={150}
           >
             <MenuList dense disablePadding>
               <MenuItem
@@ -105,14 +106,14 @@ export default function ViewMenu() {
               </MenuItem>
               <MenuItem
                 onClick={() =>
-                  appInterfaceActions.toggleAnimationControlsVisible()
+                  appInterfaceActions.togglebottombarVisible()
                 }
               >
                 <ListItemIcon>
-                  {appInterface.animationControlsVisible && <Check />}
+                  {appInterface.bottombarVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>
-                  {t("Titlebar.show_animation_controls")}
+                  {t("Titlebar.show_bottombar")}
                 </ListItemText>
               </MenuItem>
               <Divider />

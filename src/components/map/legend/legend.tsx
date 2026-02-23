@@ -5,6 +5,12 @@ import { Grid, Paper, SxProps, Typography } from "@mui/material";
 import LegendElement from "./legend-element";
 import { useTranslations } from "next-intl";
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
+import { DRAWER_WIDTH } from "@/components/interface/sidebars";
+import {
+  BOTTOMBAR_HEIGHT,
+  DRAWER_HEIGHT,
+} from "@/components/interface/bottom-bar";
 
 interface LegendProps {
   layerType: "twoD" | "threeD" | "plot";
@@ -17,11 +23,13 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
+  const appInterface = useAppStateStore((state) => state.appInterface);
+
   if (
     dataSources.allIDs!.length > 1 ||
     (dataSources.allIDs!.length == 1 &&
-      dataSources.byID![dataSources.allIDs[0]].formatting[layerType].color.mapping !=
-        "single")
+      dataSources.byID![dataSources.allIDs[0]].formatting[layerType].color
+        .mapping != "single")
   ) {
     return (
       <Paper
@@ -36,10 +44,18 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
           m: 2,
           p: 2,
 
-          ...sx,
+          transform: appInterface.timelineBarVisible
+            ? appInterface.bottombarVisible
+              ? `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
+              : `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT}px)`
+            : appInterface.bottombarVisible
+              ? `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${BOTTOMBAR_HEIGHT}px)`
+              : `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, 0)`,
+          transition: "transform.225s",
+          mb: 1,
         }}
       >
-        <Typography sx={{ mb: 1 }} fontSize={12} fontWeight="bold">
+        <Typography fontSize={12} fontWeight="bold">
           {t("legend")}
         </Typography>
         <Grid container direction="column" spacing={2} sx={{ width: "200px" }}>

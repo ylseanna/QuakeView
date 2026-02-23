@@ -27,7 +27,7 @@
     "legend": "Skýring",
     "legend_remaining": "Fjöldi eftir",
     "map_views": "Kort",
-    "overview_map": "Yfirlitskort",
+    "overview_map": "Kort",
     "overview_table": "Tafla",
     "picking": "Upplýsingatól",
     "plots": "Gröf",
@@ -41,7 +41,8 @@
     "theme_dark": "dökk",
     "theme_light": "ljós",
     "theme_system": "kerfi",
-    "Navbar": {}
+    "Navbar": {},
+    "3D": "Þrívídd"
   },
   "Filtering": {
     "add_filter": "Bæta við síu",

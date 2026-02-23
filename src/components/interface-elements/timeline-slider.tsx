@@ -11,6 +11,7 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
+import { useAppStateStore } from "@/providers/app-state-provider";
 import { minorTimeFormat } from "../interface/time-format";
 import { useData } from "../datasource/use-data";
 import { Earthquake } from "../datasource/types";
@@ -35,17 +36,13 @@ interface ViewStateMonitor {
 
 type D3Earthquake = Earthquake & { date: Date };
 
-export default function TimelineSlider({
-  isPlaying,
-  setIsPlaying,
-}: {
-  isPlaying: "playing" | "paused" | "stopped";
-  setIsPlaying: Dispatch<SetStateAction<"playing" | "paused" | "stopped">>;
-}) {
+export default function TimelineSlider() {
+
   // const t = useTranslations();
   // const theme = useTheme();
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
+  const timelineBarVisible = useAppStateStore((state) => state.appInterface.timelineBarVisible);
 
   // const { appInterface } = useAppStateStore((state) => state);
 
@@ -64,9 +61,13 @@ export default function TimelineSlider({
 
   // animation
 
-  const { enabled: animationEnabled, speed: animationSpeed } = useProjectStore(
+  const { enabled: animationEnabled, isPlaying, speed: animationSpeed } = useProjectStore(
     (state) => state.sessionInterface.animation.timeline,
   );
+
+  const {
+    setIsPlaying,
+  } = useProjectStore((state) => state.interfaceActions.animation.timeline);
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -99,7 +100,7 @@ export default function TimelineSlider({
   });
 
   // graph constants
-  const margin = { top: 16, right: 16, bottom: 40, left: 44 };
+  const margin = { top: 16, right: 16, bottom: 40, left: 50 };
 
   const graphWidth = useMemo(
     () => dimensions.width - margin.left - margin.right,
@@ -636,7 +637,7 @@ export default function TimelineSlider({
     resetAxes();
   }, [data]);
 
-  //  listen for viewport changes
+  //  listen for bounds changes
   useEffect(() => {
     if (viewPortScaleX.current && viewPortScaleY.current) {
       // time filtering (make option)

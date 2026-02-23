@@ -27,7 +27,7 @@
     "legend": "Legend",
     "legend_remaining": "Remaining",
     "map_views": "Map views",
-    "overview_map": "Map view",
+    "overview_map": "Map",
     "overview_table": "Table",
     "picking": "Information tool",
     "plots": "Plots",
@@ -41,7 +41,9 @@
     "theme_system": "System",
     "theme_light": "Light",
     "theme_dark": "Dark",
-    "Navbar": {}
+    "Navbar": {},
+    "2D": "2D",
+    "3D": "3D"
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -133,7 +135,8 @@
     "debug_window": "Show debug window",
     "map_tools": "Map tools",
     "show_timeline_bar": "Show timeline bar",
-    "show_legend": "Show legend"
+    "show_legend": "Show legend",
+    "show_bottombar": "Show bottom bar"
   },
   "Navbar": {
     "GR_plot": "GR plot",

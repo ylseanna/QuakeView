@@ -66,7 +66,7 @@ export default function DataSourceFormattingElement({
         >
           <Stack direction="row" sx={{ minWidth: 0 }}>
             <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-            <Typography noWrap textOverflow="ellipsis">
+            <Typography noWrap>
               {dataSource.name}
             </Typography>
           </Stack>

@@ -76,7 +76,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   const format = useFormatter();
 
-
   const autosizeOptions = {
     includeHeaders: true,
     includeOutliers: true,
@@ -120,18 +119,19 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
           }}
         >
           <Stack className="full-row">
-            <Stack className="first-bit" direction="row">
+            <Stack className="first-bit" direction="row" flex={1}>
               <Typography className="row-header" noWrap>
                 <b>{t("Sources.name")}:</b>
               </Typography>
 
               {dataSource.name != dataSource.filename || amEditingName ? (
                 <TextField
-                  sx={{ marginBottom: "-4px" }}
+                  sx={{ mb: "-4px", mr: 2 }}
                   size="small"
                   variant="standard"
                   value={dataSource.name}
                   fullWidth
+                  slotProps={{ input: { sx: { height: 24 } } }}
                   onChange={(event) => {
                     setName(dataSource.internal_id, event.target!.value);
                   }}
@@ -155,6 +155,19 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
             </IconButton>
           </Stack>
         </ClickAwayListener>
+        {dataSource.filename != dataSource.name && (
+          <Stack className="full-row">
+            <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
+              <Typography className="row-header">
+                <b>{t("Sources.filename")}:</b>
+              </Typography>
+
+              <Typography noWrap textOverflow="ellipsis">
+                {dataSource.filename}
+              </Typography>
+            </Stack>
+          </Stack>
+        )}
         <Stack className="full-row">
           <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
             <Typography className="row-header">

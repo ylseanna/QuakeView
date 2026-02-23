@@ -8,7 +8,6 @@ import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useState } from "react";
-import Actions from "@/components/datasource/actions";
 import ThreeDDeckGLView from "@/components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useData } from "@/components/datasource/use-data";
@@ -45,11 +44,10 @@ export default function Page() {
 
   return (
     <>
-      <Actions />
-        <ThreeDDeckGLView
-          extent={calculateExtent()}
-          positionOffset={positionOffset}
-        ></ThreeDDeckGLView>
+      <ThreeDDeckGLView
+        extent={calculateExtent()}
+        positionOffset={positionOffset}
+      ></ThreeDDeckGLView>
     </>
   );
 }

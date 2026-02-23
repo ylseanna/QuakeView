@@ -12,6 +12,8 @@ import {
   InputAdornment,
   MenuItem,
   Menu,
+  Stack,
+  Select,
 } from "@mui/material";
 import {
   DataGrid,
@@ -36,7 +38,6 @@ import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";
-import FilterListIcon from "@mui/icons-material/FilterList";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import { useProjectStore } from "@/providers/project-store-provider";
 
@@ -80,12 +81,61 @@ function CustomToolbar() {
   const { data } = useData();
 
   const { dataSources, sessionInterface } = useProjectStore((state) => state);
-
+  const { setDataSourceID } = useProjectStore(
+    (state) => state.interfaceActions.table,
+  );
   return (
     <Toolbar>
-      <Typography fontWeight="medium" sx={{ flex: 1, mx: 0.5 }}>
-        Toolbar
-      </Typography>
+      {dataSources.allIDs.length > 1 ? (
+        <Stack direction="row" sx={{ flex: 1, minWidth: 0 }}>
+          <Select
+            value={sessionInterface.table.dataSourceID}
+            onChange={(event) => {
+              setDataSourceID(event.target!.value);
+            }}
+            autoWidth
+          >
+            {dataSources.allIDs.map((dataSourceID) => (
+              <MenuItem value={dataSourceID}>
+                <Stack direction="row" sx={{ flex: 1, minWidth: 0 }}>
+                  <Typography fontWeight="medium" sx={{ mx: 0.5 }} noWrap>
+                    {dataSources.byID[dataSourceID].name}
+                  </Typography>
+
+                  {dataSources.byID[dataSourceID].name !=
+                    dataSources.byID[dataSourceID].filename && (
+                    <Typography
+                      fontWeight="medium"
+                      sx={{ mx: 0.5, opacity: 0.6 }}
+                      noWrap
+                    >
+                      ({dataSources.byID[dataSourceID].filename})
+                    </Typography>
+                  )}
+                </Stack>
+              </MenuItem>
+            ))}
+          </Select>
+        </Stack>
+      ) : (
+        <Stack direction="row" sx={{ flex: 1, mx: 0.5, minWidth: 0 }}>
+          <Typography fontWeight="medium" sx={{ mx: 0.5 }} noWrap>
+            {dataSources.byID[sessionInterface.table.dataSourceID!].name}
+          </Typography>
+
+          {dataSources.byID[sessionInterface.table.dataSourceID!].name !=
+            dataSources.byID[sessionInterface.table.dataSourceID!].filename && (
+            <Typography
+              fontWeight="medium"
+              sx={{ mx: 0.5, opacity: 0.6 }}
+              noWrap
+            >
+              ({dataSources.byID[sessionInterface.table.dataSourceID!].filename}
+              )
+            </Typography>
+          )}
+        </Stack>
+      )}
 
       <Tooltip title="Columns">
         <ColumnsPanelTrigger render={<ToolbarButton />}>
@@ -285,21 +335,47 @@ export default function Page() {
 
   const { dataSources, sessionInterface } = useProjectStore((state) => state);
 
-  useEffect(()=>{}, [sessionInterface.table.dataSourceID])
+  const { setDataSourceID } = useProjectStore(
+    (state) => state.interfaceActions.table,
+  );
 
   const { data } = useData();
 
+  useEffect(() => {
+    if (!sessionInterface.table.dataSourceID) {
+      if (data.allIDs.length > 0) {
+        setDataSourceID(dataSources.allIDs[0]);
+      }
+    }
+  }, []);
+
+  useEffect(() => {
+    if (!sessionInterface.table.dataSourceID) {
+      if (data.allIDs.length > 0) {
+        setDataSourceID(dataSources.allIDs[0]);
+      }
+    } else {
+      if (data.allIDs.length == 0) {
+        setDataSourceID(null);
+      }
+    }
+  }, [sessionInterface.table.dataSourceID, data.allIDs]);
+
   return (
-    <Box sx={{ ...ScrollBarStyling, p: 2, pb: 4 }}>
+    <Box sx={{ ...ScrollBarStyling, pb: 2 }}>
       <Paper sx={{}}>
-        {data.byID[data.allIDs[0]] && (
+        {sessionInterface.table.dataSourceID && (
           <DataGrid
             localeText={locale_text}
-            rows={data.byID[data.allIDs[0]].data}
+            rows={
+              data.allIDs.includes(sessionInterface.table.dataSourceID)
+                ? data.byID[sessionInterface.table.dataSourceID].data
+                : undefined
+            }
             columns={columns}
             initialState={{ pagination: { paginationModel } }}
             pageSizeOptions={[10, 20, 50, 100]}
-            sx={{ border: 0 }}
+            sx={{ borderTop: 0 }}
             slots={{ toolbar: CustomToolbar }}
             showToolbar
           />

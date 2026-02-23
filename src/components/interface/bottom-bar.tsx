@@ -1,36 +1,15 @@
-import {
-  Box,
-  Paper,
-  Slide,
-  useTheme,
-  Checkbox,
-  Divider,
-  IconButton,
-  Input,
-  MenuItem,
-  Select,
-  SelectChangeEvent,
-  Stack,
-  Tooltip,
-  Button,
-  Collapse,
-  Typography,
-} from "@mui/material";
-import { RefObject, useEffect, useState, ChangeEvent } from "react";
-import {
-  GradientHorizontal,
-  Selection,
-  SelectionOff,
-  Speedometer,
-} from "mdi-material-ui";
-import TimelineSlider from "../interface-elements/timeline-slider";
-import { Pause, PlayArrow } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
-import { useAppStateStore } from "@/providers/app-state-provider";
-import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../datasource/use-data";
 import { DateTimePicker } from "@mui/x-date-pickers/DateTimePicker";
+import { Pause, PlayArrow } from "@mui/icons-material";
+import { GradientHorizontal, Selection, SelectionOff, Speedometer } from "mdi-material-ui";
+import { Box, Button, Checkbox, Collapse, Divider, IconButton, Input, MenuItem, Paper, Select, SelectChangeEvent, Slide, Stack, Tooltip, Typography, useTheme } from "@mui/material";
+import { useTranslations } from "next-intl";
 import dayjs from "dayjs";
+import { ChangeEvent, RefObject, useEffect, useState } from "react";
+
+import TimelineSlider from "../interface-elements/timeline-slider";
+import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
+import { useData } from "../datasource/use-data";
 
 export const DRAWER_HEIGHT = 200;
 export const BOTTOMBAR_HEIGHT = 48;
@@ -45,7 +24,7 @@ export default function BottomBar({
   const t = useTranslations();
   const theme = useTheme();
 
-  const { animationControlsVisible, timelineBarVisible } = useAppStateStore(
+  const { bottombarVisible, timelineBarVisible } = useAppStateStore(
     (state) => state.appInterface,
   );
 
@@ -58,11 +37,13 @@ export default function BottomBar({
   const [width, setwidth] = useState(0);
   const {
     enabled: animationEnabled,
+    isPlaying,
     tapered,
     speed: animationSpeed,
   } = useProjectStore((state) => state.sessionInterface.animation.timeline);
   const {
     toggleEnabled: toggleAnimationEnabled,
+    setIsPlaying,
     setTapered,
     setSpeed: setAnimationSpeed,
   } = useProjectStore((state) => state.interfaceActions.animation.timeline);
@@ -80,13 +61,13 @@ export default function BottomBar({
     }
   }, [parentRef]);
 
-  const [isPlaying, setIsPlaying] = useState<"playing" | "paused" | "stopped">(
-    "stopped",
-  );
+  // const [isPlaying, setIsPlaying] = useState<"playing" | "paused" | "stopped">(
+  //   "stopped",
+  // );
 
   return (
     <>
-      {animationControlsVisible && (
+      {bottombarVisible && (
         <Paper
           square
           variant="outlined"
@@ -162,7 +143,7 @@ export default function BottomBar({
                 <Divider orientation="vertical" sx={{ m: 1, mr: 1 }} flexItem />
                 <Speedometer sx={{ mr: 1 }} />
                 <Input
-                disableUnderline
+                  disableUnderline
                   value={animationSpeed.multiplier}
                   size="small"
                   onChange={(event: ChangeEvent<HTMLInputElement>) => {
@@ -345,36 +326,6 @@ export default function BottomBar({
           </Stack>
         </Paper>
       )}
-      <Slide
-        direction="up"
-        in={(timelineBarVisible && data) as boolean}
-        style={{ visibility: "visible" }}
-        mountOnEnter
-        unmountOnExit
-      >
-        <Paper
-          square
-          sx={{
-            position: "fixed",
-            bottom: 0,
-            display: "flex",
-            justifyContent: "center",
-            height: DRAWER_HEIGHT,
-            zIndex: 1300,
-            width: width ? width : "",
-            borderTop: `1px solid ${theme.palette.divider}`,
-          }}
-        >
-          <Box
-            sx={{
-              width: `calc(${width}px)`,
-              height: `calc(${DRAWER_HEIGHT}px`,
-            }}
-          >
-            <TimelineSlider isPlaying={isPlaying} setIsPlaying={setIsPlaying} />
-          </Box>
-        </Paper>
-      </Slide>
     </>
   );
 }
