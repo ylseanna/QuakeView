@@ -22,6 +22,7 @@
     "build": "run-s next:build flask:build electron:build",
     "dist:deb": "electron-builder --config --linux --publish always",
     "dist:msi": "electron-builder --config --win --publish always",
+    "dist:mac": "electron-builder --config --mac --universal --publish always",
     "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
   },
   "dependencies": {
