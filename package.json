@@ -20,8 +20,8 @@
     "electron:dev": "electron-vite dev",
     "electron:build": "electron-vite build",
     "build": "run-s next:build flask:build electron:build",
-    "dist:deb": "electron-builder --config --linux",
-    "dist:msi": "electron-builder --config --win",
+    "dist:deb": "electron-builder --config --linux --publish always",
+    "dist:msi": "electron-builder --config --win --publish always",
     "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
   },
   "dependencies": {
