@@ -48,7 +48,7 @@ export default function GeneralFormattingForm({
 }) {
   const t = useTranslations("Formatting");
 
-  // const { data } = useData();
+  // const { data } = useCatalogData();
 
   const setFormatting = useProjectStore(
     (state) => state.dataSourceActions.setFormatting,

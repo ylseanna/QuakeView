@@ -9,7 +9,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 import { Earthquake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
@@ -35,7 +35,7 @@ export default function StemPlot() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);

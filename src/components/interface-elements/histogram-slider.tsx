@@ -7,7 +7,7 @@ import { ChangeEventHandler, useEffect, useLayoutEffect, useMemo, useRef, useSta
 import * as d3 from "d3";
 
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 import { DataSource, Earthquake } from "../datasource/types";
 
 export default function HistogramSlider({
@@ -56,7 +56,7 @@ export default function HistogramSlider({
   onAcceptDateTimeInputsMax?: (value: PickerValue) => void;
   onBlurNumberInputs?: () => void;
 }) {
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

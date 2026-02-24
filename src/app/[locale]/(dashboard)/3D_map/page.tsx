@@ -10,11 +10,11 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useState } from "react";
 import ThreeDDeckGLView from "@/components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "@/components/datasource/use-data";
+import{ useCatalogData } from "@/components/datasource/use-data";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const calculateExtent = () => {
     let extent: Extent | null = null;

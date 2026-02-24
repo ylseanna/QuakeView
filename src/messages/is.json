@@ -42,7 +42,11 @@
     "theme_light": "ljós",
     "theme_system": "kerfi",
     "Navbar": {},
-    "3D": "Þrívídd"
+    "3D": "Þrívídd",
+    "Common": {
+      "loading": "að hlaða niður",
+      "fetching": "að afturhlaða"
+    }
   },
   "Filtering": {
     "add_filter": "Bæta við síu",

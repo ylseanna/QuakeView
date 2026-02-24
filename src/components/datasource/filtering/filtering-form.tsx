@@ -22,7 +22,7 @@ import {
 import { ChangeEvent, SyntheticEvent, useState } from "react";
 import { useTranslations } from "next-intl";
 import HistogramSlider from "../../interface-elements/histogram-slider";
-import { useData } from "../use-data";
+import{ useCatalogData } from "../use-data";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { PickerValue } from "@mui/x-date-pickers/internals";
 import { Dayjs } from "dayjs";
@@ -46,7 +46,7 @@ const FilteringEditingRow = ({
 
   const theme = useTheme();
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const dataDescr = dataSource.metadata.variables.by_id[variable];
 
@@ -142,12 +142,12 @@ export default function FilteringForm({
 }) {
   const t = useTranslations("Filtering");
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const { setFilter } = useProjectStore((state) => state.dataSourceActions);
 
   return (
-    <Box sx={{p: 2}}>
+    <Box sx={{p: 2, pt: 1}}>
       <Autocomplete
         options={dataSource.metadata.variables.required_vars
           .concat(dataSource.metadata.variables.added_vars)

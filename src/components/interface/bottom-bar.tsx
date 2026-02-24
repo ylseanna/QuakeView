@@ -9,7 +9,7 @@ import { ChangeEvent, RefObject, useEffect, useState } from "react";
 import TimelineSlider from "../interface-elements/timeline-slider";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 
 export const DRAWER_HEIGHT = 200;
 export const BOTTOMBAR_HEIGHT = 48;
@@ -19,7 +19,7 @@ export default function BottomBar({
 }: {
   parentRef?: RefObject<HTMLElement>;
 }) {
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const t = useTranslations();
   const theme = useTheme();

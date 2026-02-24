@@ -32,7 +32,7 @@ import {
 } from "../../../map/crameri-colormaps";
 import { SwapHoriz } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../../use-data";
+import{ useCatalogData } from "../../use-data";
 import { Dayjs } from "dayjs";
 import { PickerValue } from "@mui/x-date-pickers/internals";
 
@@ -66,7 +66,7 @@ export default function ColorFormattingForm({
 }) {
   const t = useTranslations("Formatting");
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const setColorFormatting = useProjectStore(
     (state) => state.dataSourceActions.setColorFormatting,

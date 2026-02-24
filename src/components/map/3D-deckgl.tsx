@@ -19,7 +19,7 @@ import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
-import { useData } from "../datasource/use-data";
+import{ useCatalogData } from "../datasource/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
@@ -59,7 +59,7 @@ export default function ThreeDDeckGLView({
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   useEffect(() => {
     mapContainer.current = document.getElementsByTagName("main")[0];

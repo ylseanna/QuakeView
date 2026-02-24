@@ -1,17 +1,19 @@
 import { useQueries, UseQueryResult } from "@tanstack/react-query";
+import { useEffect } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
+import { useAppStateStore } from "@/providers/app-state-provider";
 import { fetchData } from "./load-data";
 import { DataSourceFiltering, Earthquake, Extent } from "./types";
 
 export type DataQueryResponse = {
-      data: Earthquake[];
-      addedVars: string[];
-      bounds: { [variable: string]: [number, number] | null };
-      unfiltered_bounds: { [variable: string]: [number, number] | null };
-      extent: Extent;
-      filters: DataSourceFiltering;
-    }
+  data: Earthquake[];
+  addedVars: string[];
+  bounds: { [variable: string]: [number, number] | null };
+  unfiltered_bounds: { [variable: string]: [number, number] | null };
+  extent: Extent;
+  filters: DataSourceFiltering;
+};
 
 export type DataCache = {
   byID: {
@@ -24,8 +26,12 @@ export type DataCacheResult = {
   pending: boolean;
 };
 
-export function useData() {
+export function useCatalogData() {
   const dataSources = useProjectStore((state) => state.dataSources);
+
+  const { setQueryStatus, checkQueryStatusPresent } = useAppStateStore(
+    (state) => state.appInterfaceActions,
+  );
 
   const queryOptions = {
     queries: dataSources.allIDs.map((dataSourceID) => {
@@ -58,10 +64,37 @@ export function useData() {
             .filter((el) => el[1] != null)
             .map((el) => el[0]),
         },
+        results: results.map((result, index) => ({
+          dataSourceID: dataSources.allIDs[index],
+          result: result,
+        })),
+
         pending: results.some((result) => result.isPending),
       };
     },
   };
 
-  return useQueries(queryOptions) as DataCacheResult;
+  const queries = useQueries(queryOptions);
+
+  useEffect(() => {
+    queries.results.forEach(
+      (queryResult: {
+        dataSourceID: string;
+        result: UseQueryResult<DataQueryResponse, Error>;
+      }) => {
+        const { isLoading, isFetching } = queryResult.result;
+        setQueryStatus({
+          dataSourceID: queryResult.dataSourceID,
+          isLoading: isLoading,
+          isFetching: isFetching,
+        });
+      },
+    );
+
+    checkQueryStatusPresent(
+      queries.results.map((result) => result.dataSourceID),
+    );
+  }, [queries]);
+
+  return { data: queries.data, pending: queries.pending } as DataCacheResult;
 }

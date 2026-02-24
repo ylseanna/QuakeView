@@ -5,7 +5,7 @@ import * as _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 
 import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
-import { useData } from "@/components/datasource/use-data";
+import { useCatalogData } from "@/components/datasource/use-data";
 import { DataSource, DataSourceDataDescription } from "../../datasource/types";
 
 interface LegendElementProps {
@@ -23,7 +23,7 @@ export default function CategoricalLegend({
 
   console.log(dataSource.formatting[layerType].color.categorical.variable);
 
-  const { data: allData } = useData();
+  const { data: allData } = useCatalogData();
 
   const data = allData.byID[dataSource.internal_id];
 

@@ -3,13 +3,13 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 import { Earthquake } from "../datasource/types";
 
 export default function MagnitudeDistributionPlot() {
   const { dataSources } = useProjectStore((state) => state);
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });

@@ -1,15 +1,20 @@
 "use client";
 
-import { Box, LinearProgress } from "@mui/material";
+import { Box, LinearProgress, Paper } from "@mui/material";
 
-import { ReactNode, useState } from "react";
+import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 
 import TitleBar from "@/components/navigation/title-bar";
 import NavBar from "@/components/navigation/nav-bar";
 import { useKeyStroke } from "@react-hooks-library/core";
 import DebugWindow from "@/components/interface/debug-window";
 
-import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import {
+  Query,
+  QueryClient,
+  QueryClientProvider,
+  QueryFilters,
+} from "@tanstack/react-query";
 
 import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import "dayjs/locale/en-gb";
@@ -23,6 +28,8 @@ import Sidebars from "@/components/interface/sidebars";
 import Toolbar from "@/components/interface/toolbar";
 import Legend from "@/components/map/legend/legend";
 import { queryClient } from "@/providers/query-client";
+import QueryMonitor from "@/components/datasource/query-monitor";
+import { useAppStateStore } from "@/providers/app-state-provider";
 
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const [debugVisible, setDebugVisible] = useState(false);
@@ -44,8 +51,25 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
   //   },
   // });
 
+  const queryMonitors = useAppStateStore(
+    (state) => state.appInterface.queryMonitors,
+  );
+
+  const isLoading = useMemo(
+    () =>
+      queryMonitors.allKeys
+        .map(
+          (queryMonitorKey) =>
+            queryMonitors.byKey[queryMonitorKey].isLoading ||
+            queryMonitors.byKey[queryMonitorKey].isFetching,
+        )
+        .some((el) => el),
+    [queryMonitors],
+  );
+
   return (
     <>
+      <QueryMonitor />
       <TitleBar />
       <NavBar />
       <Box
@@ -56,43 +80,46 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
           backgroundColor: theme.palette?.background?.default,
         }}
       >
-        {queryClient.isFetching() > 0 && (
-          <LinearProgress sx={{ position: "absolute" }} />
-        )}
-        <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale="en-gb">
-          <QueryClientProvider client={queryClient}>
-            {debugVisible && <DebugWindow />}
-            {props.children}
+        {isLoading && <LinearProgress />}
+        <Suspense>
+          <LocalizationProvider
+            dateAdapter={AdapterDayjs}
+            adapterLocale="en-gb"
+          >
+            <QueryClientProvider client={queryClient}>
+              {debugVisible && <DebugWindow />}
+              {props.children}
 
-            {["/overview_map", "/3D_map"].includes(pathname) && (
-              <>
-                <BottomBar />
-                <TimelineBar />
-              </>
-            )}
-            {[
-              "/overview_map",
-              "/3D_map",
-              "/plots/distribution_plot",
-              "/plots/GR_plot",
-              "/plots/stem_plot",
-            ].includes(pathname) && (
-              <>
-                <Legend
-                  layerType={
-                    pathname === "/overview_map"
-                      ? "twoD"
-                      : pathname === "/3D_map"
-                        ? "threeD"
-                        : "plot"
-                  }
-                />
-                <Sidebars />
-                <Toolbar />
-              </>
-            )}
-          </QueryClientProvider>
-        </LocalizationProvider>
+              {["/overview_map", "/3D_map"].includes(pathname) && (
+                <>
+                  <BottomBar />
+                  <TimelineBar />
+                </>
+              )}
+              {[
+                "/overview_map",
+                "/3D_map",
+                "/plots/distribution_plot",
+                "/plots/GR_plot",
+                "/plots/stem_plot",
+              ].includes(pathname) && (
+                <>
+                  <Legend
+                    layerType={
+                      pathname === "/overview_map"
+                        ? "twoD"
+                        : pathname === "/3D_map"
+                          ? "threeD"
+                          : "plot"
+                    }
+                  />
+                  <Sidebars />
+                  <Toolbar />
+                </>
+              )}
+            </QueryClientProvider>
+          </LocalizationProvider>
+        </Suspense>
       </Box>
     </>
   );

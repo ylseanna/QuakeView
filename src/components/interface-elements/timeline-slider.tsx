@@ -13,7 +13,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { minorTimeFormat } from "../interface/time-format";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 import { Earthquake } from "../datasource/types";
 import MapToolTip from "../map/map-tooltip";
 import { ControllerOptions } from "../map/types";
@@ -49,7 +49,7 @@ export default function TimelineSlider() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
   const { dataSources } = useProjectStore((state) => state);
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   // filtering
 

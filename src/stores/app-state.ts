@@ -5,6 +5,12 @@ import { merge } from "lodash";
 
 // import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 
+export type QueryMonitor = {
+  dataSourceID: string;
+  isLoading: boolean;
+  isFetching: boolean;
+};
+
 export type AppState = {
   appInterface: {
     mapToolsVisible: boolean;
@@ -14,6 +20,10 @@ export type AppState = {
     sidebarOpen: "formatting" | "filtering" | "layers" | null;
     legendVisible: boolean;
     popperOpen: boolean;
+    queryMonitors: {
+      byKey: { [key: string]: QueryMonitor };
+      allKeys: string[];
+    };
   };
 };
 
@@ -29,6 +39,8 @@ export type AppActions = {
     toggleLegendVisible: () => void;
     signalPopperOpen: () => void;
     signalPopperClosed: () => void;
+    setQueryStatus: (queryMonitor: QueryMonitor) => void;
+    checkQueryStatusPresent: (dataSourceIDs: string[]) => void;
   };
 };
 
@@ -43,6 +55,7 @@ export const defaultInitState: AppState = {
     sidebarOpen: null,
     legendVisible: true,
     popperOpen: false,
+    queryMonitors: { byKey: {}, allKeys: [] },
   },
 };
 
@@ -88,6 +101,45 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
           signalPopperClosed: () =>
             set((state) => {
               state.appInterface.popperOpen = false;
+            }),
+          setQueryStatus: (queryMonitor: QueryMonitor) =>
+            set((state) => {
+              if (
+                !state.appInterface.queryMonitors.allKeys.includes(
+                  queryMonitor.dataSourceID,
+                )
+              ) {
+                state.appInterface.queryMonitors.byKey[
+                  queryMonitor.dataSourceID
+                ] = queryMonitor;
+                state.appInterface.queryMonitors.allKeys.push(
+                  queryMonitor.dataSourceID,
+                );
+              } else {
+                state.appInterface.queryMonitors.byKey[
+                  queryMonitor.dataSourceID
+                ] = queryMonitor;
+              }
+            }),
+          checkQueryStatusPresent: (dataSourceIDs) =>
+            set((state) => {
+              state.appInterface.queryMonitors.allKeys.forEach(
+                (queryMonitorKey) => {
+                  if (!dataSourceIDs.includes(queryMonitorKey)) {
+                    delete state.appInterface.queryMonitors.byKey[
+                      queryMonitorKey
+                    ];
+                    const index =
+                      state.appInterface.queryMonitors.allKeys.findIndex(
+                        (iid) => iid === queryMonitorKey,
+                      );
+                    if (index > -1) {
+                      // only splice array when item is found
+                      state.appInterface.queryMonitors.allKeys.splice(index, 1);
+                    }
+                  }
+                },
+              );
             }),
         },
       })),

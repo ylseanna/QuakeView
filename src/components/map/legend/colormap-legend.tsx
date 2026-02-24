@@ -1,16 +1,10 @@
-import {
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useRef,
-  useState,
-} from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
 
+import { useCatalogData } from "@/components/datasource/use-data";
 import { DataSource } from "../../datasource/types";
 import { colormaps } from "../crameri-colormaps";
-import { useData } from "@/components/datasource/use-data";
 // import { ReImg } from "reimg";
 
 interface LegendElementProps {
@@ -25,7 +19,7 @@ export default function ColormapLegend({
   const parentRef = useRef<HTMLInputElement>(null);
   const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   useLayoutEffect(() => {
     if (parentRef.current) {

@@ -43,7 +43,11 @@
     "theme_dark": "Dark",
     "Navbar": {},
     "2D": "2D",
-    "3D": "3D"
+    "3D": "3D",
+    "Common": {
+      "loading": "loading",
+      "fetching": "fetching"
+    }
   },
   "Filtering": {
     "add_filter": "Add filter",

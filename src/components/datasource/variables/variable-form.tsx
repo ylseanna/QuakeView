@@ -33,7 +33,7 @@ import {
   dateTimeAsNumbersRequiredVars,
   dateTimeStringRequiredVars,
 } from "../constants";
-import { useData } from "../use-data";
+import{ useCatalogData } from "../use-data";
 
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
@@ -250,7 +250,7 @@ export default function DataSourceVariableForm({
     (state) => state.dataSourceActions.setColorFormatting,
   );
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const { dataSources } = useProjectStore((state) => state);
 

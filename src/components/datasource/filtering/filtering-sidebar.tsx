@@ -45,6 +45,7 @@ export default function FilteringSidebar({ drawerOpen }: FormattingProps) {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
             zIndex: theme.zIndex.appBar - 100,
+            top: "calc(80px + 32px)",
             maxHeight: `calc(100vh - 80px - 32px - ${
               appInterface.timelineBarVisible
                 ? appInterface.bottombarVisible
@@ -57,7 +58,6 @@ export default function FilteringSidebar({ drawerOpen }: FormattingProps) {
           },
         }}
       >
-        <Box sx={{ display: "box", height: "calc(80px + 32px)" }} />
         <Typography sx={sxtextbox}>
           <b>{t("filtering")}</b>
         </Typography>

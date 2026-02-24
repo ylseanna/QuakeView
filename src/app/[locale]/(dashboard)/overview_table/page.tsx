@@ -34,7 +34,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { isIS, enUS } from "@mui/x-data-grid/locales";
 import { useLocale, useTranslations } from "next-intl";
-import { useData } from "@/components/datasource/use-data";
+import{ useCatalogData } from "@/components/datasource/use-data";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
@@ -79,7 +79,7 @@ function CustomToolbar() {
   const [exportMenuOpen, setExportMenuOpen] = useState(false);
   const exportMenuTriggerRef = useRef<HTMLButtonElement>(null);
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const { dataSources, sessionInterface } = useProjectStore((state) => state);
   const { setDataSourceID } = useProjectStore(
@@ -340,7 +340,7 @@ export default function Page() {
     (state) => state.interfaceActions.table,
   );
 
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   useEffect(() => {
     if (!sessionInterface.table.dataSourceID) {

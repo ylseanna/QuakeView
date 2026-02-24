@@ -11,7 +11,7 @@ import { Earthquake } from "@/components/datasource/types";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useData } from "../datasource/use-data";
+import{ useCatalogData } from "../datasource/use-data";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
 
@@ -26,7 +26,7 @@ export default function DeckGLlayers() {
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
 
   const dataSources = useProjectStore((state) => state.dataSources);
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   // TOOLTIP
 

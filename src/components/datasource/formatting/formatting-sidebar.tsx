@@ -8,7 +8,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import { BOTTOMBAR_HEIGHT, DRAWER_HEIGHT } from "@/components/interface/bottom-bar";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import DataSourceFormattingElement from "./formatting-element";
-import { useData } from "../use-data";
+import { useCatalogData } from "../use-data";
 
 interface FormattingProps {
   drawerOpen: boolean;
@@ -28,7 +28,7 @@ export default function FormattingSidebar({ drawerOpen }: FormattingProps) {
 
   const ref = useRef(null);
 
-  const { data } = useData();
+  const { data } = useCatalogData();
   const dataSources = useProjectStore((state) => state.dataSources);
 
   const appInterface = useAppStateStore((state) => state.appInterface);

@@ -2,13 +2,13 @@ import { Box, Paper, Slide, useTheme } from "@mui/material";
 
 import TimelineSlider from "../interface-elements/timeline-slider";
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { useData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 
 export const DRAWER_HEIGHT = 200;
 export const BOTTOMBAR_HEIGHT = 48;
 
 export default function TimelineBar() {
-  const { data } = useData();
+  const { data } = useCatalogData();
 
   const theme = useTheme();
 
