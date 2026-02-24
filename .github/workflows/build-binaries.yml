@@ -96,6 +96,6 @@ jobs:
         run: npm run dist:mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OS: win32-x64
+          OS: macos-arm64
 
       - run: echo "Job status is ${{ job.status }}."
