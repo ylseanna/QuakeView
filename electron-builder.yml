@@ -31,5 +31,11 @@ win:
     publish: ["github"],
     artifactName: "quakeview_${version}_${env.OS}_${arch}.${ext}",
   }
+mac:
+  {
+    target: ["pkg"],
+    publish: ["github"],
+    artifactName: "quakeview_${version}_${env.OS}_${arch}.${ext}",
+  }
 extraResources: [{ from: "flask/dist", to: "flask" }]
 directories: { buildResources: "resources", output: "release" }
