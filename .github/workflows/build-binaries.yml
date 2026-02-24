@@ -4,53 +4,53 @@ on:
   workflow_dispatch:
 
 jobs:
-  Build-Binaries-Windows:
-    runs-on: windows-latest
-    steps:
-      - name: Check out repository code
-        uses: actions/checkout@v4
-      - run: echo "${{ github.repository }} repository has been cloned to the runner."
+  # Build-Binaries-Windows:
+  #   runs-on: windows-latest
+  #   steps:
+  #     - name: Check out repository code
+  #       uses: actions/checkout@v4
+  #     - run: echo "${{ github.repository }} repository has been cloned to the runner."
 
-      - run: echo "Branch - ${{ github.ref }}, repository - ${{ github.repository }}."
+  #     - run: echo "Branch - ${{ github.ref }}, repository - ${{ github.repository }}."
 
-      - run: cd ${{ github.workspace }}
+  #     - run: cd ${{ github.workspace }}
 
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: "24.2.0"
-          cache: "npm"
-          cache-dependency-path: ${{ github.workspace }}/package-lock.json
+  #     - name: Setup Node
+  #       uses: actions/setup-node@v4
+  #       with:
+  #         node-version: "24.2.0"
+  #         cache: "npm"
+  #         cache-dependency-path: ${{ github.workspace }}/package-lock.json
 
-      - run: npm ci --only=prod # or yarn install
+  #     - run: npm ci --only=prod # or yarn install
 
-      - name: Setup esbuild
-        run: npm install @esbuild/win32-x64
+  #     - name: Setup esbuild
+  #       run: npm install @esbuild/win32-x64
 
-      - run: npm list
+  #     - run: npm list
 
-      - name: Install python dependencies
-        uses: actions/setup-python@v5
-        with:
-          python-version: "3.11"
-          cache: "pip" # caching pip dependencies
-      - run: pip install -r ${{ github.workspace }}/flask/requirements.txt pyinstaller
+  #     - name: Install python dependencies
+  #       uses: actions/setup-python@v5
+  #       with:
+  #         python-version: "3.11"
+  #         cache: "pip" # caching pip dependencies
+  #     - run: pip install -r ${{ github.workspace }}/flask/requirements.txt pyinstaller
 
-      - run: pip freeze
+  #     - run: pip freeze
 
-      - name: List files in the repository
-        run: ls
+  #     - name: List files in the repository
+  #       run: ls
 
-      - name: Build
-        run: npm run build
+  #     - name: Build
+  #       run: npm run build
 
-      - name: Create binaries
-        run: npm run dist:msi
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          OS: win32-x64
+  #     - name: Create binaries
+  #       run: npm run dist:msi
+  #       env:
+  #         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  #         OS: win32-x64
 
-      - run: echo "Job status is ${{ job.status }}."
+  #     - run: echo "Job status is ${{ job.status }}."
 
   Build-Binaries-Mac:
     runs-on: macos-latest
