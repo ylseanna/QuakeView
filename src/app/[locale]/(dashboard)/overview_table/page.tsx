@@ -14,6 +14,7 @@ import {
   Menu,
   Stack,
   Select,
+  LinearProgress,
 } from "@mui/material";
 import {
   DataGrid,
@@ -117,7 +118,7 @@ function CustomToolbar() {
             ))}
           </Select>
         </Stack>
-      ) : (
+      ) : (dataSources.byID[sessionInterface.table.dataSourceID!]) && (
         <Stack direction="row" sx={{ flex: 1, mx: 0.5, minWidth: 0 }}>
           <Typography fontWeight="medium" sx={{ mx: 0.5 }} noWrap>
             {dataSources.byID[sessionInterface.table.dataSourceID!].name}
@@ -363,8 +364,7 @@ export default function Page() {
 
   return (
     <Box sx={{ ...ScrollBarStyling, pb: 2 }}>
-      <Paper sx={{}}>
-        {sessionInterface.table.dataSourceID && (
+        {sessionInterface.table.dataSourceID ? (
           <DataGrid
             localeText={locale_text}
             rows={
@@ -379,8 +379,7 @@ export default function Page() {
             slots={{ toolbar: CustomToolbar }}
             showToolbar
           />
-        )}
-      </Paper>
+        ) : <LinearProgress/> }
     </Box>
   );
 }
