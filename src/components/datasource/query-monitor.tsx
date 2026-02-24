@@ -8,6 +8,7 @@ import {
   Slide,
   Stack,
   Typography,
+  useTheme,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -27,6 +28,7 @@ export default function QueryMonitor() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
   const appInterface = useAppStateStore((state) => state.appInterface);
+  const theme = useTheme()
 
   if (dataSources.byID) {
     return (
@@ -75,7 +77,7 @@ export default function QueryMonitor() {
                         .isFetching ? (
                         <CircularProgress size={16}/>
                       ) : (
-                        <Check sx={{ mr: 1 }} />
+                        <Check sx={{ mr: 1, color: theme.palette.success.main}} />
                       )}
                     </Box>
                     <Typography>
