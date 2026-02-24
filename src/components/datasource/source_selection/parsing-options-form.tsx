@@ -9,6 +9,7 @@ import {
   Typography,
   Grid,
   Switch,
+  Divider,
 } from "@mui/material";
 
 // import {
@@ -108,120 +109,121 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
       </Box>
 
       <SubAccordionDetails>
-        <Grid
-          container
-          spacing={2}
-          sx={{ alignItems: "center", minHeight: "40px" }}
-        >
-          <Grid size={2.5}>
-            <Typography variant="formlabel">{t("Sources.index")}</Typography>
-          </Grid>
+        <Box sx={{ px: 2 }}>
           <Grid
-            size="grow"
-            display="flex"
-            justifyContent="end"
-            alignItems="center"
+            container
+            spacing={2}
+            sx={{ alignItems: "center", minHeight: "40px" }}
           >
-            <Switch
-              size="small"
-              checked={dataSource.metadata.index == "numerical" ? true : false}
-              onChange={(event) => {
-                setIndex(
-                  dataSource.internal_id,
-                  event.target!.checked ? "numerical" : "from_file",
-                );
-              }}
-              slotProps={{ input: { "aria-label": "controlled" } }}
-            />
-          </Grid>
-        </Grid>
-        <Grid
-          container
-          spacing={2}
-          sx={{ alignItems: "center", minHeight: "40px" }}
-        >
-          <Grid size={2.5}>
-            <Typography variant="formlabel">
-              {t("Sources.delimiter")}
-            </Typography>
-          </Grid>
-          <Grid
-            size="grow"
-            display="flex"
-            justifyContent="end"
-            alignItems="center"
-          >
-            <ToggleButtonGroup
-              color="primary"
-              value={dataSource.metadata.sep}
-              exclusive
-              onChange={(event) => {
-                setSep(
-                  dataSource.internal_id,
-                  (event.target as HTMLInputElement).value,
-                );
-              }}
-              aria-label="mode"
-              sx={{ height: "24px" }}
+            <Grid size={2.5}>
+              <Typography variant="formlabel">{t("Sources.index")}</Typography>
+            </Grid>
+            <Grid
+              size="grow"
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
             >
-              <ToggleButton value="\s+" sx={sxButton}>
-                {t("Sources.whitespace")}
-              </ToggleButton>
-              <ToggleButton value="," sx={sxButton}>
-                {t("Sources.comma")}
-              </ToggleButton>
-            </ToggleButtonGroup>
-          </Grid>
-        </Grid>
-
-        <Grid
-          container
-          spacing={2}
-          sx={{ alignItems: "center", minHeight: "40px", mb: 2 }}
-        >
-          <Grid size={2.5}>
-            <Typography variant="formlabel">
-              {t("Sources.datetime_format")}
-            </Typography>
+              <Switch
+                size="small"
+                checked={
+                  dataSource.metadata.index == "numerical" ? true : false
+                }
+                onChange={(event) => {
+                  setIndex(
+                    dataSource.internal_id,
+                    event.target!.checked ? "numerical" : "from_file",
+                  );
+                }}
+                slotProps={{ input: { "aria-label": "controlled" } }}
+              />
+            </Grid>
           </Grid>
           <Grid
-            size="grow"
-            display="flex"
-            justifyContent="end"
-            alignItems="center"
+            container
+            spacing={2}
+            sx={{ alignItems: "center", minHeight: "40px" }}
           >
-            <ToggleButtonGroup
-              color="primary"
-              value={dataSource.metadata.datetime_format}
-              exclusive
-              onChange={(event) => {
-                setDatetimeFormat(
-                  dataSource.internal_id,
-                  (event.target as HTMLInputElement).value,
-                );
-              }}
-              aria-label="mode"
-              sx={{ height: "24px" }}
+            <Grid size={2.5}>
+              <Typography variant="formlabel">
+                {t("Sources.delimiter")}
+              </Typography>
+            </Grid>
+            <Grid
+              size="grow"
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
             >
-              <ToggleButton value="parseable_datetime_string" sx={sxButton}>
-                {t("Sources.parseable_datetime_string")}
-              </ToggleButton>
-              <ToggleButton value="date_string-time_string" sx={sxButton}>
-                {t("Sources.date_string-time_string")}
-              </ToggleButton>
-              <ToggleButton
-                value="year-month-day-hour-minute-second"
-                sx={sxButton}
+              <ToggleButtonGroup
+                color="primary"
+                value={dataSource.metadata.sep}
+                exclusive
+                onChange={(event) => {
+                  setSep(
+                    dataSource.internal_id,
+                    (event.target as HTMLInputElement).value,
+                  );
+                }}
+                aria-label="mode"
+                sx={{ height: "24px" }}
               >
-                {t("Sources.year-month-day-hour-minute-second")}
-              </ToggleButton>
-            </ToggleButtonGroup>
+                <ToggleButton value="\s+" sx={sxButton}>
+                  {t("Sources.whitespace")}
+                </ToggleButton>
+                <ToggleButton value="," sx={sxButton}>
+                  {t("Sources.comma")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
           </Grid>
-        </Grid>
 
-        <Typography sx={{ fontWeight: "bold" }}>
-          {t("Sources.variable_mapping")}
-        </Typography>
+          <Grid
+            container
+            spacing={2}
+            sx={{ alignItems: "center", minHeight: "40px", mb: 2 }}
+          >
+            <Grid size={2.5}>
+              <Typography variant="formlabel">
+                {t("Sources.datetime_format")}
+              </Typography>
+            </Grid>
+            <Grid
+              size="grow"
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
+            >
+              <ToggleButtonGroup
+                color="primary"
+                value={dataSource.metadata.datetime_format}
+                exclusive
+                onChange={(event) => {
+                  setDatetimeFormat(
+                    dataSource.internal_id,
+                    (event.target as HTMLInputElement).value,
+                  );
+                }}
+                aria-label="mode"
+                sx={{ height: "24px" }}
+              >
+                <ToggleButton value="parseable_datetime_string" sx={sxButton}>
+                  {t("Sources.parseable_datetime_string")}
+                </ToggleButton>
+                <ToggleButton value="date_string-time_string" sx={sxButton}>
+                  {t("Sources.date_string-time_string")}
+                </ToggleButton>
+                <ToggleButton
+                  value="year-month-day-hour-minute-second"
+                  sx={sxButton}
+                >
+                  {t("Sources.year-month-day-hour-minute-second")}
+                </ToggleButton>
+              </ToggleButtonGroup>
+            </Grid>
+          </Grid>
+        </Box>
+        <Divider sx={{ mx: 2 }} />
 
         <DataSourceVariableForm dataSource={dataSource} />
       </SubAccordionDetails>

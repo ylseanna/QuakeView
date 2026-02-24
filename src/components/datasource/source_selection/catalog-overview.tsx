@@ -90,7 +90,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
   const theme = useTheme();
 
   return (
-    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
+    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1}}>
       <Stack
         sx={{
           ".full-row": {

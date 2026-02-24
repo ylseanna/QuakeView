@@ -147,7 +147,7 @@ export default function FilteringForm({
   const { setFilter } = useProjectStore((state) => state.dataSourceActions);
 
   return (
-    <>
+    <Box sx={{p: 2}}>
       <Autocomplete
         options={dataSource.metadata.variables.required_vars
           .concat(dataSource.metadata.variables.added_vars)
@@ -207,6 +207,6 @@ export default function FilteringForm({
           />
         ))}
       </Grid>
-    </>
+    </Box>
   );
 }

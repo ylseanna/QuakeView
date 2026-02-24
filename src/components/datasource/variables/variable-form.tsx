@@ -283,7 +283,8 @@ export default function DataSourceVariableForm({
           setColorFormatting(dataSourceID, formattingType, {
             ...dataSources.byID[dataSourceID].formatting[formattingType].color,
             linear: {
-              ...dataSources.byID[dataSourceID].formatting[formattingType].color.linear,
+              ...dataSources.byID[dataSourceID].formatting[formattingType].color
+                .linear,
               domain: boundsFromData,
             },
           });
@@ -293,7 +294,10 @@ export default function DataSourceVariableForm({
   }, [data.allIDs]);
 
   return (
-    <>
+    <Box sx={{ p: 2 }}>
+      <Typography sx={{ fontWeight: "bold" }}>
+        {t("Sources.variable_mapping")}
+      </Typography>
       <Grid container spacing={1} direction="column">
         <Grid container spacing={1} alignItems="flex-end">
           <Grid sx={{ width: "120px" }}>
@@ -525,6 +529,6 @@ export default function DataSourceVariableForm({
           ></Grid>
         </Grid>
       </Grid>
-    </>
+    </Box>
   );
 }
