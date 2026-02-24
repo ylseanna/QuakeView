@@ -22,9 +22,14 @@ files:
 linux:
   {
     target: ["deb"],
-    artifactName: "quakeview_${version}_${env.OS}.${ext}",
+    artifactName: "quakeview_${version}_${env.OS}_${arch}.${ext}",
     category: "Science",
   }
-win: { target: ["nsis"] }
+win:
+  {
+    target: ["nsis"],
+    publish: ["github"],
+    artifactName: "quakeview_${version}_${env.OS}_${arch}.${ext}",
+  }
 extraResources: [{ from: "flask/dist", to: "flask" }]
 directories: { buildResources: "resources", output: "release" }
