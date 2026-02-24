@@ -93,7 +93,7 @@ jobs:
         run: npm run build
 
       - name: Create binaries
-        run: npm run dist:mac:arm
+        run: npm run dist:mac
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           OS: win32-x64
