@@ -22,6 +22,7 @@ import { usePathname } from "@/i18n/routing";
 import Sidebars from "@/components/interface/sidebars";
 import Toolbar from "@/components/interface/toolbar";
 import Legend from "@/components/map/legend/legend";
+import { queryClient } from "@/providers/query-client";
 
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const [debugVisible, setDebugVisible] = useState(false);
@@ -32,16 +33,16 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
     setDebugVisible(!debugVisible);
   });
 
-  const queryClient = new QueryClient({
-    defaultOptions: {
-      queries: {
-        // With SSR, we usually want to set some default staleTime
-        // above 0 to avoid refetching immediately on the client
-        staleTime: 1000,
-        gcTime: Infinity,
-      },
-    },
-  });
+  // const queryClient = new QueryClient({
+  //   defaultOptions: {
+  //     queries: {
+  //       // With SSR, we usually want to set some default staleTime
+  //       // above 0 to avoid refetching immediately on the client
+  //       staleTime: Infinity,
+  //       gcTime: Infinity,
+  //     },
+  //   },
+  // });
 
   return (
     <>
