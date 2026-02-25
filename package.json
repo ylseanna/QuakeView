@@ -77,9 +77,9 @@
     "react-json-tree": "^0.20.0",
     "react-map-gl": "^7.1.9",
     "strftime": "^0.10.3",
+    "typescript": "^5.9.3",
     "use-animation-frame": "^0.2.1",
-    "zustand": "^5.0.10",
-    "typescript": "^5.9.3"
+    "zustand": "^5.0.10"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
@@ -90,6 +90,7 @@
     "cross-env": "7.0.3",
     "electron": "^37.10.3",
     "electron-builder": "^21.1.4",
+    "electron-icon-builder": "^2.0.1",
     "eslint": "^4.1.1",
     "eslint-config-next": "^0.2.4",
     "npm-run-all": "4.1.5",
