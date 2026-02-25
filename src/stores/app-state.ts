@@ -5,10 +5,19 @@ import { merge } from "lodash";
 
 // import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 
+export type ErrorObject = {
+  message: string;
+  stack: string | undefined;
+  name: string;
+  cause: unknown;
+};
+
 export type QueryMonitor = {
   dataSourceID: string;
   isLoading: boolean;
   isFetching: boolean;
+  isSucces: boolean;
+  error: null | ErrorObject;
 };
 
 export type AppState = {

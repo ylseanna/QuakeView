@@ -82,11 +82,20 @@ export function useCatalogData() {
         dataSourceID: string;
         result: UseQueryResult<DataQueryResponse, Error>;
       }) => {
-        const { isLoading, isFetching } = queryResult.result;
+        const { isLoading, isFetching, isSuccess, error } = queryResult.result;
         setQueryStatus({
           dataSourceID: queryResult.dataSourceID,
           isLoading: isLoading,
           isFetching: isFetching,
+          isSucces: isSuccess,
+          error: error
+            ? {
+                message: error.message,
+                stack: error.stack,
+                name: error.name,
+                cause: error.cause,
+              }
+            : null,
         });
       },
     );

@@ -45,7 +45,8 @@
     "3D": "Þrívídd",
     "Common": {
       "loading": "að hlaða niður",
-      "fetching": "að afturhlaða"
+      "fetching": "að afturhlaða",
+      "error": "villa"
     }
   },
   "Filtering": {

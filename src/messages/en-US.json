@@ -46,7 +46,9 @@
     "3D": "3D",
     "Common": {
       "loading": "loading",
-      "fetching": "fetching"
+      "fetching": "fetching",
+      "error": "error",
+      "succes": "succesfully loaded"
     }
   },
   "Filtering": {

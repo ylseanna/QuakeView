@@ -10,6 +10,7 @@ from pathlib import Path
 import pandas as pd
 from numpy import concatenate, float64, int64, isnan
 from shapely import multipoints
+from werkzeug.exceptions import HTTPException
 
 from flask import Flask, Response, request, send_file
 

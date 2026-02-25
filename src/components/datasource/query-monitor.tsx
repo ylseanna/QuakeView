@@ -17,8 +17,10 @@ import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
 } from "@/components/interface/bottom-bar";
-import { Check } from "mdi-material-ui";
+import { Alert, AlertCircleOutline, Check } from "mdi-material-ui";
 import { usePathname } from "@/i18n/routing";
+import { Cause } from "./load-data";
+import { useEffect, useState } from "react";
 
 export default function QueryMonitor() {
   const t = useTranslations("Common");
@@ -28,20 +30,30 @@ export default function QueryMonitor() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
   const appInterface = useAppStateStore((state) => state.appInterface);
-  const theme = useTheme()
+  const theme = useTheme();
+
+  const [isIn, setIsIn] = useState(false);
+
+  useEffect(() => {
+    const isActiveStatuses = appInterface.queryMonitors.allKeys
+      .map(
+        (queryMonitorKey) =>
+          appInterface.queryMonitors.byKey[queryMonitorKey].isLoading ||
+          appInterface.queryMonitors.byKey[queryMonitorKey].isFetching ||
+          appInterface.queryMonitors.byKey[queryMonitorKey].error,
+      )
+      .some((el) => el);
+    !isIn
+      ? setIsIn(isActiveStatuses)
+      : !isActiveStatuses &&
+        setTimeout(() => {
+          setIsIn(isActiveStatuses);
+        }, 1500);
+  }, [appInterface.queryMonitors]);
 
   if (dataSources.byID) {
     return (
-      <Slide
-        in={appInterface.queryMonitors.allKeys
-          .map(
-            (queryMonitorKey) =>
-              appInterface.queryMonitors.byKey[queryMonitorKey].isLoading ||
-              appInterface.queryMonitors.byKey[queryMonitorKey].isFetching,
-          )
-          .some((el) => el)}
-        direction="up"
-      >
+      <Slide in={isIn} direction="up">
         <Paper
           variant="outlined"
           sx={{
@@ -54,8 +66,6 @@ export default function QueryMonitor() {
               : 0,
             left: 0,
             m: 2,
-            p: 2,
-            pb: 1,
             width: "420px",
           }}
         >
@@ -64,37 +74,111 @@ export default function QueryMonitor() {
               dataSources.byID[queryMonitorKey] && (
                 <Stack
                   key={"QueryMonitor-" + queryMonitorKey}
-                  direction="row"
-                  alignItems="center"
-                  sx={{ mb: 1, w: "100%" }}
-                  justifyContent="space-between"
+                  direction="column"
+                  alignItems="stretch"
+                  sx={{ w: "100%" }}
                 >
-                  <Stack direction="row" alignItems="center">
-                    <Box sx={{display: "flex", alignItems: "center", width: 28, mr: 1 }}>
-                      {appInterface.queryMonitors.byKey[queryMonitorKey]
-                        .isLoading ||
-                      appInterface.queryMonitors.byKey[queryMonitorKey]
-                        .isFetching ? (
-                        <CircularProgress size={16}/>
-                      ) : (
-                        <Check sx={{ mr: 1, color: theme.palette.success.main}} />
-                      )}
-                    </Box>
-                    <Typography>
-                      {dataSources.byID[queryMonitorKey].filename}
-                    </Typography>{" "}
+                  <Stack
+                    direction="row"
+                    alignItems="center"
+                    sx={{
+                      m: 2,
+                      flexGrow: "1",
+                      flexShrink: 0,
+                      display: "inline-flex",
+                    }}
+                    justifyContent="space-between"
+                  >
+                    <Stack
+                      direction="row"
+                      alignItems="center"
+                      sx={{ minWidth: 0 }}
+                    >
+                      <Box
+                        sx={{
+                          display: "flex",
+                          alignItems: "center",
+                          width: 28,
+                          mr: 1,
+                        }}
+                      >
+                        {appInterface.queryMonitors.byKey[queryMonitorKey]
+                          .isLoading ||
+                        appInterface.queryMonitors.byKey[queryMonitorKey]
+                          .isFetching ? (
+                          <CircularProgress size={16} />
+                        ) : appInterface.queryMonitors.byKey[queryMonitorKey]
+                            .error ? (
+                          <AlertCircleOutline
+                            sx={{ mr: 1, color: theme.palette.error.main }}
+                          />
+                        ) : (
+                          <Check
+                            sx={{ mr: 1, color: theme.palette.success.main }}
+                          />
+                        )}
+                      </Box>
+                      <Typography
+                        sx={{
+                          color: appInterface.queryMonitors.byKey[
+                            queryMonitorKey
+                          ].error
+                            ? theme.palette.error.main
+                            : "inherit",
+                        }}
+                        noWrap
+                      >
+                        {dataSources.byID[queryMonitorKey].filename}
+                      </Typography>{" "}
+                    </Stack>
+                    <Stack direction="row" alignItems="center">
+                      <Typography sx={{ opacity: 0.6, ml: 1 }}>
+                        {appInterface.queryMonitors.byKey[queryMonitorKey]
+                          .isLoading
+                          ? t("Common.loading")
+                          : appInterface.queryMonitors.byKey[queryMonitorKey]
+                                .isFetching
+                            ? t("Common.fetching")
+                            : appInterface.queryMonitors.byKey[queryMonitorKey]
+                                  .error
+                              ? t("Common.error")
+                              :appInterface.queryMonitors.byKey[queryMonitorKey]
+                                  .isSucces
+                              ? t("Common.succes")
+                              : ""}
+                      </Typography>
+                    </Stack>
                   </Stack>
-                  <Stack direction="row" alignItems="center">
-                    <Typography sx={{ opacity: 0.6, ml: 1 }}>
-                      {appInterface.queryMonitors.byKey[queryMonitorKey]
-                        .isLoading
-                        ? t("Common.loading")
-                        : appInterface.queryMonitors.byKey[queryMonitorKey]
-                              .isFetching
-                          ? t("Common.fetching")
-                          : ""}
-                    </Typography>
-                  </Stack>
+                  {appInterface.queryMonitors.byKey[queryMonitorKey].error &&
+                    (appInterface.queryMonitors.byKey[queryMonitorKey].error
+                      .cause as Cause) && (
+                      <Box
+                        sx={{
+                          p: 1,
+                          display: "flex",
+                          flex: "grow",
+                          w: "420px",
+                          backgroundColor: theme.palette.grey.A200,
+                        }}
+                      >
+                        <Typography sx={{ opacity: 0.6, fontWeight: "bold" }}>
+                          {
+                            (
+                              appInterface.queryMonitors.byKey[queryMonitorKey]
+                                .error.cause as Cause
+                            ).code
+                          }
+                        </Typography>
+                        <Typography sx={{ opacity: 0.6, ml: 2 }}>
+                          {
+                            (
+                              appInterface.queryMonitors.byKey[queryMonitorKey]
+                                .error.cause as Cause
+                            ).prototype.message
+                          }
+                        </Typography>
+                      </Box>
+                    )}
                 </Stack>
               ),
           )}
