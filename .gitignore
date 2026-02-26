@@ -54,3 +54,6 @@ docs/site
 docs/content/releases/*
 
 
+
+# Sentry Config File
+.env.sentry-build-plugin
