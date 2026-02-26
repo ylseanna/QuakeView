@@ -28,7 +28,7 @@ export default function Error({
     >
       <Alert sx={{fontSize: 42, mb: 2}}/>
       <Typography variant="h4" sx={{opacity: .8}}>
-        Something was a little shakey there...
+        Something's a little shaky there...
       </Typography>
       {error.digest && (
         <Typography sx={{ fontFamily: "monospace" }}>{error.digest}</Typography>

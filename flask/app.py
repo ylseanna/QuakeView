@@ -8,6 +8,7 @@ from mmap import mmap
 from pathlib import Path
 
 import pandas as pd
+import sentry_sdk
 from numpy import concatenate, float64, int64, isnan
 from shapely import multipoints
 from werkzeug.exceptions import HTTPException
@@ -43,6 +44,23 @@ def count(filename: Path):
             lines += 1
         return lines
 
+sentry_sdk.init(
+    dsn="https://2fb7888fe5f00865617981b8d81158a8@o4510952822079488.ingest.de.sentry.io/4510952825618512",
+    # Add data like request headers and IP for users,
+    # see https://docs.sentry.io/platforms/python/data-management/data-collected/ for more info
+    send_default_pii=True,
+    # Enable sending logs to Sentry
+    enable_logs=True,
+    # Set traces_sample_rate to 1.0 to capture 100%
+    # of transactions for tracing.
+    traces_sample_rate=1.0,
+    # Set profile_session_sample_rate to 1.0 to profile 100%
+    # of profile sessions.
+    profile_session_sample_rate=1.0,
+    # Set profile_lifecycle to "trace" to automatically
+    # run the profiler on when there is an active transaction
+    profile_lifecycle="trace",
+)
 
 app = Flask(__name__)
 
