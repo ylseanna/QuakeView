@@ -36,6 +36,7 @@ mac:
     target: ["pkg"],
     publish: ["github"],
     artifactName: "quakeview_${version}_${env.OS}_${arch}.${ext}",
+    arch: ["arm64"],
   }
 extraResources: [{ from: "flask/dist", to: "flask" }]
 directories: { buildResources: "resources", output: "release" }
