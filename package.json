@@ -2,7 +2,7 @@
   "name": "quakeview",
   "description": "Interactive earthquake catalog visualiser",
   "author": "Ylse Anna de Vries (ylseanna) <yad2@hi.is>",
-  "version": "0.9.3",
+  "version": "0.9.4",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/ylseanna/QuakeView",
   "private": true,
@@ -23,7 +23,8 @@
     "dist:deb": "electron-builder --config --linux --publish always",
     "dist:msi": "electron-builder --config --win --publish always",
     "dist:mac": "electron-builder --config --mac --publish always",
-    "dev": "npm-run-all --parallel next:dev flask:dev electron:dev"
+    "dev": "npm-run-all --parallel next:dev flask:dev electron:dev",
+    "dev:compiled": "npm-run-all --parallel next:start flask:start electron:dev"
   },
   "dependencies": {
     "@babel/polyfill": "^7.12.1",

@@ -177,6 +177,11 @@ export default function QueryMonitor() {
                             ).prototype.message
                           }
                         </Typography>
+                        <Typography sx={{ opacity: 1, ml: 2, color: theme.palette.error.main }}>
+                          {
+                            t("Common.please_restart")
+                          }
+                        </Typography>
                       </Box>
                     )}
                 </Stack>

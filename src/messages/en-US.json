@@ -48,7 +48,8 @@
       "loading": "loading",
       "fetching": "fetching",
       "error": "error",
-      "succes": "succesfully loaded"
+      "succes": "succesfully loaded",
+      "please_restart": "please restart the app"
     }
   },
   "Filtering": {
