@@ -3,4 +3,4 @@ numpy~=1.26.4
 pandas~=2.3.0
 datetime~=5.2
 shapely~=2.1.0
-fastwsgi~=0.0.9
+fastwsgi @ https://github.com/jamesroberts/fastwsgi.git
