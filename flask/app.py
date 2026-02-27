@@ -482,6 +482,17 @@ def generate_event_dict(nlines=None):
 
     df = pd.read_csv(filepath, sep=seperator)
 
+    # SLICE
+
+    slice_text = request.args.get("slice")
+    
+    if slice_text != "unset":
+        app.logger.info(f"Slice provided, slicing...\n{slice_text}")
+
+        slice = json.loads(slice_text)
+
+        df = df[slice[0] : slice[1]]
+
     # PREPARE VAR MAPPING
     app.logger.info("getting varmaps...")
     vars = json.loads(request.args.get("vars"))
