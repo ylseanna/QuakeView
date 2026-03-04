@@ -1,8 +1,10 @@
+import { Extent } from "./types";
+
 export type BoundsDict = { [variable: string]: [number, number] | null };
 
-export const CombineBounds = (boundsDicts: BoundsDict[]) => {
+export const combineBounds = (boundsDicts: BoundsDict[]) => {
   return Object.fromEntries(
-    Object.keys(boundsDicts).map((variable) => {
+    Object.keys(boundsDicts[0]).map((variable) => {
       return [
         variable,
         [
@@ -16,6 +18,36 @@ export const CombineBounds = (boundsDicts: BoundsDict[]) => {
       ];
     }),
   ) as BoundsDict;
+};
+
+export const combineExtents = (Extents: Extent[]) => {
+  const combinedExtent = {} as Extent;
+
+  // combine centroid (mean of means)
+  combinedExtent.centroid = [
+    Extents.map((Extent) => Extent.centroid[0]).reduce(
+      (total, num) => total + num,
+      0,
+    ) / Extents.length,
+    Extents.map((Extent) => Extent.centroid[1]).reduce(
+      (total, num) => total + num,
+      0,
+    ) / Extents.length,
+    Extents.map((Extent) => Extent.centroid[2]).reduce(
+      (total, num) => total + num,
+      0,
+    ) / Extents.length,
+  ];
+
+  // combine bounds
+  combinedExtent.bounds = [
+    Math.min(...Extents.map((Extent) => Extent.bounds[0])),
+    Math.min(...Extents.map((Extent) => Extent.bounds[1])),
+    Math.max(...Extents.map((Extent) => Extent.bounds[2])),
+    Math.max(...Extents.map((Extent) => Extent.bounds[3])),
+  ];
+
+  return combinedExtent;
 };
 
 // const minY = Math.min(

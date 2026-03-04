@@ -293,7 +293,7 @@ export default function QueryMonitor() {
       : !isActiveStatuses &&
         setTimeout(() => {
           setIsIn(isActiveStatuses);
-        }, 1500);
+        }, 2500);
   }, [queryMonitors]);
 
   if (dataSources.byID) {

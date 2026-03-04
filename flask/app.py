@@ -633,23 +633,27 @@ def generate_event_dict(nlines=None):
 
     # GET EXTENT
     app.logger.info("pre-calculating extent...")
-    centroid_calculatable = (
+    coords_calculatable = (
         varmap["lon"] is not None
         and varmap["lat"] is not None
         and varmap["dep"] is not None
     )
 
-    if centroid_calculatable:
-        MultiPoint = multipoints(
-            [
-                (event[varmap["lon"]], event[varmap["lat"]], event[varmap["dep"]])
-                for _, event in df.iterrows()
-            ]
-        )
+    if coords_calculatable:
+        # calculate bounds (min x, min y, max x, max y)
+        bounds = [
+            df[varmap["lon"]].min(),
+            df[varmap["lat"]].min(),
+            df[varmap["lon"]].max(),
+            df[varmap["lat"]].max(),
+        ]
 
-        centroid = MultiPoint.centroid
-
-        centroid_processed = [centroid.x, centroid.y, df[varmap["dep"]].mean()]
+        # calculate centroid (average coords)
+        centroid = [
+            df[varmap["lon"]].mean(),
+            df[varmap["lat"]].mean(),
+            df[varmap["dep"]].mean(),
+        ]
 
     # CONVERT TO JSON
     app.logger.info("converting to json...")
@@ -677,9 +681,8 @@ def generate_event_dict(nlines=None):
         "bounds": bounds,
         "unfiltered_bounds": unfiltered_bounds,
         "extent": {
-            "centroid": centroid_processed if centroid_calculatable else None,
-            "bounds": MultiPoint.bounds if centroid_calculatable else None,
-            "polygon": MultiPoint.envelope.wkt if centroid_calculatable else None,
+            "centroid": centroid if coords_calculatable else None,
+            "bounds": bounds if coords_calculatable else None,
         },
     }
 

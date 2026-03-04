@@ -1,9 +1,10 @@
 import { useQueries, UseQueryResult } from "@tanstack/react-query";
-import { useEffect } from "react";
+import { useEffect, useMemo } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { QueryKeys } from "@/stores/app-state";
+import { combineBounds, combineExtents } from "./catalog-util";
 import { fetchData } from "./load-data";
 import { DataSourceFiltering, Earthquake, Extent } from "./types";
 
@@ -24,7 +25,38 @@ export type DataCache = {
 };
 export type DataCacheResult = {
   data: DataCache;
-  pending: boolean;
+};
+
+const combineQueryResponses = (
+  chunkedResponseA: DataQueryResponse,
+  chunkedResponseB: DataQueryResponse,
+) => {
+  const combinedResponse = {} as DataQueryResponse;
+
+  // combine data
+  combinedResponse.data = chunkedResponseA.data.concat(chunkedResponseB.data);
+
+  // inherited properties (should be the same for both chunks), thus inherit from A
+  combinedResponse.addedVars = chunkedResponseA.addedVars;
+  combinedResponse.filters = chunkedResponseA.filters;
+
+  // combine bounds
+  combinedResponse.bounds = combineBounds([
+    chunkedResponseA.bounds,
+    chunkedResponseB.bounds,
+  ]);
+  combinedResponse.unfiltered_bounds = combineBounds([
+    chunkedResponseA.unfiltered_bounds,
+    chunkedResponseB.unfiltered_bounds,
+  ]);
+
+  // combine extents
+  combinedResponse.extent = combineExtents([
+    chunkedResponseA.extent,
+    chunkedResponseB.extent,
+  ]);
+
+  return combinedResponse;
 };
 
 const aggregateData = (
@@ -40,6 +72,17 @@ const aggregateData = (
 
         aggregatedData.byID[queryKeys[resultIndex][1]] = result.data;
         aggregatedData.allIDs.push(queryKeys[resultIndex][1]);
+      } else if (queryKeys[resultIndex][3] > 1) {
+        if (!aggregatedData.allIDs.includes(queryKeys[resultIndex][1])) {
+          aggregatedData.byID[queryKeys[resultIndex][1]] = result.data;
+          aggregatedData.allIDs.push(queryKeys[resultIndex][1]);
+        } else {
+          aggregatedData.byID[queryKeys[resultIndex][1]] =
+            combineQueryResponses(
+              aggregatedData.byID[queryKeys[resultIndex][1]],
+              result.data,
+            );
+        }
       }
     }
   });
@@ -133,9 +176,7 @@ export function useCatalogData() {
     }),
     combine: (results: UseQueryResult<DataQueryResponse, Error>[]) => {
       return {
-        data: aggregateData(results, queryKeys),
         results: results,
-
         pending: results.some((result) => result.isPending),
       };
     },
@@ -144,7 +185,7 @@ export function useCatalogData() {
   const queries = useQueries(queryOptions);
 
   useEffect(() => {
-    console.log(queries)
+    console.log(queries);
 
     queries.results.forEach(
       (result: UseQueryResult<DataQueryResponse, Error>, index) => {
@@ -170,5 +211,10 @@ export function useCatalogData() {
     checkQueryStatusPresent(queryKeys.map((key) => key[1]));
   }, [queries]);
 
-  return { data: queries.data, pending: queries.pending } as DataCacheResult;
+  const data = useMemo(
+    () => aggregateData(queries.results, queryKeys),
+    [queries],
+  );
+
+  return { data: data } as DataCacheResult;
 }
