@@ -49,7 +49,12 @@
       "fetching": "fetching",
       "error": "error",
       "succes": "succesfully loaded",
-      "please_restart": "please restart the app"
+      "please_restart": "please restart the app",
+      "some_chunk_error": "some loading errored",
+      "all_chunks_succes": "fully loaded",
+      "chunk_x": "chunk {chunk}",
+      "loaded": "loaded",
+      "chunk_size_range": "events {start} to {end}"
     }
   },
   "Filtering": {

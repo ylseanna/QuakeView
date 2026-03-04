@@ -62,6 +62,7 @@
     "electron-router-dom": "^2.1.0",
     "electron-vite": "^5.0.0",
     "get-port-please": "^3.2.0",
+    "humanize-plus": "^1.8.2",
     "immer": "^10.2.0",
     "lodash": "^4.17.21",
     "mapbox-gl": "^3.18.0",
@@ -84,6 +85,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3.3.3",
+    "@types/humanize-plus": "^1.8.2",
     "@types/lodash": "^4.17.23",
     "@types/node": "^20.19.29",
     "@types/react": "^19.2.8",

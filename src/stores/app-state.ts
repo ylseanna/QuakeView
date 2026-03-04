@@ -3,6 +3,8 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
+import { DataSourceDataDescription, DataSourceFiltering } from "@/components/datasource/types";
+
 // import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 
 export type ErrorObject = {
@@ -14,11 +16,28 @@ export type ErrorObject = {
 
 export type QueryMonitor = {
   dataSourceID: string;
+  index: number;
   isLoading: boolean;
   isFetching: boolean;
   isSucces: boolean;
   error: null | ErrorObject;
 };
+
+export type QueryKeys = [
+  string,
+  string,
+  number,
+  number,
+  [number, number],
+  {
+    filepath: string;
+    filtering: DataSourceFiltering;
+    variables: {
+      [variable: string]: DataSourceDataDescription;
+    };
+    added_vars: string[];
+  },
+][];
 
 export type AppState = {
   appInterface: {
@@ -29,8 +48,9 @@ export type AppState = {
     sidebarOpen: "formatting" | "filtering" | "layers" | null;
     legendVisible: boolean;
     popperOpen: boolean;
+    queryKeys: QueryKeys;
     queryMonitors: {
-      byKey: { [key: string]: QueryMonitor };
+      byKey: { [key: string]: { [index: string]: QueryMonitor } };
       allKeys: string[];
     };
   };
@@ -48,6 +68,7 @@ export type AppActions = {
     toggleLegendVisible: () => void;
     signalPopperOpen: () => void;
     signalPopperClosed: () => void;
+    setQueryKeys: (keys: QueryKeys) => void;
     setQueryStatus: (queryMonitor: QueryMonitor) => void;
     checkQueryStatusPresent: (dataSourceIDs: string[]) => void;
   };
@@ -64,6 +85,7 @@ export const defaultInitState: AppState = {
     sidebarOpen: null,
     legendVisible: true,
     popperOpen: false,
+    queryKeys: [],
     queryMonitors: { byKey: {}, allKeys: [] },
   },
 };
@@ -111,7 +133,11 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
             set((state) => {
               state.appInterface.popperOpen = false;
             }),
-          setQueryStatus: (queryMonitor: QueryMonitor) =>
+          setQueryKeys: (keys) =>
+            set((state) => {
+              state.appInterface.queryKeys = keys;
+            }),
+          setQueryStatus: (queryMonitor) =>
             set((state) => {
               if (
                 !state.appInterface.queryMonitors.allKeys.includes(
@@ -120,14 +146,17 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
               ) {
                 state.appInterface.queryMonitors.byKey[
                   queryMonitor.dataSourceID
-                ] = queryMonitor;
+                ] = {};
+                state.appInterface.queryMonitors.byKey[
+                  queryMonitor.dataSourceID
+                ][String(queryMonitor.index)] = queryMonitor;
                 state.appInterface.queryMonitors.allKeys.push(
                   queryMonitor.dataSourceID,
                 );
               } else {
                 state.appInterface.queryMonitors.byKey[
                   queryMonitor.dataSourceID
-                ] = queryMonitor;
+                ][String(queryMonitor.index)] = queryMonitor;
               }
             }),
           checkQueryStatusPresent: (dataSourceIDs) =>

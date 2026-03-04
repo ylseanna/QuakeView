@@ -485,7 +485,7 @@ def generate_event_dict(nlines=None):
     # SLICE
 
     slice_text = request.args.get("slice")
-    
+
     if slice_text != "unset":
         app.logger.info(f"Slice provided, slicing...\n{slice_text}")
 

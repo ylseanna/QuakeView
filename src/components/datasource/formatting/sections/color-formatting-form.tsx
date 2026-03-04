@@ -92,7 +92,7 @@ export default function ColorFormattingForm({
   });
 
   return (
-    data.allIDs.length > 0 && (
+    data.allIDs && (
       <Grid container spacing={1} direction="column" sx={{ mt: 1 }}>
         <Typography variant="formheader">{t("colour")}</Typography>
         <Grid container alignItems="center">

@@ -16,7 +16,9 @@ export const fetchData = async (
   let slice_encoded = "&slice=unset";
 
   if (slice) {
-    slice_encoded = "&slice=" + encodeURIComponent(JSON.stringify(slice));
+    if (!(slice[0] == 0 && slice[1] == -1)) {
+      slice_encoded = "&slice=" + encodeURIComponent(JSON.stringify(slice));
+    }
   }
 
   // get URL

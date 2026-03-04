@@ -33,7 +33,7 @@ import {
   dateTimeAsNumbersRequiredVars,
   dateTimeStringRequiredVars,
 } from "../constants";
-import{ useCatalogData } from "../use-data";
+import { useCatalogData } from "../use-data";
 
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
@@ -73,8 +73,6 @@ function VariableEditingRow({
     mappedVarCheck = requiredVars
       .map((requiredVar) => {
         const description = dataSource.metadata.variables.by_id[requiredVar];
-
-        console.log(requiredVar);
 
         return !(
           dataSource.metadata.index == "from_file" ? [] : ["id"]
@@ -255,40 +253,44 @@ export default function DataSourceVariableForm({
   const { dataSources } = useProjectStore((state) => state);
 
   useEffect(() => {
-    if (data) {
+    if (data.allIDs) {
       data.allIDs.forEach((dataSourceID) => {
-        ["twoD", "threeD", "plot"].forEach((type) => {
-          const formattingType = type as "twoD" | "threeD" | "plot";
+        if (data.byID[dataSourceID].bounds) {
+          ["twoD", "threeD", "plot"].forEach((type) => {
+            const formattingType = type as "twoD" | "threeD" | "plot";
 
-          const boundsFromData = {} as {
-            [variable: string]: [number, number] | null;
-          };
+            const boundsFromData = {} as {
+              [variable: string]: [number, number] | null;
+            };
 
-          dataSource.metadata.variables.required_vars
-            .concat(dataSource.metadata.variables.datetime_vars)
-            .concat(dataSource.metadata.variables.added_vars)
-            .concat(["t"])
-            .forEach((variable) => {
-              return (boundsFromData[variable] = dataSource.formatting[
-                formattingType
-              ].color.linear.domain[
-                dataSource.formatting[formattingType].color.linear.variable
-              ]
-                ? dataSource.formatting[formattingType].color.linear.domain[
-                    dataSource.formatting[formattingType].color.linear.variable
-                  ]
-                : data.byID[dataSourceID].bounds[variable]);
+            dataSource.metadata.variables.required_vars
+              .concat(dataSource.metadata.variables.datetime_vars)
+              .concat(dataSource.metadata.variables.added_vars)
+              .concat(["t"])
+              .forEach((variable) => {
+                return (boundsFromData[variable] = dataSource.formatting[
+                  formattingType
+                ].color.linear.domain[
+                  dataSource.formatting[formattingType].color.linear.variable
+                ]
+                  ? dataSource.formatting[formattingType].color.linear.domain[
+                      dataSource.formatting[formattingType].color.linear
+                        .variable
+                    ]
+                  : data.byID[dataSourceID].bounds[variable]);
+              });
+
+            setColorFormatting(dataSourceID, formattingType, {
+              ...dataSources.byID[dataSourceID].formatting[formattingType]
+                .color,
+              linear: {
+                ...dataSources.byID[dataSourceID].formatting[formattingType]
+                  .color.linear,
+                domain: boundsFromData,
+              },
             });
-
-          setColorFormatting(dataSourceID, formattingType, {
-            ...dataSources.byID[dataSourceID].formatting[formattingType].color,
-            linear: {
-              ...dataSources.byID[dataSourceID].formatting[formattingType].color
-                .linear,
-              domain: boundsFromData,
-            },
           });
-        });
+        }
       });
     }
   }, [data.allIDs]);

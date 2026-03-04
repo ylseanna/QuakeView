@@ -60,8 +60,16 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
       queryMonitors.allKeys
         .map(
           (queryMonitorKey) =>
-            queryMonitors.byKey[queryMonitorKey].isLoading ||
-            queryMonitors.byKey[queryMonitorKey].isFetching,
+            queryMonitors.byKey[queryMonitorKey] &&
+            Object.keys(queryMonitors.byKey[queryMonitorKey])
+              .map(
+                (queryKeyIndex) =>
+                  queryMonitors.byKey[queryMonitorKey][queryKeyIndex]
+                    .isLoading ||
+                  queryMonitors.byKey[queryMonitorKey][queryKeyIndex]
+                    .isFetching,
+              )
+              .some((el) => el),
         )
         .some((el) => el),
     [queryMonitors],

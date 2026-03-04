@@ -43,6 +43,24 @@ html {
   app-region: no-drag;
 }
 
+/* Animation */
+
+.shimmer {
+  background: linear-gradient(135deg, #ffffff, #5E5E5E, #ffffff);
+  background-clip: text;
+  color: transparent;
+  background-size: 200% 100%;
+  animation: shimmer 5s linear infinite;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: 200% 0;
+  }
+  100% {
+    background-position: -200% 0;
+  }
+}
 
 /* #deckgl-wrapper {
   background-color: #FFF;
