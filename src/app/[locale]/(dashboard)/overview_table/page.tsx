@@ -34,7 +34,7 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { isIS, enUS } from "@mui/x-data-grid/locales";
 import { useLocale, useTranslations } from "next-intl";
-import{ useCatalogData } from "@/components/datasource/use-data";
+import { useCatalogData } from "@/components/datasource/use-data";
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
@@ -118,24 +118,31 @@ function CustomToolbar() {
             ))}
           </Select>
         </Stack>
-      ) : (dataSources.byID[sessionInterface.table.dataSourceID!]) && (
-        <Stack direction="row" sx={{ flex: 1, mx: 0.5, minWidth: 0 }}>
-          <Typography fontWeight="medium" sx={{ mx: 0.5 }} noWrap>
-            {dataSources.byID[sessionInterface.table.dataSourceID!].name}
-          </Typography>
-
-          {dataSources.byID[sessionInterface.table.dataSourceID!].name !=
-            dataSources.byID[sessionInterface.table.dataSourceID!].filename && (
-            <Typography
-              fontWeight="medium"
-              sx={{ mx: 0.5, opacity: 0.6 }}
-              noWrap
-            >
-              ({dataSources.byID[sessionInterface.table.dataSourceID!].filename}
-              )
+      ) : (
+        dataSources.byID[sessionInterface.table.dataSourceID!] && (
+          <Stack direction="row" sx={{ flex: 1, mx: 0.5, minWidth: 0 }}>
+            <Typography fontWeight="medium" sx={{ mx: 0.5 }} noWrap>
+              {dataSources.byID[sessionInterface.table.dataSourceID!].name}
             </Typography>
-          )}
-        </Stack>
+
+            {dataSources.byID[sessionInterface.table.dataSourceID!].name !=
+              dataSources.byID[sessionInterface.table.dataSourceID!]
+                .filename && (
+              <Typography
+                fontWeight="medium"
+                sx={{ mx: 0.5, opacity: 0.6 }}
+                noWrap
+              >
+                (
+                {
+                  dataSources.byID[sessionInterface.table.dataSourceID!]
+                    .filename
+                }
+                )
+              </Typography>
+            )}
+          </Stack>
+        )
       )}
 
       <Tooltip title="Columns">
@@ -364,22 +371,21 @@ export default function Page() {
 
   return (
     <Box sx={{ ...ScrollBarStyling, pb: 2 }}>
-        {sessionInterface.table.dataSourceID ? (
-          <DataGrid
-            localeText={locale_text}
-            rows={
-              data.allIDs.includes(sessionInterface.table.dataSourceID)
-                ? data.byID[sessionInterface.table.dataSourceID].data
-                : undefined
-            }
-            columns={columns}
-            initialState={{ pagination: { paginationModel } }}
-            pageSizeOptions={[10, 20, 50, 100]}
-            sx={{ borderTop: 0 }}
-            slots={{ toolbar: CustomToolbar }}
-            showToolbar
-          />
-        ) : <LinearProgress/> }
+      <DataGrid
+        localeText={locale_text}
+        rows={
+          sessionInterface.table.dataSourceID &&
+          data.allIDs.includes(sessionInterface.table.dataSourceID)
+            ? data.byID[sessionInterface.table.dataSourceID].data
+            : undefined
+        }
+        columns={columns}
+        initialState={{ pagination: { paginationModel } }}
+        pageSizeOptions={[10, 20, 50, 100]}
+        sx={{ borderTop: 0 }}
+        slots={{ toolbar: CustomToolbar }}
+        showToolbar
+      />
     </Box>
   );
 }

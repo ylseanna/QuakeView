@@ -30,30 +30,24 @@ import Legend from "@/components/map/legend/legend";
 import { queryClient } from "@/providers/query-client";
 import QueryMonitor from "@/components/datasource/query-monitor";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import { useProjectStore } from "@/providers/project-store-provider";
 
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
-  const [debugVisible, setDebugVisible] = useState(false);
-
   const pathname = usePathname();
 
+  const { queryMonitors, debugVisible } = useAppStateStore(
+    (state) => state.appInterface,
+  );
+
+  const { toggleDebugVisible } = useAppStateStore(
+    (state) => state.appInterfaceActions,
+  );
+
   useKeyStroke(["F3"], () => {
-    setDebugVisible(!debugVisible);
+    toggleDebugVisible();
   });
 
-  // const queryClient = new QueryClient({
-  //   defaultOptions: {
-  //     queries: {
-  //       // With SSR, we usually want to set some default staleTime
-  //       // above 0 to avoid refetching immediately on the client
-  //       staleTime: Infinity,
-  //       gcTime: Infinity,
-  //     },
-  //   },
-  // });
-
-  const queryMonitors = useAppStateStore(
-    (state) => state.appInterface.queryMonitors,
-  );
+  const dataSourceIDs = useProjectStore((state) => state.dataSources.allIDs);
 
   const isLoading = useMemo(
     () =>
@@ -72,7 +66,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
               .some((el) => el),
         )
         .some((el) => el),
-    [queryMonitors],
+    [queryMonitors, dataSourceIDs],
   );
 
   return (

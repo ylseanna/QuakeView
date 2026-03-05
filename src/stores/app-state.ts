@@ -47,6 +47,7 @@ export type AppState = {
     timelineBarVisible: boolean;
     sidebarOpen: "formatting" | "filtering" | "layers" | null;
     legendVisible: boolean;
+    debugVisible: boolean;
     popperOpen: boolean;
     queryKeys: QueryKeys;
     queryMonitors: {
@@ -66,6 +67,7 @@ export type AppActions = {
       value: "formatting" | "filtering" | "layers" | null,
     ) => void;
     toggleLegendVisible: () => void;
+    toggleDebugVisible: () => void;
     signalPopperOpen: () => void;
     signalPopperClosed: () => void;
     setQueryKeys: (keys: QueryKeys) => void;
@@ -84,6 +86,7 @@ export const defaultInitState: AppState = {
     timelineBarVisible: false,
     sidebarOpen: null,
     legendVisible: true,
+    debugVisible: false,
     popperOpen: false,
     queryKeys: [],
     queryMonitors: { byKey: {}, allKeys: [] },
@@ -120,6 +123,11 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
             set((state) => {
               state.appInterface.legendVisible =
                 !state.appInterface.legendVisible;
+            }),
+          toggleDebugVisible: () =>
+            set((state) => {
+              state.appInterface.debugVisible =
+                !state.appInterface.debugVisible;
             }),
           setSidebarOpen: (value) =>
             set((state) => {
