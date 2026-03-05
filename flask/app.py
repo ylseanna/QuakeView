@@ -641,7 +641,7 @@ def generate_event_dict(nlines=None):
 
     if coords_calculatable:
         # calculate bounds (min x, min y, max x, max y)
-        bounds = [
+        extent = [
             df[varmap["lon"]].min(),
             df[varmap["lat"]].min(),
             df[varmap["lon"]].max(),
@@ -682,7 +682,7 @@ def generate_event_dict(nlines=None):
         "unfiltered_bounds": unfiltered_bounds,
         "extent": {
             "centroid": centroid if coords_calculatable else None,
-            "bounds": bounds if coords_calculatable else None,
+            "bounds": extent if coords_calculatable else None,
         },
     }
 

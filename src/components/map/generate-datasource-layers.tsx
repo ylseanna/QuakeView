@@ -267,9 +267,6 @@ export function StemPlotLayers(
     antialiasing: dataSource.formatting.plot.antialiasing,
     pickable: sessionInterface.pickable,
     fp64: true,
-    transitions: {
-      getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-    },
   } as Partial<Required<ScatterplotLayerProps<Earthquake>> & Required<LayerProps>> );
 
   if (include_stem) {
@@ -289,9 +286,7 @@ export function StemPlotLayers(
         colorFormat: "RGB",
         opacity: 0.1,
         pickable: false,
-        // transitions: {
-        //   getPosition: { type: "spring", stiffness: 0.01, damping: 0.2 },
-        // },
+
       }),
       scatterplotLayer,
     ];

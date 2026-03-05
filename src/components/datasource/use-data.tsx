@@ -1,4 +1,5 @@
 import { useQueries, UseQueryResult } from "@tanstack/react-query";
+import { chunk } from "lodash";
 import { useEffect, useMemo } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -28,32 +29,32 @@ export type DataCacheResult = {
 };
 
 const combineQueryResponses = (
-  chunkedResponseA: DataQueryResponse,
-  chunkedResponseB: DataQueryResponse,
+  chunkedDataA: DataQueryResponse,
+  chunkedDataB: DataQueryResponse,
 ) => {
   const combinedResponse = {} as DataQueryResponse;
 
   // combine data
-  combinedResponse.data = chunkedResponseA.data.concat(chunkedResponseB.data);
+  combinedResponse.data = chunkedDataA.data.concat(chunkedDataB.data);
 
   // inherited properties (should be the same for both chunks), thus inherit from A
-  combinedResponse.addedVars = chunkedResponseA.addedVars;
-  combinedResponse.filters = chunkedResponseA.filters;
+  combinedResponse.addedVars = chunkedDataA.addedVars;
+  combinedResponse.filters = chunkedDataA.filters;
 
   // combine bounds
   combinedResponse.bounds = combineBounds([
-    chunkedResponseA.bounds,
-    chunkedResponseB.bounds,
+    chunkedDataA.bounds,
+    chunkedDataB.bounds,
   ]);
   combinedResponse.unfiltered_bounds = combineBounds([
-    chunkedResponseA.unfiltered_bounds,
-    chunkedResponseB.unfiltered_bounds,
+    chunkedDataA.unfiltered_bounds,
+    chunkedDataB.unfiltered_bounds,
   ]);
 
   // combine extents
   combinedResponse.extent = combineExtents([
-    chunkedResponseA.extent,
-    chunkedResponseB.extent,
+    chunkedDataA.extent,
+    chunkedDataB.extent,
   ]);
 
   return combinedResponse;
@@ -177,7 +178,6 @@ export function useCatalogData() {
     combine: (results: UseQueryResult<DataQueryResponse, Error>[]) => {
       return {
         results: results,
-        pending: results.some((result) => result.isPending),
       };
     },
   };
@@ -185,8 +185,6 @@ export function useCatalogData() {
   const queries = useQueries(queryOptions);
 
   useEffect(() => {
-    console.log(queries);
-
     queries.results.forEach(
       (result: UseQueryResult<DataQueryResponse, Error>, index) => {
         const { isLoading, isFetching, isSuccess, error } = result;

@@ -501,7 +501,7 @@ export default function TimelineSlider() {
   }, [viewStateMonitor.coordPosition, viewStateMonitor.pixelPosition]);
 
   const layers = useMemo(() => {
-    if (data) {
+    if (data.allIDs) {
       if (scaleX.current && scaleY.current) {
         const minX = Math.min(
           ...data.allIDs.map((id) => data.byID[id]!.bounds["t"]![0]),

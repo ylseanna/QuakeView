@@ -63,18 +63,6 @@ function MultiChunkQueryElement({
     .map((queryKeyIndex) => singleDataSourceQueryMonitor[queryKeyIndex].error)
     .some((el) => el);
 
-  const allChunksSucces = Object.keys(singleDataSourceQueryMonitor)
-    .map(
-      (queryKeyIndex) => singleDataSourceQueryMonitor[queryKeyIndex].isSucces,
-    )
-    .every((el) => el);
-
-  useEffect(() => {
-    if (allChunksSucces) {
-      setListOpen(false);
-    }
-  }, [allChunksSucces]);
-
   const numChunksSucces = Object.keys(singleDataSourceQueryMonitor)
     .map(
       (queryKeyIndex) => singleDataSourceQueryMonitor[queryKeyIndex].isSucces,
