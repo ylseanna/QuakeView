@@ -87,7 +87,6 @@ export type DataSourceColorFormatting = {
 export type Extent = {
   centroid: [number, number, number];
   bounds: [number, number, number, number];
-  polygon: string;
 };
 
 // export const DATASOURCE_JSON_CODEC: Codec<DataSource[]> = {

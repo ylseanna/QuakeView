@@ -4,7 +4,7 @@ import { Box, IconButton, Paper, Typography, useTheme } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { JSONTree } from "react-json-tree";
 import { ScrollBarStyling } from "../layout/scrollbar-styling";
-import{ useCatalogData } from "../datasource/use-data";
+import { useCatalogData } from "../datasource/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "mdi-material-ui";
@@ -90,17 +90,17 @@ export default function DebugWindow() {
         }}
       >
         <Typography variant="inherit">-- Debug window --</Typography>
-        <JSONTree data={appInterface} theme={JSONTheme} hideRoot />
 
         <Typography variant="inherit" sx={{ mt: 2 }}>
           - Global App State -
         </Typography>
+        <JSONTree data={appInterface} theme={JSONTheme} hideRoot />
 
         <Typography variant="inherit" sx={{ mt: 2 }}>
           - Project State -
         </Typography>
 
-        <Typography variant="inherit">DataSources:</Typography>
+        <Typography variant="inherit" sx={{ mt: 2 }}>DataSources:</Typography>
         <JSONTree data={dataSources} theme={JSONTheme} hideRoot />
 
         <Typography variant="inherit" sx={{ mt: 2 }}>
