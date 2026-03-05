@@ -255,7 +255,7 @@ export default function DataSourceVariableForm({
   useEffect(() => {
     if (data.allIDs) {
       data.allIDs.forEach((dataSourceID) => {
-        if (data.byID[dataSourceID].bounds) {
+        if (data.byID[dataSourceID].bounds && dataSources.byID[dataSourceID]) {
           ["twoD", "threeD", "plot"].forEach((type) => {
             const formattingType = type as "twoD" | "threeD" | "plot";
 
