@@ -1,7 +1,7 @@
 import { Drawer, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -10,12 +10,8 @@ import { useAppStateStore } from "@/providers/app-state-provider";
 import DataSourceFormattingElement from "./formatting-element";
 import { useCatalogData } from "../use-data";
 
-interface FormattingProps {
-  drawerOpen: boolean;
-  single?: boolean;
-}
 
-export default function FormattingSidebar({ drawerOpen }: FormattingProps) {
+export default function FormattingSidebar() {
   const t = useTranslations("Formatting");
   const theme = useTheme();
 
@@ -33,13 +29,24 @@ export default function FormattingSidebar({ drawerOpen }: FormattingProps) {
 
   const appInterface = useAppStateStore((state) => state.appInterface);
 
+  const [drawerOpenDuration, setDrawerOpenDuration] = useState(225);
+
+  useEffect(() => {
+    if (appInterface.sidebarOpen) {
+      setTimeout(() => setDrawerOpenDuration(0), 225);
+    } else {
+      setDrawerOpenDuration(225);
+    }
+  }, [appInterface.sidebarOpen]);
+
   return (
     <>
       <Drawer
         ref={ref}
         anchor="right"
         variant="persistent"
-        open={drawerOpen}
+        open={appInterface.sidebarOpen == "formatting"}
+        transitionDuration={drawerOpenDuration}
         sx={{
           width: DRAWER_WIDTH,
 

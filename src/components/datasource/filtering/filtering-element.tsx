@@ -26,10 +26,10 @@ export default function FilteringElement({
           expandIcon={<ExpandMore />}
           aria-controls="panel1a-content"
           id="panel2a-header"
-          sx={{ flexGrow: 1 }}
+          slotProps={{ content: { sx: { width: "calc(100% - 24px)" } } }}
         >
           <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-          <Typography>{dataSource.filename}</Typography>
+          <Typography noWrap>{dataSource.name}</Typography>
         </SubAccordionSummary>
       </Box>
       <SubAccordionDetails>

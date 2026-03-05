@@ -80,7 +80,7 @@ export default function DataTab({ id }: DataTabProps) {
                 : { color: theme.palette.warning.main }
             }
           >
-            {dataSource.filename}
+            {dataSource.name}
           </Typography>
         </AccordionSummary>
         <Tooltip title={t("Sources.remove_data_source")}>

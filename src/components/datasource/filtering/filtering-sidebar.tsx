@@ -2,18 +2,14 @@ import { Steam } from "mdi-material-ui";
 import { Drawer, Typography, useTheme } from "@mui/material";
 import { Box } from "@mui/material";
 import { useTranslations } from "next-intl";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { BOTTOMBAR_HEIGHT, DRAWER_HEIGHT } from "@/components/interface/bottom-bar";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import FilteringElement from "./filtering-element";
 
-interface FormattingProps {
-  drawerOpen: boolean;
-}
-
-export default function FilteringSidebar({ drawerOpen }: FormattingProps) {
+export default function FilteringSidebar() {
   const theme = useTheme();
   const t = useTranslations("Filtering");
 
@@ -30,13 +26,24 @@ export default function FilteringSidebar({ drawerOpen }: FormattingProps) {
 
   const appInterface = useAppStateStore((state) => state.appInterface);
 
+  const [drawerOpenDuration, setDrawerOpenDuration] = useState(225);
+
+  useEffect(() => {
+    if (appInterface.sidebarOpen) {
+      setTimeout(() => setDrawerOpenDuration(0), 225);
+    } else {
+      setDrawerOpenDuration(225);
+    }
+  }, [appInterface.sidebarOpen]);
+
   return (
     <>
       <Drawer
         ref={ref}
         anchor="right"
         variant="persistent"
-        open={drawerOpen}
+        open={appInterface.sidebarOpen == "filtering"}
+        transitionDuration={drawerOpenDuration}
         sx={{
           width: DRAWER_WIDTH,
 

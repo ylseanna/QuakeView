@@ -38,14 +38,16 @@ export default function Page() {
 
   const { overViewState, setOverViewState } = useProjectStore(
     useShallow((state) => ({
-      overViewState: state.sessionInterface.overViewState,
-      setOverViewState: state.interfaceActions.setOverViewState,
+      overViewState: state.sessionInterface.map.mapViewState,
+      setOverViewState: state.interfaceActions.map.setMapViewState,
     })),
   );
 
-  const [mapTheme, setMapTheme] = useState<"US" | "Iceland" | "WorldCountries">(
-    "Iceland",
-  );
+  const { mapStyle } = useProjectStore((state) => state.sessionInterface.map);
+
+  // const [mapTheme, setMapTheme] = useState<"US" | "Iceland" | "WorldCountries">(
+  //   "Iceland",
+  // );
 
   const onMapLoad = () => {
     setIsLoading(false);
@@ -66,12 +68,12 @@ export default function Page() {
         <Map
           onLoad={onMapLoad}
           reuseMaps
-          {...(overViewState as object)}
+          {...overViewState}
           onMove={(evt) => setViewStateandLocalStorage(evt.viewState)}
           mapStyle={
-            mapTheme == "Iceland"
+            mapStyle == "Iceland"
               ? IcelandDEMStyle
-              : mapTheme == "US"
+              : mapStyle == "US"
                 ? USDEMStyle
                 : WorldCoastLines
           }
@@ -115,45 +117,7 @@ export default function Page() {
           />
           {/* <FullscreenControl position="top-left" /> */}
           {appInterface.mapToolsVisible && (
-            <>
-              <NavigationControl position="top-left" />
-              <Paper
-                variant="outlined"
-                sx={{
-                  position: "fixed",
-                  top: "calc(8px + 32px + 80px)",
-                  left: "48px",
-                  width: "200px",
-                  p: 2,
-                  backGroundColor: theme.palette.background.paper,
-                  zIndex: theme.zIndex.appBar,
-                }}
-              >
-                <Typography variant="h6" sx={{ mb: 1 }}>
-                  {t("Map.styling")}
-                </Typography>
-                <Select
-                  value={mapTheme}
-                  fullWidth
-                  onChange={(event) => {
-                    setMapTheme(
-                      event.target!.value as
-                        | "Iceland"
-                        | "US"
-                        | "WorldCountries",
-                    );
-                  }}
-                >
-                  <MenuItem value={"Iceland"}>
-                    DEM Iceland (Náttúrufræðistofnun)
-                  </MenuItem>
-                  <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
-                  <MenuItem value={"WorldCountries"}>
-                    World country outlines
-                  </MenuItem>
-                </Select>
-              </Paper>
-            </>
+            <NavigationControl position="top-left" />
           )}
 
           <DeckGLlayers />

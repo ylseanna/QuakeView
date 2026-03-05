@@ -21,8 +21,8 @@ export default function DataSourceFormattingElement({
   const [allDomainsPresent, setAllDomainsPresent] = useState(false);
 
   useEffect(() => {
-    const all_domains_present = ["twoD", "threeD", "plot"].map(
-      (formattingType) =>
+    const all_domains_present = ["twoD", "threeD", "plot"]
+      .map((formattingType) =>
         dataSource.metadata.variables.required_vars
           .concat(dataSource.metadata.variables.datetime_vars)
           .concat(dataSource.metadata.variables.added_vars)
@@ -48,7 +48,8 @@ export default function DataSourceFormattingElement({
                 ].color.linear.domain[variable] != null;
           })
           .every((el) => el),
-    ).every((el) => el);
+      )
+      .every((el) => el);
 
     setAllDomainsPresent(all_domains_present);
   }, [dataSource.formatting, dataSource.metadata.variables]);
@@ -57,19 +58,21 @@ export default function DataSourceFormattingElement({
     <SubAccordion
       disabled={!dataSource.interface.loadable && allDomainsPresent}
     >
-      <Box sx={{ display: "flex" }}>
+      <Box sx={{ display: "flex", maxWidth: "100%" }}>
         <SubAccordionSummary
           expandIcon={<ExpandMore />}
           aria-controls="panel1a-content"
           id="panel2a-header"
-          sx={{ flexGrow: 1 }}
+          sx={{
+            flexGrow: 1,
+            flexShrink: 1,
+            justifyContent: "space-between",
+            minWidth: 0,
+          }}
+          slotProps={{ content: { sx: { width: "calc(100% - 24px)" } } }}
         >
-          <Stack direction="row" sx={{ minWidth: 0 }}>
             <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-            <Typography noWrap>
-              {dataSource.name}
-            </Typography>
-          </Stack>
+            <Typography noWrap>{dataSource.name}</Typography>
         </SubAccordionSummary>
       </Box>
       <SubAccordionDetails>

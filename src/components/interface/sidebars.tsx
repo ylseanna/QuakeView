@@ -8,7 +8,6 @@ import {
   IconButton,
   Paper,
   Tooltip,
-  Typography,
   useTheme,
 } from "@mui/material";
 import { useTranslations } from "next-intl";
@@ -16,15 +15,14 @@ import {
   ColorLens,
   FilterAlt,
   Layers,
-  Visibility,
-  VisibilityOff,
 } from "@mui/icons-material";
-import { ChangeEvent, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import FormattingSidebar from "../datasource/formatting/formatting-sidebar";
 import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "../datasource/filtering/filtering-sidebar";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import LayersSidebar from "../datasource/layers/layers-sidebar";
 
 export const DRAWER_WIDTH = 360;
 
@@ -112,7 +110,7 @@ export default function Sidebars() {
   const theme = useTheme();
 
   return (
-    <>
+    <Box ref={actionsRef}>
       <Paper
         sx={{
           display: "flex",
@@ -122,7 +120,7 @@ export default function Sidebars() {
           width: 58,
           flexDirection: "column",
           justifyContent: "flex-end",
-          transform: `translateX(-${panelPosition}px)`,
+          transform: `translateX(-${sidebarOpen ? DRAWER_WIDTH : 0}px)`,
           mt: 2,
           p: 1,
           pr: 2,
@@ -136,15 +134,17 @@ export default function Sidebars() {
           title={sidebarOpen == "layers" ? "" : t("Layers.layers")}
           placement="left"
         >
-          <Checkbox
-            disabled
-            checked={layersVisible}
-            onChange={(event: ChangeEvent<HTMLInputElement>) => {
-              setLayersVisible(event.target.checked);
+          <IconButton
+            onClick={() => {
+              if (sidebarOpen == "layers") {
+                setSidebarOpen(null);
+              } else {
+                setSidebarOpen("layers");
+              }
             }}
-            icon={<Layers />}
-            checkedIcon={<Layers />}
-          />
+          >
+            <Layers sx={{ color: "var(--theme-palette-text-primary)" }} />
+          </IconButton>
         </Tooltip>
         <Tooltip
           title={sidebarOpen == "formatting" ? "" : t("Formatting.formatting")}
@@ -162,51 +162,11 @@ export default function Sidebars() {
             <FilterAlt sx={{ color: "var(--theme-palette-text-primary)" }} />
           </IconButton>
         </Tooltip>
-        {layersVisible && (
-          <Paper
-            sx={{
-              position: "fixed",
-              right: "80px",
-              p: 2,
-            }}
-          >
-            <Grid container direction={"column"} alignItems="end" spacing={0.5}>
-              {dataSources &&
-                dataSources.allIDs.map((id) => (
-                  <Grid
-                    size="grow"
-                    key={id}
-                    direction="row"
-                    display={"flex"}
-                    alignItems={"center"}
-                  >
-                    <Typography
-                      noWrap
-                      sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
-                    >
-                      {dataSources.byID[id].filename}
-                    </Typography>
-                    <Checkbox
-                      checked={dataSources.byID[id].interface.visible}
-                      icon={<VisibilityOff />}
-                      checkedIcon={<Visibility />}
-                      color="default"
-                      onChange={(event: ChangeEvent<HTMLInputElement>) => {
-                        setVisible(id, event.target.checked);
-                      }}
-                      size="small"
-                    />
-                  </Grid>
-                ))}
-            </Grid>
-          </Paper>
-        )}
       </Paper>
-      <FormattingSidebar drawerOpen={sidebarOpen == "formatting"} />
+      <LayersSidebar />
+      <FormattingSidebar />
       <FilteringSidebar
-        // setDataSources={setDataSources}
-        drawerOpen={sidebarOpen == "filtering"}
       />
-    </>
+    </Box>
   );
 }
