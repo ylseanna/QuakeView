@@ -35,12 +35,19 @@ import { useProjectStore } from "@/providers/project-store-provider";
 export default function DashboardPagesLayout(props: { children: ReactNode }) {
   const pathname = usePathname();
 
-  const { queryMonitors, debugVisible } = useAppStateStore(
-    (state) => state.appInterface,
-  );
+  const {
+    queries: { queryMonitors },
+    views: {
+      debugVisible,
+      sideBarsVisible,
+      mapToolsVisible,
+      bottombarVisible,
+      legendVisible,
+    },
+  } = useAppStateStore((state) => state.appInterface);
 
   const { toggleDebugVisible } = useAppStateStore(
-    (state) => state.appInterfaceActions,
+    (state) => state.appInterfaceActions.viewActions,
   );
 
   useKeyStroke(["F3"], () => {
@@ -94,7 +101,7 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
 
               {["/overview_map", "/3D_map"].includes(pathname) && (
                 <>
-                  <BottomBar />
+                  {bottombarVisible && <BottomBar />}
                   <TimelineBar />
                 </>
               )}
@@ -106,17 +113,19 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
                 "/plots/stem_plot",
               ].includes(pathname) && (
                 <>
-                  <Legend
-                    layerType={
-                      pathname === "/overview_map"
-                        ? "twoD"
-                        : pathname === "/3D_map"
-                          ? "threeD"
-                          : "plot"
-                    }
-                  />
-                  <Sidebars />
-                  <Toolbar />
+                  {legendVisible && (
+                    <Legend
+                      layerType={
+                        pathname === "/overview_map"
+                          ? "twoD"
+                          : pathname === "/3D_map"
+                            ? "threeD"
+                            : "plot"
+                      }
+                    />
+                  )}
+                  {sideBarsVisible && <Sidebars />}
+                  {mapToolsVisible && <Toolbar />}
                 </>
               )}
             </QueryClientProvider>

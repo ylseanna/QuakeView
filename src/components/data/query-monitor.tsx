@@ -47,7 +47,7 @@ function MultiChunkQueryElement({
 
   const [listOpen, setListOpen] = useState(true);
 
-  const { queryKeys } = useAppStateStore((state) => state.appInterface);
+  const { queryKeys } = useAppStateStore((state) => state.appInterface.queries);
 
   const queryMonitorKey = singleDataSourceQueryMonitor["0"].dataSourceID;
 
@@ -256,7 +256,7 @@ export default function QueryMonitor() {
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const { queryMonitors, timelineBarVisible, bottombarVisible } =
+  const { queries: { queryMonitors }, views: { timelineBarVisible, bottombarVisible } } =
     useAppStateStore((state) => state.appInterface);
   const theme = useTheme();
 

@@ -24,6 +24,8 @@ export type SessionInterface = {
   map: {
     mapViewState: ViewState;
     mapStyle: string;
+    showExtents: boolean;
+    zoomTo: string | null;
   };
   animation: {
     timeline: {
@@ -52,6 +54,8 @@ export type ProjectActions = {
     map: {
       setMapViewState: (value: ViewState) => void;
       setMapStyle: (style: string) => void;
+      toggleExtents: () => void;
+      setZoomToTarget: (target: string | null) => void;
     };
     animation: {
       timeline: {
@@ -129,6 +133,8 @@ export const defaultInitState: ProjectState = {
           right: 0,
         },
       },
+      showExtents: true,
+      zoomTo: null,
     },
     table: {
       dataSourceID: null,
@@ -172,6 +178,15 @@ export const createProjectStore = (
             setMapStyle: (style) =>
               set((state) => {
                 state.sessionInterface.map.mapStyle = style;
+              }),
+            toggleExtents: () =>
+              set((state) => {
+                state.sessionInterface.map.showExtents =
+                  !state.sessionInterface.map.showExtents;
+              }),
+            setZoomToTarget: (target) =>
+              set((state) => {
+                state.sessionInterface.map.zoomTo = target;
               }),
           },
           animation: {

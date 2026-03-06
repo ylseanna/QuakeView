@@ -1,16 +1,14 @@
 "use client";
 
 import {
-  ExpandMore,
   ScatterPlot,
   Visibility,
   VisibilityOff,
 } from "@mui/icons-material";
-import { Box, Checkbox, IconButton, Stack, Typography } from "@mui/material";
+import { Box, Checkbox, Stack, Typography } from "@mui/material";
 
 import { DataSource } from "@/components/custom/types";
 import { SubAccordion, SubAccordionSummary } from "../../../custom/accordion";
-import { TrashCan } from "mdi-material-ui";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 export default function LayerElement({
@@ -20,6 +18,10 @@ export default function LayerElement({
 }) {
   const { setVisible, removeDataSource } = useProjectStore(
     (state) => state.dataSourceActions,
+  );
+
+  const { setZoomToTarget } = useProjectStore(
+    (state) => state.interfaceActions.map
   );
   return (
     <SubAccordion disabled={!dataSource.interface.loadable}>
@@ -35,6 +37,7 @@ export default function LayerElement({
             minWidth: 0,
           }}
           slotProps={{ content: { sx: { width: "calc(100% + 24px)" } } }}
+          onClick={()=>{setZoomToTarget(dataSource.internal_id)}}
         >
           <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
           <Typography noWrap>{dataSource.name}</Typography>
@@ -46,9 +49,6 @@ export default function LayerElement({
           spacing={1}
           sx={{ mx: 2 }}
         >
-          {/* <IconButton onClick={()=>{removeDataSource(dataSource.internal_id)}} size="small" sx={{ height: "1rem", width: "1rem" }}>
-            <TrashCan />
-          </IconButton> */}
           <Checkbox
             checked={dataSource.interface.visible}
             icon={<VisibilityOff />}

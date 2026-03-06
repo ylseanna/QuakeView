@@ -13,7 +13,7 @@ export default function TimelineBar() {
   const theme = useTheme();
 
   const { timelineBarVisible } = useAppStateStore(
-    (state) => state.appInterface,
+    (state) => state.appInterface.views,
   );
 
   return (

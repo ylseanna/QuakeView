@@ -24,17 +24,17 @@ export default function FilteringSidebar() {
 
   const ref = useRef(null);
 
-  const appInterface = useAppStateStore((state) => state.appInterface);
+  const { sidebarOpen, timelineBarVisible, bottombarVisible } = useAppStateStore((state) => state.appInterface.views );
 
   const [drawerOpenDuration, setDrawerOpenDuration] = useState(225);
 
   useEffect(() => {
-    if (appInterface.sidebarOpen) {
+    if (sidebarOpen) {
       setTimeout(() => setDrawerOpenDuration(0), 225);
     } else {
       setDrawerOpenDuration(225);
     }
-  }, [appInterface.sidebarOpen]);
+  }, [sidebarOpen]);
 
   return (
     <>
@@ -42,7 +42,7 @@ export default function FilteringSidebar() {
         ref={ref}
         anchor="right"
         variant="persistent"
-        open={appInterface.sidebarOpen == "filtering"}
+        open={sidebarOpen == "filtering"}
         transitionDuration={drawerOpenDuration}
         sx={{
           width: DRAWER_WIDTH,
@@ -54,11 +54,11 @@ export default function FilteringSidebar() {
             zIndex: theme.zIndex.appBar - 100,
             top: "calc(80px + 32px)",
             maxHeight: `calc(100vh - 80px - 32px - ${
-              appInterface.timelineBarVisible
-                ? appInterface.bottombarVisible
+              timelineBarVisible
+                ? bottombarVisible
                   ? `${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px`
                   : `${DRAWER_HEIGHT}px`
-                : appInterface.bottombarVisible
+                : bottombarVisible
                   ? `${BOTTOMBAR_HEIGHT}px`
                   : `0`
             })`,

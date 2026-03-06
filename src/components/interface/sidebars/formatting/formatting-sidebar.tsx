@@ -27,17 +27,17 @@ export default function FormattingSidebar() {
   const { data } = useCatalogData();
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const appInterface = useAppStateStore((state) => state.appInterface);
+  const { views } = useAppStateStore((state) => state.appInterface);
 
   const [drawerOpenDuration, setDrawerOpenDuration] = useState(225);
 
   useEffect(() => {
-    if (appInterface.sidebarOpen) {
+    if (views.sidebarOpen) {
       setTimeout(() => setDrawerOpenDuration(0), 225);
     } else {
       setDrawerOpenDuration(225);
     }
-  }, [appInterface.sidebarOpen]);
+  }, [views.sidebarOpen]);
 
   return (
     <>
@@ -45,7 +45,7 @@ export default function FormattingSidebar() {
         ref={ref}
         anchor="right"
         variant="persistent"
-        open={appInterface.sidebarOpen == "formatting"}
+        open={views.sidebarOpen == "formatting"}
         transitionDuration={drawerOpenDuration}
         sx={{
           width: DRAWER_WIDTH,
@@ -59,11 +59,11 @@ export default function FormattingSidebar() {
             ...ScrollBarStyling,
             top: "calc(80px + 32px)",
             maxHeight: `calc(100vh - 80px - 32px - ${
-              appInterface.timelineBarVisible
-                ? appInterface.bottombarVisible
+              views.timelineBarVisible
+                ? views.bottombarVisible
                   ? `${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px`
                   : `${DRAWER_HEIGHT}px`
-                : appInterface.bottombarVisible
+                : views.bottombarVisible
                   ? `${BOTTOMBAR_HEIGHT}px`
                   : `0`
             })`,

@@ -37,7 +37,7 @@ export default function ViewMenu() {
 
   const t = useTranslations();
 
-  const { appInterface, appInterfaceActions } = useAppStateStore(
+  const { appInterface: { views }, appInterfaceActions: { viewActions } } = useAppStateStore(
     (state) => state,
   );
 
@@ -89,28 +89,28 @@ export default function ViewMenu() {
               </MenuItem>
               <Divider />
               <MenuItem
-                onClick={() => appInterfaceActions.toggleSideBarsVisible()}
+                onClick={() => viewActions.toggleSideBarsVisible()}
               >
                 <ListItemIcon>
-                  {appInterface.sideBarsVisible && <Check />}
+                  {views.sideBarsVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.show_sidebar")}</ListItemText>
               </MenuItem>
               <MenuItem
-                onClick={() => appInterfaceActions.toggleMapToolsVisible()}
+                onClick={() => viewActions.toggleMapToolsVisible()}
               >
                 <ListItemIcon>
-                  {appInterface.mapToolsVisible && <Check />}
+                  {views.mapToolsVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.map_tools")}</ListItemText>
               </MenuItem>
               <MenuItem
                 onClick={() =>
-                  appInterfaceActions.togglebottombarVisible()
+                  viewActions.togglebottombarVisible()
                 }
               >
                 <ListItemIcon>
-                  {appInterface.bottombarVisible && <Check />}
+                  {views.bottombarVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>
                   {t("Titlebar.show_bottombar")}
@@ -118,18 +118,18 @@ export default function ViewMenu() {
               </MenuItem>
               <Divider />
               <MenuItem
-                onClick={() => appInterfaceActions.toggleTimelineBarVisible()}
+                onClick={() => viewActions.toggleTimelineBarVisible()}
               >
                 <ListItemIcon>
-                  {appInterface.timelineBarVisible && <Check />}
+                  {views.timelineBarVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.show_timeline_bar")}</ListItemText>
               </MenuItem>
               <MenuItem
-                onClick={() => appInterfaceActions.toggleLegendVisible()}
+                onClick={() => viewActions.toggleLegendVisible()}
               >
                 <ListItemIcon>
-                  {appInterface.legendVisible && <Check />}
+                  {views.legendVisible && <Check />}
                 </ListItemIcon>
                 <ListItemText>{t("Titlebar.show_legend")}</ListItemText>
               </MenuItem>

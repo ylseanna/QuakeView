@@ -5,7 +5,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useMemo, useState } from "react";
 import { DeckProps, PickingInfo } from "@deck.gl/core";
 import { MapboxOverlay } from "@deck.gl/mapbox";
-import { useControl } from "react-map-gl";
+import { useControl } from "react-map-gl/maplibre";
 import { Earthquake } from "@/components/custom/types";
 
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";

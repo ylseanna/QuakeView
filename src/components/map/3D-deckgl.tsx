@@ -123,44 +123,7 @@ export default function ThreeDDeckGLView({
 
   const deckRef = useRef(null);
 
-  // const terrainlayer = useMemo(
-  //   () =>
-  //     new TerrainLayer({
-  //       elevationData: "/api/tiles/{z}/{x}/{y}.png",
-
-  //       loaders: [TerrainLoader],
-  //       elevationDecoder: {
-  //         rScaler: 4,
-  //         gScaler: 0,
-  //         bScaler: 0,
-  //         offset: 0,
-  //       },
-  //       visible: false,
-  //       fp64: true,
-  //       maxZoom: 12,
-  //       meshMaxError: 0,
-  //       tesselator: "martini",
-  //       getTranslation: [0,0, positionOffset],
-
-  //       opacity: 1,
-  //       extensions: [new MaskExtension()],
-  //       maskByInstance: true,
-  //       maskId: "geofence",
-  //     }),
-  //   [positionOffset]
-  // );
-
-  // const maskLayer = useMemo(
-  //   () =>
-  //     new GeoJsonLayer({
-  //       id: "geofence",
-  //       data: "/geojsonfiles/coastline.geojson",
-  //       operation: "mask",
-  //     }),
-  //   []
-  // );
-
-  const { appInterface } = useAppStateStore((state) => state);
+  const { mapToolsVisible } = useAppStateStore((state) => state.appInterface.views);
 
   return (
     <>
@@ -184,16 +147,11 @@ export default function ThreeDDeckGLView({
       >
         {/* {IsLoading && <LinearProgress variant="query" />} */}
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
-        {appInterface.mapToolsVisible && (
+        {mapToolsVisible && (
           <>
             <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
               reset view
             </Button>
-            <ZoomWidget placement="top-left" />
-            <FullscreenWidget
-              placement="top-left"
-              container={mapContainer.current!}
-            />
           </>
         )}
       </DeckGL>

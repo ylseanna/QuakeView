@@ -17,15 +17,15 @@ export default function Toolbar() {
 
   return (
     <Paper
+      variant="outlined"
       sx={{
         position: "absolute",
         display: "flex",
         flexDirection: "column",
         justifyContent: "flex-end",
-        left: "16px",
-        mt: 2,
-        p: 0.5,
-        borderRadius: "24px",
+        m: 1,
+        p: 0,
+        borderRadius: "8px",
         zIndex: 9000,
         color: "var(--theme-palette-text-primary)",
       }}
@@ -39,6 +39,8 @@ export default function Toolbar() {
           }}
           icon={<Search />}
           checkedIcon={<Search />}
+          size="small"
+          style={{borderRadius: 0}}
         />
       </Tooltip>
     </Paper>

@@ -1,26 +1,12 @@
 "use client";
 
-// import { useTranslations } from "next-intl";
-import {
-  Box,
-  Checkbox,
-  Grid,
-  IconButton,
-  Paper,
-  Tooltip,
-  useTheme,
-} from "@mui/material";
+import { Box, IconButton, Paper, Tooltip, useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
-import {
-  ColorLens,
-  FilterAlt,
-  Layers,
-} from "@mui/icons-material";
-import { useEffect, useRef, useState } from "react";
+import { ColorLens, FilterAlt, Layers } from "@mui/icons-material";
+import { useRef } from "react";
 import FormattingSidebar from "@/components/interface/sidebars/formatting/formatting-sidebar";
 import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "@/components/interface/sidebars/filtering/filtering-sidebar";
-import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import LayersSidebar from "@/components/interface/sidebars/layers/layers-sidebar";
 
@@ -28,67 +14,20 @@ export const DRAWER_WIDTH = 360;
 
 export default function Sidebars() {
   const t = useTranslations();
-
-  // GLOBAL APP STATE
-
-  const { appInterface } = useAppStateStore((state) => state);
+  const theme = useTheme();
 
   // SIDEBAR STATE
 
-  const [panelPosition, setPanelPosition] = useState(0);
-
-  const DRAWER_WIDTH = 360;
-
-  const actionsRef = useRef<HTMLElement | null>(null);
-
-  // const [sidebarOpen, setSidebarOpen] = useState<string | null>(null);
-
-  const { sidebarOpen } = useAppStateStore((state) => state.appInterface);
+  const { sidebarOpen } = useAppStateStore((state) => state.appInterface.views);
 
   const { setSidebarOpen } = useAppStateStore(
-    (state) => state.appInterfaceActions,
+    (state) => state.appInterfaceActions.viewActions,
   );
-
-  const dataSources = useProjectStore((state) => state.dataSources);
-
-  const setVisible = useProjectStore(
-    (state) => state.dataSourceActions.setVisible,
-  );
-
-  // if any sidebar open, also move panel
-  useEffect(() => {
-    if (sidebarOpen != null) {
-      setPanelPosition(DRAWER_WIDTH);
-    } else {
-      setPanelPosition(0);
-    }
-  }, [sidebarOpen]);
-
-  // FORMATTING SIDEBAR
-
-  const toggleFormattingSidebar = () => {
-    if (sidebarOpen == "formatting") {
-      setSidebarOpen(null);
-    } else {
-      setSidebarOpen("formatting");
-    }
-  };
-
-  // FILTERING SIDEBAR
-
-  const toggleFilteringSidebar = () => {
-    if (sidebarOpen == "filtering") {
-      setSidebarOpen(null);
-    } else {
-      setSidebarOpen("filtering");
-    }
-  };
-
-  const [layersVisible, setLayersVisible] = useState(false);
 
   // CLICK-AWAY
+  const sidebarsRef = useRef<HTMLElement | null>(null);
 
-  useClickOutside(actionsRef, (evt: PointerEvent) => {
+  useClickOutside(sidebarsRef, (evt: PointerEvent) => {
     const { target } = evt;
     if (target instanceof HTMLElement) {
       const classList = target.classList;
@@ -104,14 +43,12 @@ export default function Sidebars() {
       }
     }
     setSidebarOpen(null);
-    setLayersVisible(false);
   });
 
-  const theme = useTheme();
-
   return (
-    <Box ref={actionsRef}>
+    <Box ref={sidebarsRef}>
       <Paper
+      variant="outlined"
         sx={{
           display: "flex",
           position: "fixed",
@@ -125,6 +62,7 @@ export default function Sidebars() {
           p: 1,
           pr: 2,
           borderRadius: "24px 0 0 24px",
+          borderRight: 0,
           zIndex: theme.zIndex.appBar - 100,
           color: "var(--theme-palette-text-primary)",
         }}
@@ -150,7 +88,15 @@ export default function Sidebars() {
           title={sidebarOpen == "formatting" ? "" : t("Formatting.formatting")}
           placement="left"
         >
-          <IconButton onClick={toggleFormattingSidebar}>
+          <IconButton
+            onClick={() => {
+              if (sidebarOpen == "formatting") {
+                setSidebarOpen(null);
+              } else {
+                setSidebarOpen("formatting");
+              }
+            }}
+          >
             <ColorLens sx={{ color: "var(--theme-palette-text-primary)" }} />
           </IconButton>
         </Tooltip>
@@ -158,15 +104,22 @@ export default function Sidebars() {
           title={sidebarOpen == "filtering" ? "" : t("Filtering.filtering")}
           placement="left"
         >
-          <IconButton onClick={toggleFilteringSidebar}>
+          <IconButton
+            onClick={() => {
+              if (sidebarOpen == "filtering") {
+                setSidebarOpen(null);
+              } else {
+                setSidebarOpen("filtering");
+              }
+            }}
+          >
             <FilterAlt sx={{ color: "var(--theme-palette-text-primary)" }} />
           </IconButton>
         </Tooltip>
       </Paper>
       <LayersSidebar />
       <FormattingSidebar />
-      <FilteringSidebar
-      />
+      <FilteringSidebar />
     </Box>
   );
 }

@@ -93,10 +93,10 @@ const aggregateData = (
 export function useCatalogData() {
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const { queryKeys } = useAppStateStore((state) => state.appInterface);
+  const { queryKeys } = useAppStateStore((state) => state.appInterface.queries);
 
   const { setQueryKeys, setQueryStatus, checkQueryStatusPresent } =
-    useAppStateStore((state) => state.appInterfaceActions);
+    useAppStateStore((state) => state.appInterfaceActions. queryActions);
 
   useEffect(() => {
     if (dataSources) {

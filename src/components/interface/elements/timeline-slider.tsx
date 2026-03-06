@@ -37,14 +37,9 @@ interface ViewStateMonitor {
 type D3Earthquake = Earthquake & { date: Date };
 
 export default function TimelineSlider() {
-
-  // const t = useTranslations();
-  // const theme = useTheme();
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
-  const timelineBarVisible = useAppStateStore((state) => state.appInterface.timelineBarVisible);
-
-  // const { appInterface } = useAppStateStore((state) => state);
+  const { timelineBarVisible } = useAppStateStore((state) => state.appInterface.views);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores

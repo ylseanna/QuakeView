@@ -24,13 +24,13 @@ export default function BottomBar({
   const theme = useTheme();
 
   const { bottombarVisible, timelineBarVisible } = useAppStateStore(
-    (state) => state.appInterface,
+    (state) => state.appInterface.views,
   );
 
   const GPU_filtering = useProjectStore((state) => state.GPUfiltering);
 
   const { toggleTimelineBarVisible } = useAppStateStore(
-    (state) => state.appInterfaceActions,
+    (state) => state.appInterfaceActions.viewActions,
   );
 
   const [width, setwidth] = useState(0);

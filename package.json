@@ -76,7 +76,7 @@
     "react-color": "^2.19.3",
     "react-dom": "^19.2.3",
     "react-json-tree": "^0.20.0",
-    "react-map-gl": "^7.1.9",
+    "react-map-gl": "^8.1.0",
     "strftime": "^0.10.3",
     "typescript": "^5.9.3",
     "use-animation-frame": "^0.2.1",

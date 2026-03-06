@@ -1,6 +1,4 @@
-import { Visibility, VisibilityOff } from "@mui/icons-material";
-import { TrashCan } from "mdi-material-ui";
-import { Box, Checkbox, Divider, Drawer, IconButton, MenuItem, Select, Stack, Typography } from "@mui/material";
+import { Box, Divider, Drawer, MenuItem, Select, Typography } from "@mui/material";
 import { useTheme } from "@mui/material";
 import { useTranslations } from "next-intl";
 import { useEffect, useRef, useState } from "react";
@@ -15,7 +13,7 @@ import { usePathname } from "@/i18n/routing";
 export default function LayersSidebar() {
   const t = useTranslations();
   const theme = useTheme();
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   const DRAWER_WIDTH = "360px";
 
@@ -28,17 +26,17 @@ export default function LayersSidebar() {
 
   const { dataSources, sessionInterface } = useProjectStore((state) => state);
 
-  const appInterface = useAppStateStore((state) => state.appInterface);
+  const views = useAppStateStore((state) => state.appInterface.views);
 
   const [drawerOpenDuration, setDrawerOpenDuration] = useState(225);
 
   useEffect(() => {
-    if (appInterface.sidebarOpen) {
+    if (views.sidebarOpen) {
       setTimeout(() => setDrawerOpenDuration(0), 225);
     } else {
       setDrawerOpenDuration(225);
     }
-  }, [appInterface.sidebarOpen]);
+  }, [views.sidebarOpen]);
 
   const {
     map: { setMapStyle },
@@ -49,7 +47,7 @@ export default function LayersSidebar() {
       ref={ref}
       anchor="right"
       variant="persistent"
-      open={appInterface.sidebarOpen == "layers"}
+      open={views.sidebarOpen == "layers"}
       transitionDuration={drawerOpenDuration}
       sx={{
         width: DRAWER_WIDTH,
@@ -63,11 +61,11 @@ export default function LayersSidebar() {
           ...ScrollBarStyling,
           top: "calc(80px + 32px)",
           maxHeight: `calc(100vh - 80px - 32px - ${
-            appInterface.timelineBarVisible
-              ? appInterface.bottombarVisible
+            views.timelineBarVisible
+              ? views.bottombarVisible
                 ? `${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px`
                 : `${DRAWER_HEIGHT}px`
-              : appInterface.bottombarVisible
+              : views.bottombarVisible
                 ? `${BOTTOMBAR_HEIGHT}px`
                 : `0`
           })`,
@@ -86,69 +84,36 @@ export default function LayersSidebar() {
                 key={"LayerElement-" + dataSourceID}
                 dataSource={dataSources.byID[dataSourceID]}
               />
-
-              // <Stack
-              //   key={"LayerElement-" + dataSourceID}
-              //   direction="row"
-              //   justifyContent="space-between"
-              //   alignContent="center"
-              //   sx={{ p: 2, minWidth: 0 }}
-              // >
-              //   <Typography
-              //     noWrap
-              //     sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
-              //   >
-              //     {dataSources.byID[dataSourceID].name}
-              //   </Typography>
-              //   <Stack
-              //     direction="row"
-              //     justifyContent="space-between"
-              //     alignContent="center"
-              //   >
-              //     <IconButton
-              //       size="small"
-              //       sx={{ height: "1rem", width: "1rem" }}
-              //     >
-              //       <TrashCan />
-              //     </IconButton>
-              //     <Checkbox
-              //       checked={dataSources.byID[dataSourceID].interface.visible}
-              //       icon={<VisibilityOff />}
-              //       checkedIcon={<Visibility />}
-              //       color="default"
-              //       onChange={(event) => {
-              //         setVisible(dataSourceID, event.target.checked);
-              //       }}
-              //       sx={{ height: "1rem", width: "1rem" }}
-              //       size="small"
-              //     />
-              //   </Stack>
-              // </Stack>
             ),
         )}
-      {pathname == "/overview_map" && <><Divider/>
-      <Typography sx={sxtextbox}>
-        <b>{t("Map.basemap")}</b>
-      </Typography>
-      <Box sx={{p: 2, pt: 0}}>
-        <Select
-          value={sessionInterface.map.mapStyle}
-          fullWidth
-          onChange={(event) => {
-            setMapStyle(
-              event.target!.value as "Iceland" | "US" | "WorldCountries",
-            );
-          }}
-        >
-          <MenuItem value={"Iceland"}>
-            DEM Iceland (Náttúrufræðistofnun)
-          </MenuItem>
-          <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
-          <MenuItem value={"WorldCountries"}>World country outlines</MenuItem>
-        </Select>
-      </Box></>}
-      
-      <Divider/>
+      {pathname == "/overview_map" && (
+        <>
+          <Divider />
+          <Typography sx={sxtextbox}>
+            <b>{t("Map.basemap")}</b>
+          </Typography>
+          <Box sx={{ p: 2, pt: 0 }}>
+            <Select
+              value={sessionInterface.map.mapStyle}
+              fullWidth
+              onChange={(event) => {
+                setMapStyle(
+                  event.target!.value as "Iceland" | "US" | "WorldCountries",
+                );
+              }}
+            >
+              <MenuItem value={"Iceland"}>
+                DEM Iceland (Náttúrufræðistofnun)
+              </MenuItem>
+              <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
+              <MenuItem value={"WorldCountries"}>
+                World country outlines
+              </MenuItem>
+            </Select>
+          </Box>
+        </>
+      )}
+      <Divider />
     </Drawer>
   );
 }

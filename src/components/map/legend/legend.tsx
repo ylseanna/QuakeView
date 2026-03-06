@@ -23,7 +23,7 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
-  const appInterface = useAppStateStore((state) => state.appInterface);
+  const { timelineBarVisible, bottombarVisible, sidebarOpen } = useAppStateStore((state) => state.appInterface.views);
 
   if (
     dataSources.allIDs!.length > 1 ||
@@ -44,15 +44,14 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
           m: 2,
           p: 2,
 
-          transform: appInterface.timelineBarVisible
-            ? appInterface.bottombarVisible
-              ? `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
-              : `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT}px)`
-            : appInterface.bottombarVisible
-              ? `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, -${BOTTOMBAR_HEIGHT}px)`
-              : `translate(-${appInterface.sidebarOpen ? DRAWER_WIDTH : 0}px, 0)`,
+          transform: timelineBarVisible
+            ? bottombarVisible
+              ? `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
+              : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT}px)`
+            : bottombarVisible
+              ? `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${BOTTOMBAR_HEIGHT}px)`
+              : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, 0)`,
           transition: "transform.225s",
-          mb: 1,
         }}
       >
         <Typography fontSize={12} fontWeight="bold">
