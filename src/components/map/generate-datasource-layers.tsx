@@ -3,7 +3,7 @@ import { LineLayer, ScatterplotLayer, ScatterplotLayerProps } from "@deck.gl/lay
 import { Color, LayerProps } from "@deck.gl/core";
 import * as d3 from "d3";
 
-import { DataSource, DataSourceColorFormatting, Earthquake } from "@/components/datasource/types";
+import { DataSource, DataSourceColorFormatting, Earthquake } from "@/components/custom/types";
 import { GPU_filtering, SessionInterface } from "@/stores/project-store";
 import { colormaps, colormaps_categorical } from "./crameri-colormaps";
 

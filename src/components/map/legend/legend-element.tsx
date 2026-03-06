@@ -1,7 +1,7 @@
 import { Box, Grid, Typography } from "@mui/material";
 
-import { DataSource } from "../../datasource/types";
 import CategoricalLegend from "./categorical-legend";
+import { DataSource } from "../../custom/types";
 // import { useTranslations } from "next-intl";
 import ColormapLegend from "./colormap-legend";
 

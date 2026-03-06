@@ -124,5 +124,8 @@
     "GR_plot": "GR graf",
     "stem_plot": "Leggjagraf",
     "open_in_window": "Opna siða \"{page}\" í nýjum glugga"
+  },
+  "Map": {
+    "basemap": "Grunnkort"
   }
 }

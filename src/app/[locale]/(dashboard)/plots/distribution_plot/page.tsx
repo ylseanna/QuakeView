@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { Container, Paper, Box } from "@mui/material";
-import Sidebars from "@/components/interface/sidebars";
+import Sidebars from "@/components/interface/sidebars/sidebars";
 import Legend from "@/components/map/legend/legend";
-import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 import MagnitudeDistributionPlot from "@/components/plots/magnitude-distribution-plot";
 
 export default function Page() {

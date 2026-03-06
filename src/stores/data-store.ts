@@ -1,7 +1,7 @@
 import { immer } from "zustand/middleware/immer";
 import { createStore } from "zustand/vanilla";
 
-import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
+import { DataSourceFiltering, Earthquake, Extent } from "../components/custom/types";
 
 export type DataState = {
   data: {

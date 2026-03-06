@@ -3,8 +3,8 @@ import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useCatalogData } from "../datasource/use-data";
-import { Earthquake } from "../datasource/types";
+import { useCatalogData } from "../data/use-data";
+import { Earthquake } from "../custom/types";
 
 export default function GutenbergRichterPlot() {
   const { dataSources } = useProjectStore((state) => state);

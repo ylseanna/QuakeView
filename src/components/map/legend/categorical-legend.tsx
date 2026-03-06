@@ -4,9 +4,9 @@ import { useTranslations } from "next-intl";
 import * as _ from "lodash";
 import { useEffect, useRef, useState } from "react";
 
-import { ColorMapping } from "@/components/datasource/formatting/color-mapping";
-import { useCatalogData } from "@/components/datasource/use-data";
-import { DataSource, DataSourceDataDescription } from "../../datasource/types";
+import { ColorMapping } from "@/components/interface/sidebars/formatting/color-mapping";
+import { useCatalogData } from "@/components/data/use-data";
+import { DataSource, DataSourceDataDescription } from "../../custom/types";
 
 interface LegendElementProps {
   dataSource: DataSource;

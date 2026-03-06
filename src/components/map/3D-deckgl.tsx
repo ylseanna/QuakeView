@@ -3,7 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Earthquake, Extent } from "@/components/datasource/types";
+import { Earthquake, Extent } from "@/components/custom/types";
 
 import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
@@ -19,7 +19,7 @@ import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
-import{ useCatalogData } from "../datasource/use-data";
+import{ useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
@@ -123,44 +123,7 @@ export default function ThreeDDeckGLView({
 
   const deckRef = useRef(null);
 
-  // const terrainlayer = useMemo(
-  //   () =>
-  //     new TerrainLayer({
-  //       elevationData: "/api/tiles/{z}/{x}/{y}.png",
-
-  //       loaders: [TerrainLoader],
-  //       elevationDecoder: {
-  //         rScaler: 4,
-  //         gScaler: 0,
-  //         bScaler: 0,
-  //         offset: 0,
-  //       },
-  //       visible: false,
-  //       fp64: true,
-  //       maxZoom: 12,
-  //       meshMaxError: 0,
-  //       tesselator: "martini",
-  //       getTranslation: [0,0, positionOffset],
-
-  //       opacity: 1,
-  //       extensions: [new MaskExtension()],
-  //       maskByInstance: true,
-  //       maskId: "geofence",
-  //     }),
-  //   [positionOffset]
-  // );
-
-  // const maskLayer = useMemo(
-  //   () =>
-  //     new GeoJsonLayer({
-  //       id: "geofence",
-  //       data: "/geojsonfiles/coastline.geojson",
-  //       operation: "mask",
-  //     }),
-  //   []
-  // );
-
-  const { appInterface } = useAppStateStore((state) => state);
+  const { mapToolsVisible } = useAppStateStore((state) => state.appInterface.views);
 
   return (
     <>
@@ -184,16 +147,11 @@ export default function ThreeDDeckGLView({
       >
         {/* {IsLoading && <LinearProgress variant="query" />} */}
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
-        {appInterface.mapToolsVisible && (
+        {mapToolsVisible && (
           <>
             <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
               reset view
             </Button>
-            <ZoomWidget placement="top-left" />
-            <FullscreenWidget
-              placement="top-left"
-              container={mapContainer.current!}
-            />
           </>
         )}
       </DeckGL>

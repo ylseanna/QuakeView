@@ -3,9 +3,9 @@
 import * as React from "react";
 import { Container, Paper, Box } from "@mui/material";
 import GutenbergRichterPlot from "@/components/plots/gutenberg-richter-plot";
-import Sidebars from "@/components/interface/sidebars";
+import Sidebars from "@/components/interface/sidebars/sidebars";
 import Legend from "@/components/map/legend/legend";
-import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 
 export default function Page() {
   return (

@@ -43,7 +43,7 @@
     "electron/main.js",
     "electron/preload.ts",
     "electron/main.cjs",
-    "src/components/interface-elements/timeline-slider-canvas-regl.tsx_disable",
+    "src/components/interface/elements/timeline-slider-canvas-regl.tsx_disable",
     ".next/dev/types/**/*.ts",
     "src/components/map/map-style-hook.tsx_disable",
     "next/types/**/*.ts",

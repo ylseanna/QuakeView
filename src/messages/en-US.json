@@ -161,7 +161,8 @@
     "raw_preview_option": "raw"
   },
   "Map": {
-    "styling": "Map styling"
+    "styling": "Map styling",
+    "basemap": "Base map"
   },
   "Slider": {
     "start_time": "Start time",

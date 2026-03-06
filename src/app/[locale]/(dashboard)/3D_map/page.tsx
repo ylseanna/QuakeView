@@ -3,14 +3,14 @@
 import {
   Extent,
   // EXTENT_JSON_CODEC,
-} from "@/components/datasource/types";
+} from "@/components/custom/types";
 import { useKeyDown } from "@react-hooks-library/core";
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useState } from "react";
 import ThreeDDeckGLView from "@/components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import{ useCatalogData } from "@/components/datasource/use-data";
+import{ useCatalogData } from "@/components/data/use-data";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);

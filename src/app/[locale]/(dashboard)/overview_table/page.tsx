@@ -34,8 +34,8 @@ import {
 import { useEffect, useRef, useState } from "react";
 import { isIS, enUS } from "@mui/x-data-grid/locales";
 import { useLocale, useTranslations } from "next-intl";
-import { useCatalogData } from "@/components/datasource/use-data";
-import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import { useCatalogData } from "@/components/data/use-data";
+import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 import CancelIcon from "@mui/icons-material/Cancel";
 import SearchIcon from "@mui/icons-material/Search";
 import FileDownloadIcon from "@mui/icons-material/FileDownload";

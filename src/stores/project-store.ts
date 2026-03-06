@@ -4,8 +4,8 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
-import { DataSource } from "@/components/datasource/types";
+import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "../components/custom/types";
+import { DataSource } from "@/components/custom/types";
 
 export type ProjectState = {
   sessionInterface: SessionInterface;
@@ -17,10 +17,15 @@ export type ProjectState = {
 };
 
 export type SessionInterface = {
-  overViewState: ViewState;
   pickable: boolean;
   table: {
     dataSourceID: string | null;
+  };
+  map: {
+    mapViewState: ViewState;
+    mapStyle: string;
+    showExtents: boolean;
+    zoomTo: string | null;
   };
   animation: {
     timeline: {
@@ -42,10 +47,15 @@ export type GPU_filtering = {
 
 export type ProjectActions = {
   interfaceActions: {
-    setOverViewState: (value: ViewState) => void;
     setPickable: (value: boolean) => void;
     table: {
       setDataSourceID: (id: string | null) => void;
+    };
+    map: {
+      setMapViewState: (value: ViewState) => void;
+      setMapStyle: (style: string) => void;
+      toggleExtents: () => void;
+      setZoomToTarget: (target: string | null) => void;
     };
     animation: {
       timeline: {
@@ -107,20 +117,25 @@ export type ProjectStore = ProjectState & ProjectActions;
 
 export const defaultInitState: ProjectState = {
   sessionInterface: {
-    overViewState: {
-      longitude: -19,
-      latitude: 65,
-      zoom: 6,
-      pitch: 0,
-      bearing: 0,
-      padding: {
-        top: 0,
-        bottom: 0,
-        left: 0,
-        right: 0,
-      },
-    },
     pickable: false,
+    map: {
+      mapStyle: "Iceland",
+      mapViewState: {
+        longitude: -19,
+        latitude: 65,
+        zoom: 6,
+        pitch: 0,
+        bearing: 0,
+        padding: {
+          top: 0,
+          bottom: 0,
+          left: 0,
+          right: 0,
+        },
+      },
+      showExtents: true,
+      zoomTo: null,
+    },
     table: {
       dataSourceID: null,
     },
@@ -145,10 +160,6 @@ export const createProjectStore = (
       immer((set) => ({
         ...initState,
         interfaceActions: {
-          setOverViewState: (value) =>
-            set((state) => {
-              state.sessionInterface.overViewState = value;
-            }),
           setPickable: (value) =>
             set((state) => {
               state.sessionInterface.pickable = value;
@@ -157,6 +168,25 @@ export const createProjectStore = (
             setDataSourceID: (id) =>
               set((state) => {
                 state.sessionInterface.table.dataSourceID = id;
+              }),
+          },
+          map: {
+            setMapViewState: (value) =>
+              set((state) => {
+                state.sessionInterface.map.mapViewState = value;
+              }),
+            setMapStyle: (style) =>
+              set((state) => {
+                state.sessionInterface.map.mapStyle = style;
+              }),
+            toggleExtents: () =>
+              set((state) => {
+                state.sessionInterface.map.showExtents =
+                  !state.sessionInterface.map.showExtents;
+              }),
+            setZoomToTarget: (target) =>
+              set((state) => {
+                state.sessionInterface.map.zoomTo = target;
               }),
           },
           animation: {
