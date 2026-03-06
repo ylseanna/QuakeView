@@ -2,7 +2,7 @@
 
 import { PickingInfo } from "@deck.gl/core";
 // import { useTranslations } from "next-intl";
-import { Earthquake, DataSourceDataDescription } from "../datasource/types";
+import { Earthquake, DataSourceDataDescription } from "../custom/types";
 import { Grid, Paper, SxProps, Typography } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useMemo } from "react";

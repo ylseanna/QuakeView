@@ -4,8 +4,8 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "./../components/datasource/types";
-import { DataSource } from "@/components/datasource/types";
+import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "../components/custom/types";
+import { DataSource } from "@/components/custom/types";
 
 export type ProjectState = {
   sessionInterface: SessionInterface;

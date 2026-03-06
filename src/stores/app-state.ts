@@ -3,7 +3,7 @@ import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
 import { merge } from "lodash";
 
-import { DataSourceDataDescription, DataSourceFiltering } from "@/components/datasource/types";
+import { DataSourceDataDescription, DataSourceFiltering } from "@/components/custom/types";
 
 // import { DataSourceFiltering, Earthquake, Extent } from "../components/datasource/types";
 

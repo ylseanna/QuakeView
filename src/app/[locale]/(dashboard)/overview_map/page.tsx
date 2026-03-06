@@ -29,7 +29,7 @@ import { useTranslations } from "next-intl";
 import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
-} from "@/components/interface/bottom-bar";
+} from "@/components/interface/bottom-bar/bottom-bar";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);

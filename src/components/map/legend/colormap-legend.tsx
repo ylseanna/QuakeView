@@ -2,9 +2,9 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 // import { useTranslations } from "next-intl";
 import * as d3 from "d3";
 
-import { useCatalogData } from "@/components/datasource/use-data";
-import { DataSource } from "../../datasource/types";
+import { useCatalogData } from "@/components/data/use-data";
 import { colormaps } from "../crameri-colormaps";
+import { DataSource } from "../../custom/types";
 // import { ReImg } from "reimg";
 
 interface LegendElementProps {

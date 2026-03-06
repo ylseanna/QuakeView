@@ -6,12 +6,12 @@ import { useMemo, useState } from "react";
 import { DeckProps, PickingInfo } from "@deck.gl/core";
 import { MapboxOverlay } from "@deck.gl/mapbox";
 import { useControl } from "react-map-gl";
-import { Earthquake } from "@/components/datasource/types";
+import { Earthquake } from "@/components/custom/types";
 
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
-import{ useCatalogData } from "../datasource/use-data";
+import{ useCatalogData } from "../data/use-data";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
 

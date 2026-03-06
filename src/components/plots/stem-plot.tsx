@@ -7,11 +7,11 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { StemPlotLayers } from "../map/generate-datasource-layers";
+import MapToolTip from "../map/map-tooltip";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
-import { useCatalogData } from "../datasource/use-data";
-import { Earthquake } from "../datasource/types";
-import MapToolTip from "../map/map-tooltip";
+import { useCatalogData } from "../data/use-data";
+import { Earthquake } from "../custom/types";
 import { ControllerOptions } from "../map/types";
 interface Bounds {
   x: [Date, Date];

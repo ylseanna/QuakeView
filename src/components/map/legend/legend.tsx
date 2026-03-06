@@ -1,16 +1,16 @@
 "use client";
 
 // import { useTranslations } from "next-intl";
-import { Grid, Paper, SxProps, Typography } from "@mui/material";
+import { Grid, Paper, Stack, SxProps, Typography } from "@mui/material";
 import LegendElement from "./legend-element";
 import { useTranslations } from "next-intl";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { DRAWER_WIDTH } from "@/components/interface/sidebars";
+import { DRAWER_WIDTH } from "@/components/interface/sidebars/sidebars";
 import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
-} from "@/components/interface/bottom-bar";
+} from "@/components/interface/bottom-bar/bottom-bar";
 
 interface LegendProps {
   layerType: "twoD" | "threeD" | "plot";
@@ -58,25 +58,17 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
         <Typography fontSize={12} fontWeight="bold">
           {t("legend")}
         </Typography>
-        <Grid container direction="column" spacing={2} sx={{ width: "200px" }}>
+        <Stack direction="column" spacing={2} sx={{ width: "200px", mt: 1}}>
           {dataSources &&
             dataSources.allIDs.map((id) => (
-              <Grid size="grow" key={`LegendElement-${id}`}>
-                {/* {dataSources.allIDs.length > 1 &&
-                  (dataSources.byID[id].formatting.color.mapping == "linear" ||
-                    dataSources.byID[id].formatting.color.mapping ==
-                      "categorical") &&
-                  !singleColor && (
-                  )} */}
-
-                <LegendElement
-                  dataSource={dataSources.byID[id]}
-                  layerType={layerType}
-                  singleColor={singleColor}
-                />
-              </Grid>
+              <LegendElement
+                key={`LegendElement-${id}`}
+                dataSource={dataSources.byID[id]}
+                layerType={layerType}
+                singleColor={singleColor}
+              />
             ))}
-        </Grid>
+        </Stack>
       </Paper>
     );
   }

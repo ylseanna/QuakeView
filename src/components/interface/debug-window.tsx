@@ -3,8 +3,8 @@
 import { Box, IconButton, Paper, Typography, useTheme } from "@mui/material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { JSONTree } from "react-json-tree";
-import { ScrollBarStyling } from "../layout/scrollbar-styling";
-import { useCatalogData } from "../datasource/use-data";
+import { ScrollBarStyling } from "../custom/scrollbar-styling";
+import { useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useState } from "react";
 import { ChevronLeft, ChevronRight } from "mdi-material-ui";

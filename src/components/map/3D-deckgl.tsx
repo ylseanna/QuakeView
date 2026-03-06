@@ -3,7 +3,7 @@
 import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { Earthquake, Extent } from "@/components/datasource/types";
+import { Earthquake, Extent } from "@/components/custom/types";
 
 import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
@@ -19,7 +19,7 @@ import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
-import{ useCatalogData } from "../datasource/use-data";
+import{ useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";

@@ -2,9 +2,9 @@
 
 import * as React from "react";
 import { Paper, Box } from "@mui/material";
-import Sidebars from "@/components/interface/sidebars";
+import Sidebars from "@/components/interface/sidebars/sidebars";
 import Legend from "@/components/map/legend/legend";
-import { ScrollBarStyling } from "@/components/layout/scrollbar-styling";
+import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 import StemPlot from "@/components/plots/stem-plot";
 import Toolbar from "@/components/interface/toolbar";
 

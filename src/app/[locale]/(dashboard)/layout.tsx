@@ -4,8 +4,8 @@ import { Box, LinearProgress, Paper } from "@mui/material";
 
 import { ReactNode, Suspense, useEffect, useMemo, useState } from "react";
 
-import TitleBar from "@/components/navigation/title-bar";
-import NavBar from "@/components/navigation/nav-bar";
+import TitleBar from "@/components/interface/navigation/title-bar";
+import NavBar from "@/components/interface/navigation/nav-bar";
 import { useKeyStroke } from "@react-hooks-library/core";
 import DebugWindow from "@/components/interface/debug-window";
 
@@ -21,14 +21,14 @@ import "dayjs/locale/en-gb";
 
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { theme } from "../theme";
-import BottomBar from "@/components/interface/bottom-bar";
-import TimelineBar from "@/components/interface/timeline-bar";
+import BottomBar from "@/components/interface/bottom-bar/bottom-bar";
+import TimelineBar from "@/components/interface/bottom-bar/timeline-bar";
 import { usePathname } from "@/i18n/routing";
-import Sidebars from "@/components/interface/sidebars";
+import Sidebars from "@/components/interface/sidebars/sidebars";
 import Toolbar from "@/components/interface/toolbar";
 import Legend from "@/components/map/legend/legend";
 import { queryClient } from "@/providers/query-client";
-import QueryMonitor from "@/components/datasource/query-monitor";
+import QueryMonitor from "@/components/data/query-monitor";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useProjectStore } from "@/providers/project-store-provider";
 
