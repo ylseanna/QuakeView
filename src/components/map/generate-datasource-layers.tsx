@@ -153,8 +153,7 @@ export function generateDataSourceMapLayers(
   });
 }
 
-export function StemPlotLayers(
-  // layer_type: "1D" | "3D",
+export function useStemPlotLayers(
   dataSource: DataSource,
   data: Earthquake[],
   sessionInterface: SessionInterface,
@@ -162,10 +161,7 @@ export function StemPlotLayers(
   scaleY: d3.ScaleLinear<number, number, never>,
   baseLineY: number,
   include_stem: boolean = true,
-  // filtering: GPU_filtering,
 ) {
-  // console.log(filtering);
-
   const linearColorScale = d3
     .scaleSequential(
       d3.piecewise(

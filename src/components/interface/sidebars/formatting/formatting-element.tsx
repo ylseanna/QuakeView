@@ -27,8 +27,6 @@ export default function DataSourceFormattingElement({
           .concat(dataSource.metadata.variables.datetime_vars)
           .concat(dataSource.metadata.variables.added_vars)
           .map((variable) => {
-            console.log(variable);
-
             return [
               "dt",
               "id",
