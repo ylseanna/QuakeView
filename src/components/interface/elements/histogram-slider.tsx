@@ -63,7 +63,7 @@ export default function HistogramSlider({
   const [isLoading, setIsLoading] = useState(true);
 
   const { signalPopperOpen, signalPopperClosed } = useAppStateStore(
-    (state) => state.appInterfaceActions,
+    (state) => state.appInterfaceActions.viewActions,
   );
 
   const step = Number((max! - min!).toPrecision(1)) / 100;
@@ -154,9 +154,13 @@ export default function HistogramSlider({
         .data(bins)
         .join("rect")
         .attr("x", (d) => x(d.x0!))
-        .attr("width", (d) => x(d.x1!) - x(d.x0!))
+        .attr("width", (d) =>
+          x(d.x1!) - x(d.x0!) > 0 ? x(d.x1!) - x(d.x0!) : 0,
+        )
         .attr("y", (d) => y(d.length))
-        .attr("height", (d) => y(0) - y(d.length))
+        .attr("height", (d) =>
+          y(0) - y(d.length) > 0 ? y(0) - y(d.length) : 0,
+        )
         .attr("fill", "var(--mui-palette-text-primary)")
         .attr("fill-opacity", 0.4);
 

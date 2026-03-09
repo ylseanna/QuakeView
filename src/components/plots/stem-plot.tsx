@@ -6,8 +6,8 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { StemPlotLayers } from "../map/generate-datasource-layers";
 import MapToolTip from "../map/map-tooltip";
+import { useStemPlotLayers } from "../map/use-layers";
 // import { fetchData } from "../datasource/load-data";
 // import { useDataStore } from "@/providers/data-store-provider";
 import { useCatalogData } from "../data/use-data";
@@ -296,7 +296,7 @@ export default function StemPlot() {
     }
   }, [bounds, dimensions]);
 
-  const layers = useMemo(() => {
+  useEffect(() => {
     if (data) {
       if (scaleX.current && scaleY.current) {
         const minX = Math.min(
@@ -351,32 +351,6 @@ export default function StemPlot() {
             ],
           },
         });
-
-        console.log(viewPortBounds);
-
-        const layers_to_set = data.allIDs.map((id) => {
-          if (data.byID[id]) {
-            const layer = StemPlotLayers(
-              dataSources.byID[id],
-              data.byID[id].data,
-              sessionInterface,
-              viewPortScaleX.current!,
-              viewPortScaleY.current!,
-              viewPortScaleY.current!(minY),
-              false,
-            ) as ScatterplotLayer<Earthquake>;
-
-            layer.onHover = (info: PickingInfo<Earthquake>) => {
-              setHoverInfo(info);
-              return true;
-            };
-
-            console.log(layer);
-
-            return layer;
-          }
-        });
-        return layers_to_set;
       }
     }
   }, [
@@ -387,6 +361,24 @@ export default function StemPlot() {
     scaleY,
     sessionInterface,
   ]);
+
+  const layers = useStemPlotLayers(
+    viewPortScaleX.current,
+    viewPortScaleY.current,
+    0,
+    false,
+  );
+
+  useEffect(() => {
+    if (layers) {
+      layers.forEach((layer) => {
+        layer!.onHover = (info: PickingInfo<Earthquake>) => {
+          setHoverInfo(info);
+          return true;
+        };
+      });
+    }
+  }, [layers]);
 
   return (
     <Box

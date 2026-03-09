@@ -11,6 +11,7 @@ import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
 } from "@/components/interface/bottom-bar/bottom-bar";
+import { usePathname } from "@/i18n/routing";
 
 interface LegendProps {
   layerType: "twoD" | "threeD" | "plot";
@@ -20,6 +21,7 @@ interface LegendProps {
 
 export default function Legend({ layerType, singleColor, sx }: LegendProps) {
   const t = useTranslations("Common");
+  const pathname = usePathname();
 
   const dataSources = useProjectStore((state) => state.dataSources);
 
@@ -44,13 +46,13 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
           m: 2,
           p: 2,
 
-          transform: timelineBarVisible
+          transform: ["/overview_map", "/3D_map"].includes(pathname) ?  timelineBarVisible
             ? bottombarVisible
               ? `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
               : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT}px)`
             : bottombarVisible
               ? `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${BOTTOMBAR_HEIGHT}px)`
-              : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, 0)`,
+              : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, 0)` : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, 0)`,
           transition: "transform.225s",
         }}
       >

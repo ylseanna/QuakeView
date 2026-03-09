@@ -22,6 +22,7 @@ export default function TimelineBar() {
       in={(timelineBarVisible && data) as boolean}
       style={{ visibility: "visible" }}
       mountOnEnter
+      unmountOnExit
     >
       <Paper
         square

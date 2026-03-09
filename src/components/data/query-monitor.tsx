@@ -309,8 +309,6 @@ export default function QueryMonitor() {
               ) {
                 const queryMonitor = queryMonitors.byKey[queryMonitorKey]["0"];
 
-                console.log(queryMonitor);
-
                 return (
                   <Stack
                     key={"QueryMonitor-" + queryMonitorKey}

@@ -10,8 +10,8 @@ from pathlib import Path
 
 import pandas as pd
 from numpy import concatenate, float64, int64, isnan
-from shapely import multipoints
-from werkzeug.exceptions import HTTPException
+# from shapely import multipoints
+# from werkzeug.exceptions import HTTPException
 
 from flask import Flask, Response, request, send_file
 
@@ -601,11 +601,11 @@ def generate_event_dict(nlines=None):
         app.logger.info("applying filters...")
         for variable in filtering.keys():
             app.logger.info(
-                f"{filtering[variable][0]} < {variable} < {filtering[variable][1]}"
+                f"{filtering[variable][0]} <= {variable} <= {filtering[variable][1]}"
             )
             df = df[
-                (df[varmap[variable]] > filtering[variable][0])
-                & (df[varmap[variable]] < filtering[variable][1])
+                (df[varmap[variable]] >= filtering[variable][0])
+                & (df[varmap[variable]] <= filtering[variable][1])
             ]
 
         # GENERATE FILTERED BOUNDS

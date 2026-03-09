@@ -3,20 +3,16 @@ import useAnimationFrame from "use-animation-frame";
 import DeckGL from "@deck.gl/react";
 import { Box } from "@mui/material";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
-import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
-// import { fetchData } from "../datasource/load-data";
-// import { useDataStore } from "@/providers/data-store-provider";
-import { SetStateAction } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { StemPlotLayers } from "../../map/generate-datasource-layers";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useAppStateStore } from "@/providers/app-state-provider";
-import { minorTimeFormat } from "../../custom/time-format";
-import MapToolTip from "../../map/map-tooltip";
-import { useCatalogData } from "../../data/use-data";
-import { Earthquake } from "../../custom/types";
-import { ControllerOptions } from "../../map/types";
+import { minorTimeFormat } from "@/components/custom/time-format";
+import MapToolTip from "@/components/map/map-tooltip";
+import { useStemPlotLayers } from "@/components/map/use-layers";
+import { useCatalogData } from "@/components/data/use-data";
+import { Earthquake } from "@/components/custom/types";
+import { ControllerOptions } from "@/components/map/types";
 // import { useKeyPressed } from "@react-hooks-library/core";
 
 interface Bounds {
@@ -39,7 +35,6 @@ type D3Earthquake = Earthquake & { date: Date };
 export default function TimelineSlider() {
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
-  const { timelineBarVisible } = useAppStateStore((state) => state.appInterface.views);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
@@ -56,13 +51,15 @@ export default function TimelineSlider() {
 
   // animation
 
-  const { enabled: animationEnabled, isPlaying, speed: animationSpeed } = useProjectStore(
-    (state) => state.sessionInterface.animation.timeline,
-  );
-
   const {
-    setIsPlaying,
-  } = useProjectStore((state) => state.interfaceActions.animation.timeline);
+    enabled: animationEnabled,
+    isPlaying,
+    speed: animationSpeed,
+  } = useProjectStore((state) => state.sessionInterface.animation.timeline);
+
+  const { setIsPlaying } = useProjectStore(
+    (state) => state.interfaceActions.animation.timeline,
+  );
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -495,7 +492,7 @@ export default function TimelineSlider() {
     }
   }, [viewStateMonitor.coordPosition, viewStateMonitor.pixelPosition]);
 
-  const layers = useMemo(() => {
+  useEffect(() => {
     if (data.allIDs) {
       if (scaleX.current && scaleY.current) {
         const minX = Math.min(
@@ -551,30 +548,41 @@ export default function TimelineSlider() {
           },
         });
 
-        const layers_to_set = data.allIDs.map((id) => {
-          if (data.byID[id]) {
-            const layer = StemPlotLayers(
-              dataSources.byID[id],
-              data.byID[id].data,
-              sessionInterface,
-              viewPortScaleX.current!,
-              viewPortScaleY.current!,
-              viewPortScaleY.current!(minY),
-              false,
-            ) as ScatterplotLayer;
+        // const layers_to_set = data.allIDs.map((id) => {
+        //   if (data.byID[id]) {
+        //     const layer = useStemPlotLayers(
+        //       dataSources.byID[id],
+        //       viewPortScaleX.current!,
+        //       viewPortScaleY.current!,
+        //       viewPortScaleY.current!(minY),
+        //       false,
+        //     ) as ScatterplotLayer;
 
-            layer.onHover = (info: PickingInfo<Earthquake>) => {
-              setHoverInfo(info);
-              return true;
-            };
-
-            return layer;
-          }
-        });
-        return layers_to_set;
+        //     return layer;
+        //   }
+        // });
+        // return layers_to_set;
       }
     }
-  }, [dimensions, dataSources.byID, data, scaleX, scaleY, sessionInterface]);
+  }, [dimensions, data.allIDs, scaleX, scaleY]);
+
+  const layers = useStemPlotLayers(
+    viewPortScaleX.current,
+    viewPortScaleY.current,
+    0,
+    false,
+  );
+
+  useEffect(() => {
+    if (layers) {
+      layers.forEach((layer) => {
+        layer!.onHover = (info: PickingInfo<Earthquake>) => {
+          setHoverInfo(info);
+          return true;
+        };
+      });
+    }
+  }, [layers]);
 
   const resetAxes = useCallback(() => {
     const minX = Math.min(
@@ -595,8 +603,6 @@ export default function TimelineSlider() {
       x: [new Date(minX), new Date(maxX)],
       y: [minY, maxY],
     });
-
-    console.log(bounds);
 
     // time filtering (make option)
     setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
@@ -627,7 +633,7 @@ export default function TimelineSlider() {
     resetAxes();
   }, []);
 
-  // reset based on data change
+  // // reset based on data change
   useEffect(() => {
     resetAxes();
   }, [data]);

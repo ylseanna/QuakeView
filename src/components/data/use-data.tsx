@@ -1,5 +1,4 @@
-import { useQueries, UseQueryResult } from "@tanstack/react-query";
-import { chunk } from "lodash";
+import { keepPreviousData, useQueries, UseQueryResult } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -96,7 +95,7 @@ export function useCatalogData() {
   const { queryKeys } = useAppStateStore((state) => state.appInterface.queries);
 
   const { setQueryKeys, setQueryStatus, checkQueryStatusPresent } =
-    useAppStateStore((state) => state.appInterfaceActions. queryActions);
+    useAppStateStore((state) => state.appInterfaceActions.queryActions);
 
   useEffect(() => {
     if (dataSources) {
@@ -173,6 +172,7 @@ export function useCatalogData() {
         enabled: dataSources.byID[queryKey[1]]
           ? dataSources.byID[queryKey[1]].interface.loadable
           : false,
+        placeholderData: keepPreviousData,
       };
     }),
     combine: (results: UseQueryResult<DataQueryResponse, Error>[]) => {
