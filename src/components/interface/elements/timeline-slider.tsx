@@ -7,7 +7,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
-import { minorTimeFormat } from "@/components/custom/time-format";
+import { majorTickFormat, majorTickLocator, majorTimeBoundaryLocator, minorTimeFormat } from "@/components/custom/time-format";
 import MapToolTip from "@/components/map/map-tooltip";
 import { useStemPlotLayers } from "@/components/map/use-layers";
 import { useCatalogData } from "@/components/data/use-data";
@@ -32,13 +32,16 @@ interface ViewStateMonitor {
 
 type D3Earthquake = Earthquake & { date: Date };
 
-export default function TimelineSlider() {
+export default function TimelineSlider({
+  heightToWidthRatio,
+}: {
+  heightToWidthRatio?: number;
+}) {
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
-  const { dataSources } = useProjectStore((state) => state);
   const { data } = useCatalogData();
 
   // filtering
@@ -99,7 +102,10 @@ export default function TimelineSlider() {
     [dimensions],
   );
   const graphHeight = useMemo(
-    () => 200 - margin.top - margin.bottom,
+    () =>
+      (heightToWidthRatio ? dimensions.width * heightToWidthRatio : 200) -
+      margin.top -
+      margin.bottom,
     [dimensions],
   );
 
@@ -115,7 +121,36 @@ export default function TimelineSlider() {
 
   const minorFormat = useMemo(
     () =>
-      minorTimeFormat((bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000),
+      minorTimeFormat(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ) as (domainValue: Date | d3.NumberValue, index: number) => string,
+    [bounds.x],
+  );
+
+  const majorFormat = useMemo(
+    () =>
+      majorTickFormat(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ) as (domainValue: Date | d3.NumberValue, index: number) => string,
+    [bounds.x],
+  );
+
+  const majorLocator = useMemo(
+    () =>
+      majorTickLocator(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+        bounds.x,
+      ),
+    [bounds.x],
+  );
+
+  console.log(majorLocator);
+
+  const majorBoundaryLocator = useMemo(
+    () =>
+      majorTimeBoundaryLocator(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ),
     [bounds.x],
   );
 
@@ -191,6 +226,10 @@ export default function TimelineSlider() {
     viewPortScaleY = useRef<d3.ScaleLinear<number, number, never>>(null);
   // axes
   const xAxes =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
+    xAxesMajor =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
+    xAxesMajorBoundaries =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
     yAxes =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
@@ -334,7 +373,7 @@ export default function TimelineSlider() {
   // init graph
   useEffect(() => {
     const width = dimensions.width,
-      height = 200;
+      height = heightToWidthRatio ? dimensions.width * heightToWidthRatio : 200;
 
     d3.select("#chart-stem-plot").select("svg").remove();
 
@@ -363,15 +402,42 @@ export default function TimelineSlider() {
       .style("font-size", ".9rem")
       .call(d3.axisBottom(scaleX.current).tickFormat(minorFormat));
 
-    // // x axes label
-    SVG.current
-      .append("text")
-      .attr("x", graphWidth / 2)
-      .attr("y", height - 5)
-      .attr("dx", margin.left)
-      .attr("font-size", ".95rem")
-      .attr("text-anchor", "middle")
-      .text("Year");
+    // x major ticks
+    xAxesMajor.current = SVG.current
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .style("stroke-opacity", 0)
+      .style("font-size", ".95rem")
+      .call(
+        d3
+          .axisBottom(scaleX.current)
+          .tickPadding(18)
+          .tickFormat(majorFormat)
+          .tickValues(majorLocator),
+      );
+    // x major boundary divisions
+    xAxesMajorBoundaries.current = SVG.current
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .style("stroke-opacity", 1)
+      .style("stroke-width", 0.5)
+      .call(
+        d3
+          .axisBottom(scaleX.current)
+          .ticks(majorBoundaryLocator)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
+
+    // // // x axes label
+    // SVG.current
+    //   .append("text")
+    //   .attr("x", graphWidth / 2)
+    //   .attr("y", height - 5)
+    //   .attr("dx", margin.left)
+    //   .attr("font-size", ".95rem")
+    //   .attr("text-anchor", "middle")
+    //   .text("Year");
 
     // y axes
     yAxes.current = SVG.current
@@ -654,6 +720,29 @@ export default function TimelineSlider() {
         .duration(0.0000001)
         .ease(d3.easeLinear)
         .call(d3.axisBottom(scaleX.current!).tickFormat(minorFormat));
+      // x major axes
+      xAxesMajor
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .tickFormat(majorFormat)
+            .tickPadding(18)
+            .tickValues(majorLocator),
+        );
+      xAxesMajorBoundaries
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .ticks(majorBoundaryLocator)
+            .tickFormat(() => "")
+            .tickSize(-graphHeight),
+        );
       xAxesGrid
         .current!.transition()
         .duration(0.0000001)
@@ -689,7 +778,9 @@ export default function TimelineSlider() {
       style={{
         position: "relative",
         display: "block",
-        minHeight: "200px",
+        minHeight: heightToWidthRatio
+          ? dimensions.width * heightToWidthRatio
+          : "200px",
       }}
     >
       <Box
