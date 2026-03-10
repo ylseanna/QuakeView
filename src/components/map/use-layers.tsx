@@ -31,6 +31,12 @@ export function useStemPlotLayers(
       if (scaleX && scaleY) {
         return data.allIDs.map((dataSourceID) => {
           if (data.byID[dataSourceID]) {
+            console.log(dataSources.byID[dataSourceID].formatting.plot.color.linear
+                  .domain[
+                  dataSources.byID[dataSourceID].formatting.plot.color.linear
+                    .variable
+                ]!)
+
             const linearColorScale = d3
               .scaleSequential(
                 d3.piecewise(

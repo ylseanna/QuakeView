@@ -244,56 +244,6 @@ export default function DataSourceVariableForm({
     (state) => state.metadataActions.clearAllVariableMaps,
   );
 
-  const setColorFormatting = useProjectStore(
-    (state) => state.dataSourceActions.setColorFormatting,
-  );
-
-  const { data } = useCatalogData();
-
-  const { dataSources } = useProjectStore((state) => state);
-
-  useEffect(() => {
-    if (data.allIDs) {
-      data.allIDs.forEach((dataSourceID) => {
-        if (data.byID[dataSourceID].bounds && dataSources.byID[dataSourceID]) {
-          ["twoD", "threeD", "plot"].forEach((type) => {
-            const formattingType = type as "twoD" | "threeD" | "plot";
-
-            const boundsFromData = {} as {
-              [variable: string]: [number, number] | null;
-            };
-
-            dataSource.metadata.variables.required_vars
-              .concat(dataSource.metadata.variables.datetime_vars)
-              .concat(dataSource.metadata.variables.added_vars)
-              .concat(["t"])
-              .forEach((variable) => {
-                return (boundsFromData[variable] = dataSource.formatting[
-                  formattingType
-                ].color.linear.domain[
-                  dataSource.formatting[formattingType].color.linear.variable
-                ]
-                  ? dataSource.formatting[formattingType].color.linear.domain[
-                      dataSource.formatting[formattingType].color.linear
-                        .variable
-                    ]
-                  : data.byID[dataSourceID].bounds[variable]);
-              });
-
-            setColorFormatting(dataSourceID, formattingType, {
-              ...dataSources.byID[dataSourceID].formatting[formattingType]
-                .color,
-              linear: {
-                ...dataSources.byID[dataSourceID].formatting[formattingType]
-                  .color.linear,
-                domain: boundsFromData,
-              },
-            });
-          });
-        }
-      });
-    }
-  }, [data.allIDs]);
 
   return (
     <Box sx={{ p: 2 }}>
