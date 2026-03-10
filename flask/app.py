@@ -10,6 +10,7 @@ from pathlib import Path
 
 import pandas as pd
 from numpy import concatenate, float64, int64, isnan
+
 # from shapely import multipoints
 # from werkzeug.exceptions import HTTPException
 
@@ -655,29 +656,69 @@ def generate_event_dict(nlines=None):
             df[varmap["dep"]].mean(),
         ]
 
+    ### ADDING NUMERICAL INDICES IF SET
+
+    if index == "numerical":
+        app.logger.info("Setting numerical index...")
+
+        df["id"] == list(range(len(df)))
+
+    ### REDUCING THE DATEFRAME
+    app.logger.info("Reducing the dataframe to its output shape...")
+    reduced_df = df[
+        [
+            varmap["id"] if not index == "numerical" else "id",
+            "t",
+            "dt",
+            varmap["mag"],
+            varmap["dep"],
+            varmap["lon"],
+            varmap["lat"],
+        ]
+        + optional_vars
+    ]
+
+    ### mapping parameters
+
+    column_mapping = {
+        varmap["mag"]: "mag",
+        varmap["dep"]: "dep",
+        varmap["lon"]: "lon",
+        varmap["lat"]: "lat",
+    }
+
+    if not index == "numerical":
+        column_mapping[varmap["id"]] = "id"
+
+    app.logger.info(f"column mapping: {column_mapping}")
+
+    reduced_df.rename(columns=column_mapping, inplace=True)
+
+    app.logger.info(f"columns: {reduced_df.columns}")
+
     # CONVERT TO JSON
-    app.logger.info("converting to json...")
-    event_list = []
-    for row_index, row in df.iterrows():
-        if not isnan(row[varmap["mag"]]):
-            event_row = {
-                "id": row[varmap["id"]] if not index == "numerical" else row_index,
-                "t": row["t"],
-                "dt": row["dt"],
-                "mag": row[varmap["mag"]],
-                "dep": row[varmap["dep"]],
-                "lon": row[varmap["lon"]],
-                "lat": row[varmap["lat"]],
-            }
+    # app.logger.info("converting to json...")
+    # event_list = []
+    # for row_index, row in df.iterrows():
+    #     if not isnan(row[varmap["mag"]]):
+    #         event_row = {
+    #             "id": row[varmap["id"]] if not index == "numerical" else row_index,
+    #             "t": row["t"],
+    #             "dt": row["dt"],
+    #             "mag": row[varmap["mag"]],
+    #             "dep": row[varmap["dep"]],
+    #             "lon": row[varmap["lon"]],
+    #             "lat": row[varmap["lat"]],
+    #         }
 
-            for var in optional_vars:
-                event_row[var] = row[var]
+    #         for var in optional_vars:
+    #             event_row[var] = row[var]
 
-            event_list.append(event_row)
+    #         event_list.append(event_row)
 
     app.logger.info("returning data object...")
     return {
-        "data": event_list,
+        "data": reduced_df.to_dict(orient="records"),
         "bounds": bounds,
         "unfiltered_bounds": unfiltered_bounds,
         "extent": {
