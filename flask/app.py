@@ -661,13 +661,15 @@ def generate_event_dict(nlines=None):
     if index == "numerical":
         app.logger.info("Setting numerical index...")
 
-        df["id"] == list(range(len(df)))
+        varmap["id"] = "id"
+
+        df["id"] = list(range(len(df)))
 
     ### REDUCING THE DATEFRAME
     app.logger.info("Reducing the dataframe to its output shape...")
     reduced_df = df[
         [
-            varmap["id"] if not index == "numerical" else "id",
+            varmap["id"],
             "t",
             "dt",
             varmap["mag"],
