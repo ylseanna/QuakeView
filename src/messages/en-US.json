@@ -55,7 +55,9 @@
       "chunk_x": "chunk {chunk}",
       "loaded": "loaded",
       "chunk_size_range": "events {start} to {end}"
-    }
+    },
+    "show_extents": "Show extents",
+    "zoom_to_full_extent": "Zoom to full extent"
   },
   "Filtering": {
     "add_filter": "Add filter",

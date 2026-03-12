@@ -2,25 +2,34 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Earthquake, Extent } from "@/components/custom/types";
-
-import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
+import { bbox } from "@turf/bbox";
+import DeckGL from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
 import {
   FlyToInterpolator,
   MapView,
   MapViewState,
   PickingInfo,
+  WebMercatorViewport,
 } from "@deck.gl/core";
-import { Button } from "@mui/material";
+import { Button, useTheme } from "@mui/material";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
-import{ useCatalogData } from "../data/use-data";
+import { useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import useExtents from "./use-extents";
+import { ZoomWidget } from "@deck.gl/widgets";
+
+import { CompassWidget } from "@deck.gl/widgets";
+import {
+  BOTTOMBAR_HEIGHT,
+  DRAWER_HEIGHT,
+} from "../interface/bottom-bar/bottom-bar";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
 // import { TerrainLayer } from "@deck.gl/geo-layers";
@@ -38,26 +47,15 @@ export default function ThreeDDeckGLView({
   extent,
   positionOffset,
 }: DeckGLProps) {
-  const INITIAL_VIEWSTATE = useMemo(
-    () => ({
-      longitude: extent ? extent.centroid[0] : -19,
-      latitude: extent ? extent.centroid[1] : 64,
-      zoom: 12,
-      pitch: 0,
-      bearing: 0,
-      minZoom: 1,
-      maxZoom: 20,
-      maxPitch: 180,
-      position: [0, 0, 0],
-    }),
-    [extent],
-  );
-
   const mapContainer = useRef<HTMLElement>(null);
 
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
   const dataSources = useProjectStore((state) => state.dataSources);
+
+  const { timelineBarVisible, bottombarVisible } = useAppStateStore(
+    (state) => state.appInterface.views,
+  );
 
   const { data } = useCatalogData();
 
@@ -107,29 +105,115 @@ export default function ThreeDDeckGLView({
   ]);
 
   // VIEWSTATE & RESET VIEW
+  const extents = useExtents();
+
+  const { threeDViewState } = useProjectStore(
+    (state) => state.sessionInterface.threeD,
+  );
+
+  const { zoomTo } = useProjectStore((state) => state.sessionInterface.map);
+
+  const { setThreeDViewState } = useProjectStore(
+    (state) => state.interfaceActions.threeD,
+  );
+
   const [initialViewState, setInitialViewState] =
-    useState<MapViewState>(INITIAL_VIEWSTATE);
+    useState<MapViewState>(threeDViewState);
 
-  const flyToDataSource = () => {
-    setInitialViewState({
-      ...INITIAL_VIEWSTATE,
-      transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
-      transitionDuration: "auto",
-    });
-  };
+  useEffect(() => {
+    if (extents.main && data.allIDs) {
+      const viewportWebMercator = new WebMercatorViewport(threeDViewState);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setInitialViewState(INITIAL_VIEWSTATE));
+      const [minLng, minLat, maxLng, maxLat] = bbox(extents.main);
+
+      try {
+        const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(
+          [
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ],
+          {
+            padding: {
+              top: 8,
+              bottom:
+                8 +
+                (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) +
+                (timelineBarVisible ? DRAWER_HEIGHT : 0),
+              left: 8,
+              right: 8,
+            },
+          },
+        );
+
+        setInitialViewState({
+          ...initialViewState,
+          longitude: longitude,
+          latitude: latitude,
+          zoom: zoom,
+        });
+      } catch {}
+    }
+  }, [extents.main, data.allIDs]);
+
+  useEffect(() => {
+    const viewportWebMercator = new WebMercatorViewport(threeDViewState);
+
+    const [minLng, minLat, maxLng, maxLat] = bbox(
+      zoomTo != "all" && zoomTo ? extents.byID[zoomTo] : extents.main,
+    );
+
+    try {
+      const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat],
+        ],
+        {
+          padding: {
+            top: 8,
+            bottom:
+              8 +
+              (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) +
+              (timelineBarVisible ? DRAWER_HEIGHT : 0),
+            left: 8,
+            right: 8,
+          },
+        },
+      );
+
+      console.log(longitude, latitude, zoom);
+
+      setInitialViewState({
+        ...initialViewState,
+        longitude: longitude,
+        latitude: latitude,
+        zoom: zoom,
+        bearing: 0,
+        pitch: 0,
+        transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
+        transitionDuration: "auto",
+      });
+    } catch {}
+
+    (deckRef.current! as unknown).setProps();
+  }, [zoomTo]);
+
+  // // eslint-disable-next-line react-hooks/exhaustive-deps
+  // useEffect(() => setInitialViewState(INITIAL_VIEWSTATE));
 
   const deckRef = useRef(null);
 
-  const { mapToolsVisible } = useAppStateStore((state) => state.appInterface.views);
+  const { mapToolsVisible } = useAppStateStore(
+    (state) => state.appInterface.views,
+  );
+
+  // const theme = useTheme();
 
   return (
     <>
       <DeckGL
         ref={deckRef}
-        views={new MapView({ farZMultiplier: 50 })}
+        views={new MapView({ farZMultiplier: 10000 })}
         controller={{
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
@@ -143,17 +227,21 @@ export default function ThreeDDeckGLView({
           backgroundColor: "var(--mui-palette-background-default)",
         }}
         useDevicePixels={false}
-        // onLoad={onMapLoad}
+        onViewStateChange={({ viewState }) => {
+          setThreeDViewState({ ...viewState });
+        }}
       >
-        {/* {IsLoading && <LinearProgress variant="query" />} */}
         {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
-        {mapToolsVisible && (
+        {/* {mapToolsVisible && (
           <>
-            <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
+            <Button
+              onClick={() => flyToDataSource()}
+              sx={{ left: "52px", top: "8px" }}
+            >
               reset view
             </Button>
           </>
-        )}
+        )} */}
       </DeckGL>
     </>
   );

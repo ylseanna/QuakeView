@@ -1,7 +1,7 @@
 "use client";
 
 import "maplibre-gl/dist/maplibre-gl.css";
-import Map, { ScaleControl } from "react-map-gl/maplibre";
+import Map, { Layer, ScaleControl } from "react-map-gl/maplibre";
 import { createRef, useEffect, useState } from "react";
 import { ViewState } from "react-map-gl/maplibre";
 import { bbox } from "@turf/bbox";
@@ -16,7 +16,7 @@ import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
 } from "@/components/interface/bottom-bar/bottom-bar";
-import useMapStyle from "@/components/map/use-map-style";
+import { useMapStyle, useExtentLayers } from "@/components/map/use-map-style";
 import useExtents from "@/components/map/use-extents";
 
 export default function Page() {
@@ -24,13 +24,18 @@ export default function Page() {
 
   const mapRef = createRef<MapRef>();
 
-  const { overViewState, setOverViewState, zoomTo, setZoomToTarget } = useProjectStore(
-    useShallow((state) => ({
-      overViewState: state.sessionInterface.map.mapViewState,
-      zoomTo: state.sessionInterface.map.zoomTo,
-      setOverViewState: state.interfaceActions.map.setMapViewState,
-      setZoomToTarget: state.interfaceActions.map.setZoomToTarget,
-    })),
+  const { overViewState, setOverViewState, zoomTo, setZoomToTarget } =
+    useProjectStore(
+      useShallow((state) => ({
+        overViewState: state.sessionInterface.map.mapViewState,
+        zoomTo: state.sessionInterface.map.zoomTo,
+        setOverViewState: state.interfaceActions.map.setMapViewState,
+        setZoomToTarget: state.interfaceActions.map.setZoomToTarget,
+      })),
+    );
+
+  const { showExtents } = useProjectStore(
+    (state) => state.sessionInterface.map,
   );
 
   const onMapLoad = () => {
@@ -40,7 +45,7 @@ export default function Page() {
   function setViewStateandLocalStorage(viewState: ViewState) {
     if (IsLoading == false) {
       setOverViewState(viewState);
-      setZoomToTarget(null)
+      setZoomToTarget(null);
     }
   }
 
@@ -53,20 +58,35 @@ export default function Page() {
   );
 
   useEffect(() => {
-    if (zoomTo && extents.byID[zoomTo] && mapRef.current) {
-        const [minLng, minLat, maxLng, maxLat] = bbox(
-          zoomTo != "all" ? extents.byID[zoomTo] : extents.main,
-        );
+    if (zoomTo && mapRef.current) {
+      const [minLng, minLat, maxLng, maxLat] = bbox(
+        zoomTo != "all"
+          ? extents.byID[zoomTo] && extents.byID[zoomTo]
+          : extents.main,
+      );
 
-        mapRef.current.fitBounds(
-          [
-            [minLng, minLat],
-            [maxLng, maxLat],
-          ],
-          { padding: {top: 8, bottom: 8 + (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) + (timelineBarVisible ? DRAWER_HEIGHT : 0), left: 8, right: 8}, duration: 1000 },
-        );
+      mapRef.current.fitBounds(
+        [
+          [minLng, minLat],
+          [maxLng, maxLat],
+        ],
+        {
+          padding: {
+            top: 8,
+            bottom:
+              8 +
+              (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) +
+              (timelineBarVisible ? DRAWER_HEIGHT : 0),
+            left: 8,
+            right: 8,
+          },
+          duration: 1000,
+        },
+      );
     }
   }, [zoomTo]);
+
+  const extentLayers = useExtentLayers();
 
   return (
     <Map
@@ -115,6 +135,7 @@ export default function Page() {
         }}
       />
       <DeckGLlayers />
+      {showExtents && <Layer {...extentLayers["mainExtent"]} />}
     </Map>
   );
 }

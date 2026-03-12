@@ -807,7 +807,7 @@ export default function TimelineSlider({
         }
         controller={
           {
-            scrollZoom: { speed: 0.1, smooth: true },
+            scrollZoom: { speed: 0.2, smooth: true },
             zoomAxis: "X",
             keyboard: { moveSpeed: -50 },
           } as ControllerOptions

@@ -7,7 +7,7 @@ export function minorTimeFormat(dateIntervalSeconds: number) {
       ? d3.utcFormat("%H:%M:%S")
       : dateIntervalSeconds < 7 * 24 * 60 * 60
         ? d3.utcFormat("%H:%M")
-        : dateIntervalSeconds < 31 * 24 * 60 * 60
+        : dateIntervalSeconds < 3 * 31 * 24 * 60 * 60
           ? d3.utcFormat("%_d")
           : dateIntervalSeconds < 5 * 365.25 * 24 * 60 * 60
             ? d3.utcFormat("%_d %b")

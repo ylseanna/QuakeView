@@ -2,6 +2,7 @@ import { immer } from "zustand/middleware/immer";
 import { ViewState } from "react-map-gl/maplibre";
 import { persist } from "zustand/middleware";
 import { createStore } from "zustand/vanilla";
+import { MapViewState } from "deck.gl";
 import { merge } from "lodash";
 
 import { DataSourceColorFormatting, DataSourceDataDescription, DataSourceFormatting, DataSourceMetaData } from "../components/custom/types";
@@ -20,6 +21,9 @@ export type SessionInterface = {
   pickable: boolean;
   table: {
     dataSourceID: string | null;
+  };
+  threeD: {
+    threeDViewState: MapViewState;
   };
   map: {
     mapViewState: ViewState;
@@ -50,6 +54,9 @@ export type ProjectActions = {
     setPickable: (value: boolean) => void;
     table: {
       setDataSourceID: (id: string | null) => void;
+    };
+    threeD: {
+      setThreeDViewState: (value: MapViewState) => void;
     };
     map: {
       setMapViewState: (value: ViewState) => void;
@@ -118,6 +125,19 @@ export type ProjectStore = ProjectState & ProjectActions;
 export const defaultInitState: ProjectState = {
   sessionInterface: {
     pickable: false,
+    threeD: {
+      threeDViewState: {
+        longitude: -19,
+        latitude: 64,
+        zoom: 10,
+        pitch: 0,
+        bearing: 0,
+        minZoom: 1,
+        maxZoom: 20,
+        maxPitch: 180,
+        position: [0, 0, 0],
+      },
+    },
     map: {
       mapStyle: "Iceland",
       mapViewState: {
@@ -168,6 +188,12 @@ export const createProjectStore = (
             setDataSourceID: (id) =>
               set((state) => {
                 state.sessionInterface.table.dataSourceID = id;
+              }),
+          },
+          threeD: {
+            setThreeDViewState: (value) =>
+              set((state) => {
+                state.sessionInterface.threeD.threeDViewState = value;
               }),
           },
           map: {
