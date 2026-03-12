@@ -2,7 +2,7 @@
 
 import "maplibre-gl/dist/maplibre-gl.css";
 import Map, { Layer, ScaleControl } from "react-map-gl/maplibre";
-import { createRef, useEffect, useState } from "react";
+import { createRef, useEffect, useMemo, useState } from "react";
 import { ViewState } from "react-map-gl/maplibre";
 import { bbox } from "@turf/bbox";
 
@@ -12,17 +12,25 @@ import { AttributionControl, type MapRef } from "react-map-gl/maplibre";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useShallow } from "zustand/react/shallow";
 import { useAppStateStore } from "@/providers/app-state-provider";
+// import { GeoGrid } from "geogrid-maplibre-gl";
+
 import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
 } from "@/components/interface/bottom-bar/bottom-bar";
 import { useMapStyle, useExtentLayers } from "@/components/map/use-map-style";
 import useExtents from "@/components/map/use-extents";
+import { useTheme } from "@mui/material/styles";
 
 export default function Page() {
   const [IsLoading, setIsLoading] = useState(true);
+  const theme = useTheme()
 
   const mapRef = createRef<MapRef>();
+
+  // const graticuleRef = createRef<GeoGrid>();
+
+  // const geogrid = useMemo(() => mapRef.current && [mapRef]);
 
   const { overViewState, setOverViewState, zoomTo, setZoomToTarget } =
     useProjectStore(
@@ -40,6 +48,26 @@ export default function Page() {
 
   const onMapLoad = () => {
     setIsLoading(false);
+
+    console.log(mapRef.current?.getMap());
+
+    // if (mapRef.current) {
+    //   graticuleRef.current = new GeoGrid({
+    //     map: mapRef.current.getMap(),
+    //     beforeLayerId: "joklar",
+    //     gridStyle: {
+    //       color: theme.palette.divider,
+    //       width: 0.5,
+    //     },
+    //     labelStyle: {
+    //       color: "rgba(0, 0, 0, 0.3)",
+    //       fontSize: ".7rem",
+    //     },
+    //     zoomLevelRange: [0, 22],
+    //     gridDensity: (zoomLevel) => zoomLevel != 0 ? 1 : 10,
+    //     formatLabels: (degreesFloat) => String(degreesFloat),
+    //   });
+    // }
   };
 
   function setViewStateandLocalStorage(viewState: ViewState) {

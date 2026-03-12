@@ -60,6 +60,7 @@
     "deck.gl": "^9.2.3",
     "electron-router-dom": "^2.1.0",
     "electron-vite": "^5.0.0",
+    "geogrid-maplibre-gl": "^0.2.4",
     "get-port-please": "^3.2.0",
     "humanize-plus": "^1.8.2",
     "immer": "^10.2.0",
