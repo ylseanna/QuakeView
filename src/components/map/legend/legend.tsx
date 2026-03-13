@@ -15,11 +15,10 @@ import { usePathname } from "@/i18n/routing";
 
 interface LegendProps {
   layerType: "twoD" | "threeD" | "plot";
-  singleColor?: boolean;
-  sx?: SxProps;
+  floating?: boolean,
 }
 
-export default function Legend({ layerType, singleColor, sx }: LegendProps) {
+export default function Legend({ layerType, floating = true }: LegendProps) {
   const t = useTranslations("Common");
   const pathname = usePathname();
 
@@ -27,12 +26,7 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
 
   const { timelineBarVisible, bottombarVisible, sidebarOpen } = useAppStateStore((state) => state.appInterface.views);
 
-  if (
-    dataSources.allIDs!.length > 1 ||
-    (dataSources.allIDs!.length == 1 &&
-      dataSources.byID![dataSources.allIDs[0]].formatting[layerType].color
-        .mapping != "single")
-  ) {
+
     return (
       <Paper
         variant="outlined"
@@ -66,11 +60,9 @@ export default function Legend({ layerType, singleColor, sx }: LegendProps) {
                 key={`LegendElement-${id}`}
                 dataSource={dataSources.byID[id]}
                 layerType={layerType}
-                singleColor={singleColor}
               />
             ))}
         </Stack>
       </Paper>
     );
-  }
 }
