@@ -195,7 +195,6 @@ export default function ThreeDDeckGLView({
       });
     } catch {}
 
-    (deckRef.current! as unknown).setProps();
   }, [zoomTo]);
 
   // // eslint-disable-next-line react-hooks/exhaustive-deps
