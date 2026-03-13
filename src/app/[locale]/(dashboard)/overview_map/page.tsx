@@ -19,7 +19,7 @@ import {
   DRAWER_HEIGHT,
 } from "@/components/interface/bottom-bar/bottom-bar";
 import { useMapStyle, useExtentLayers } from "@/components/map/use-map-style";
-import useExtents from "@/components/map/use-extents";
+import { useExtentPolygons } from "@/components/map/use-extents";
 import { useTheme } from "@mui/material/styles";
 
 export default function Page() {
@@ -79,7 +79,7 @@ export default function Page() {
 
   const { mapStyle } = useMapStyle();
 
-  const extents = useExtents();
+  const extents = useExtentPolygons();
 
   const { bottombarVisible, timelineBarVisible } = useAppStateStore(
     (state) => state.appInterface.views,

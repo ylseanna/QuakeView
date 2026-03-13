@@ -3,19 +3,28 @@ import { Extent } from "../custom/types";
 export type BoundsDict = { [variable: string]: [number, number] | null };
 
 export const combineBounds = (boundsDicts: BoundsDict[]) => {
+  console.log(boundsDicts)
   return Object.fromEntries(
     Object.keys(boundsDicts[0]).map((variable) => {
-      return [
-        variable,
-        [
-          Math.min(
-            ...boundsDicts.map((boundsDict) => boundsDict[variable]![0]),
-          ),
-          Math.max(
-            ...boundsDicts.map((boundsDict) => boundsDict[variable]![1]),
-          ),
-        ],
-      ];
+      if (
+        boundsDicts
+          .map((boundsDict) => boundsDict[variable]!)
+          .some((el) => el != null)
+      ) {
+        return [
+          variable,
+          [
+            Math.min(
+              ...boundsDicts.map((boundsDict) => boundsDict[variable]![0]),
+            ),
+            Math.max(
+              ...boundsDicts.map((boundsDict) => boundsDict[variable]![1]),
+            ),
+          ],
+        ];
+      } else {
+        return [variable, null];
+      }
     }),
   ) as BoundsDict;
 };

@@ -24,6 +24,7 @@ export type SessionInterface = {
   };
   threeD: {
     threeDViewState: MapViewState;
+    elevationOffset: number;
   };
   map: {
     mapViewState: ViewState;
@@ -57,6 +58,7 @@ export type ProjectActions = {
     };
     threeD: {
       setThreeDViewState: (value: MapViewState) => void;
+      setElevationOffset: (value: number) => void;
     };
     map: {
       setMapViewState: (value: ViewState) => void;
@@ -126,6 +128,7 @@ export const defaultInitState: ProjectState = {
   sessionInterface: {
     pickable: false,
     threeD: {
+      elevationOffset: 0,
       threeDViewState: {
         longitude: -19,
         latitude: 64,
@@ -194,6 +197,10 @@ export const createProjectStore = (
             setThreeDViewState: (value) =>
               set((state) => {
                 state.sessionInterface.threeD.threeDViewState = value;
+              }),
+            setElevationOffset: (value) =>
+              set((state) => {
+                state.sessionInterface.threeD.elevationOffset = value;
               }),
           },
           map: {

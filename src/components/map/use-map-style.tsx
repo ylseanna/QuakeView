@@ -11,7 +11,7 @@ import coastline from "@/json/coastline.geojson" with { type: "json" };
 import all_countries from "@/json/countries.geojson" with { type: "json" };
 import calderas from "@/json/calderas.geojson" with { type: "json" };
 import joklar from "@/json/joklar.geojson" with { type: "json" };
-import useExtents from "./use-extents";
+import { useExtentPolygons } from "./use-extents";
 
 const ocean = mask(coastline);
 
@@ -174,7 +174,7 @@ export function useMapStyle() {
     (state) => state.sessionInterface.map,
   );
 
-  const { main: mainExtent, byID: extentPolygons } = useExtents();
+  const { main: mainExtent, byID: extentPolygons } = useExtentPolygons();
 
   const mapStyle = useMemo(() => {
     const mapStyle =
@@ -247,7 +247,7 @@ export function useExtentLayers() {
     (state) => state.sessionInterface.map,
   );
 
-  const { main: mainExtent, byID: extentPolygons } = useExtents();
+  const { main: mainExtent, byID: extentPolygons } = useExtentPolygons();
 
   const extentLayers  = useMemo(() => {
     const layers = {} as { [id: string]: LayerSpecification };
