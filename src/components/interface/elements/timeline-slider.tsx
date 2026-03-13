@@ -791,10 +791,10 @@ export default function TimelineSlider({
       <DeckGL
         style={{
           position: "absolute",
-          width: graphWidth + "px",
-          height: graphHeight + "px",
-          top: margin.top + "px",
-          left: margin.left + "px",
+          width: graphWidth - 1 + "px", // account for width of axes
+          height: graphHeight - 1 + "px",
+          top: margin.top + 1 + "px",
+          left: margin.left + 1 + "px",
           pointerEvents: animationEnabled ? "none" : "inherit",
           cursor: sessionInterface.pickable ? "crosshair" : "auto",
           zIndex: "40",
