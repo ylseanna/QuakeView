@@ -94,6 +94,7 @@ export default function NavBar() {
 
   const theme = useTheme();
 
+
   return (
     <Toolbar
       sx={{
