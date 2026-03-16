@@ -267,6 +267,9 @@ export const createProjectStore = (
                 state.dataSources.allIDs.findIndex((iid) => iid === id),
                 1,
               );
+              if (state.sessionInterface.table.dataSourceID == id) {
+                state.sessionInterface.table.dataSourceID = null
+              }
             }),
           setName: (id, value) =>
             set((state) => {
