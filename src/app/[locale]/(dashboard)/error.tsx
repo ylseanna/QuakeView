@@ -26,15 +26,15 @@ export default function Error({
         justifyContent: "center",
       }}
     >
-      <Alert sx={{fontSize: 42, mb: 2}}/>
-      <Typography variant="h4" sx={{opacity: .8}}>
+      <Alert sx={{ fontSize: 42, mb: 2 }} />
+      <Typography variant="h4" sx={{ opacity: 0.8 }}>
         Something was a little shakey there...
       </Typography>
       {error.digest && (
         <Typography sx={{ fontFamily: "monospace" }}>{error.digest}</Typography>
       )}
       <Button
-      sx={{mt:2}}
+        sx={{ mt: 2 }}
         variant="outlined"
         onClick={
           // Attempt to recover by trying to re-render the segment
