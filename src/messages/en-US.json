@@ -87,7 +87,8 @@
     "Formatting": {
       "map": "2D Map",
       "plot": "plot",
-      "3D_map": "3D map"
+      "3D_map": "3D map",
+      "linear_mapping_warning": "Something went wrong while retrieving the paremeters for the linear colour mapping"
     }
   },
   "Layers": {
