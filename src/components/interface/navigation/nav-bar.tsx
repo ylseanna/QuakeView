@@ -5,6 +5,7 @@ import { Box, Button, Divider, ListItemIcon, ListItemText, Menu, MenuItem, MenuL
 import { useTranslations } from "next-intl";
 import { Fragment } from "react";
 
+import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 import { Link, usePathname } from "@/i18n/routing";
 
 export default function NavBar() {
@@ -70,12 +71,12 @@ export default function NavBar() {
           icon: <ChartPpf />,
           enabled: true,
         },
-        {
-          segment: "/plots/distribution_plot",
-          title: t("Navbar.distribution_plot"),
-          icon: <ChartHistogram />,
-          enabled: true,
-        },
+        // {
+        //   segment: "/plots/distribution_plot",
+        //   title: t("Navbar.distribution_plot"),
+        //   icon: <ChartHistogram />,
+        //   enabled: true,
+        // },
       ],
     },
 
@@ -109,7 +110,7 @@ export default function NavBar() {
         direction="row"
         spacing={2}
         divider={<Divider orientation="vertical" flexItem />}
-        sx={{ height: "80px", alignItems: "center" }}
+        sx={{ height: "80px", alignItems: "center", overflowX: "scroll", scrollbarWidth: "none", "::-webkit-scrollbar" : {display: "none"} }}
       >
         {NavigationSections.map((NavigationSection) => (
           <Box
@@ -156,7 +157,8 @@ export default function NavBar() {
                             justifyContent: "center",
                             p: "4px",
                             fontSize: "0.8rem",
-                            textTransform: "capitalize",
+                            textTransform: "none",
+                            textWrap: "nowrap"
                           }}
                           disabled={!NavigationItem.enabled}
                         >

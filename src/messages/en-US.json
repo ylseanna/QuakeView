@@ -154,9 +154,9 @@
     "show_bottombar": "Show bottom bar"
   },
   "Navbar": {
-    "GR_plot": "GR plot",
+    "GR_plot": "Magnitude vs. frequency",
     "distribution_plot": "Histogram",
-    "stem_plot": "Stem plot",
+    "stem_plot": "Time vs. magnitude",
     "open_in_window": "Open page \"{page}\" in new window"
   },
   "Source": {
