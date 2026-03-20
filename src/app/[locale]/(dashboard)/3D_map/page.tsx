@@ -10,7 +10,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useState } from "react";
 import ThreeDDeckGLView from "@/components/map/3D-deckgl";
 import { useProjectStore } from "@/providers/project-store-provider";
-import{ useCatalogData } from "@/components/data/use-data";
+import { useCatalogData } from "@/components/data/use-data";
 
 export default function Page() {
   const { dataSources } = useProjectStore((state) => state);
@@ -30,24 +30,11 @@ export default function Page() {
 
   const [positionOffset, setPositionOffset] = useState<number>(0);
 
-  useKeyDown(["PageDown"], (e) => {
-    setPositionOffset((positionOffset) => positionOffset - 0.1);
-    console.log(positionOffset);
-    e.preventDefault();
-  });
-
-  useKeyDown(["PageUp"], (e) => {
-    setPositionOffset((positionOffset) => positionOffset + 0.1);
-    console.log(positionOffset);
-    e.preventDefault();
-  });
+  
 
   return (
     <>
-      <ThreeDDeckGLView
-        extent={calculateExtent()}
-        positionOffset={positionOffset}
-      ></ThreeDDeckGLView>
+      <ThreeDDeckGLView />
     </>
   );
 }

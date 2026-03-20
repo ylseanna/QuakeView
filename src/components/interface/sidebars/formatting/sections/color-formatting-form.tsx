@@ -2,6 +2,7 @@
 "use client";
 
 import {
+  Alert,
   Autocomplete,
   Box,
   Checkbox,
@@ -154,7 +155,7 @@ export default function ColorFormattingForm({
                   />
                 </Grid>
               </Grid>
-            ) : dataSource.formatting[type].color.mapping == "linear" ? (
+            ) : dataSource.formatting[type].color.mapping == "linear" ? data.byID[dataSource.internal_id] ? (
               <Grid container direction="column">
                 <Grid
                   container
@@ -446,7 +447,7 @@ export default function ColorFormattingForm({
                   />
                 </Grid>
               </Grid>
-            ) : dataSource.formatting[type].color.mapping == "categorical" ? (
+            ) : <Alert severity="error">{t("Formatting.linear_mapping_warning")}</Alert> : dataSource.formatting[type].color.mapping == "categorical" ? (
               <Grid container direction="column">
                 <Grid
                   container

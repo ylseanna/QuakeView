@@ -1,5 +1,5 @@
 import combine from "@turf/combine";
-import { StyleSpecification } from "maplibre-gl";
+import { LayerSpecification, StyleSpecification } from "maplibre-gl";
 import mask from "@turf/mask";
 import { FeatureCollection, GeoJsonProperties, MultiPolygon } from "geojson";
 import { useMemo } from "react";
@@ -11,7 +11,7 @@ import coastline from "@/json/coastline.geojson" with { type: "json" };
 import all_countries from "@/json/countries.geojson" with { type: "json" };
 import calderas from "@/json/calderas.geojson" with { type: "json" };
 import joklar from "@/json/joklar.geojson" with { type: "json" };
-import useExtents from "./use-extents";
+import { useExtentPolygons } from "./use-extents";
 
 const ocean = mask(coastline);
 
@@ -169,12 +169,12 @@ export const WorldCoastLines: StyleSpecification = {
   ],
 };
 
-export default function useMapStyle() {
+export function useMapStyle() {
   const { mapStyle: selectedStyle, showExtents } = useProjectStore(
     (state) => state.sessionInterface.map,
   );
 
-  const { main: mainExtent, byID: extentPolygons } = useExtents();
+  const { main: mainExtent, byID: extentPolygons } = useExtentPolygons();
 
   const mapStyle = useMemo(() => {
     const mapStyle =
@@ -192,45 +192,47 @@ export default function useMapStyle() {
               type: "geojson",
               data: extentPolygons[dataSourceID],
             };
-            if (
-              !mapStyle.layers
-                .map((layer) => layer.id)
-                .includes("extent-" + dataSourceID)
-            ) {
-              mapStyle.layers.push({
-                id: "extent-" + dataSourceID,
-                type: "line",
-                source: "extent-source-" + dataSourceID,
-                paint: {
-                  "line-color": "#000",
-                  "line-opacity": 1,
-                  "line-width": 1.2,
-                },
-              });
-            }
+            // if (
+            //   !mapStyle.layers
+            //     .map((layer) => layer.id)
+            //     .includes("extent-" + dataSourceID)
+            // ) {
+            //   mapStyle.layers.push({
+            //     id: "extent-" + dataSourceID,
+            //     type: "line",
+            //     source: "extent-source-" + dataSourceID,
+            //     paint: {
+            //       "line-color": "#000",
+            //       "line-opacity": 1,
+            //       "line-width": 1.2,
+            //     },
+            //   });
+            // }
           }
         });
       }
-    }
 
-    if (mainExtent) {
-      if (extentPolygons) {
-        mapStyle.sources["mainExtent"] = {
-          type: "geojson",
-          data: mainExtent,
-        };
-        if (!mapStyle.layers.map((layer) => layer.id).includes("mainExtent")) {
-          mapStyle.layers.push({
-            id: "mainExtent",
-            type: "line",
-            source: "mainExtent",
-            paint: {
-              "line-dasharray": [1, 1],
-              "line-color": "#000",
-              "line-opacity": 1,
-              "line-width": 1.2,
-            },
-          });
+      if (mainExtent) {
+        if (extentPolygons) {
+          mapStyle.sources["mainExtent"] = {
+            type: "geojson",
+            data: mainExtent,
+          };
+          // if (
+          //   !mapStyle.layers.map((layer) => layer.id).includes("mainExtent")
+          // ) {
+          //   mapStyle.layers.push({
+          //     id: "mainExtent",
+          //     type: "line",
+          //     source: "mainExtent",
+          //     paint: {
+          //       "line-dasharray": [1, 1],
+          //       "line-color": "#000",
+          //       "line-opacity": 1,
+          //       "line-width": 1.2,
+          //     },
+          //   });
+          // }
         }
       }
     }
@@ -238,4 +240,58 @@ export default function useMapStyle() {
   }, [selectedStyle, extentPolygons, showExtents]);
 
   return { mapStyle: mapStyle } as { mapStyle: StyleSpecification };
+}
+
+export function useExtentLayers() {
+  const { mapStyle: selectedStyle, showExtents } = useProjectStore(
+    (state) => state.sessionInterface.map,
+  );
+
+  const { main: mainExtent, byID: extentPolygons } = useExtentPolygons();
+
+  const extentLayers  = useMemo(() => {
+    const layers = {} as { [id: string]: LayerSpecification };
+
+    if (extentPolygons) {
+      Object.keys(extentPolygons).forEach((dataSourceID) => {
+        if (extentPolygons[dataSourceID]) {
+          if (!Object.keys(layers).includes("extent-" + dataSourceID)) {
+            layers["extent-" + dataSourceID] = {
+              id: "extent-" + dataSourceID,
+              type: "line",
+              source: "extent-source-" + dataSourceID,
+              paint: {
+                "line-color": "#000",
+                "line-opacity": 1,
+                "line-width": 1.2,
+              },
+            };
+          }
+        }
+      });
+
+      if (mainExtent) {
+        if (extentPolygons) {
+          if (
+            !Object.keys(layers).includes("mainExtent")
+          ) {
+            layers["mainExtent"] = {
+              id: "mainExtent",
+              type: "line",
+              source: "mainExtent",
+              paint: {
+                "line-dasharray": [1, 1],
+                "line-color": "#000",
+                "line-opacity": 1,
+                "line-width": 1.2,
+              },
+            };
+          }
+        }
+      }
+    }
+    return layers;
+  }, [selectedStyle, extentPolygons, showExtents]);
+
+  return extentLayers;
 }

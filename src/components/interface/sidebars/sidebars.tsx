@@ -9,6 +9,7 @@ import { useClickOutside } from "@react-hooks-library/core";
 import FilteringSidebar from "@/components/interface/sidebars/filtering/filtering-sidebar";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import LayersSidebar from "@/components/interface/sidebars/layers/layers-sidebar";
+import { usePathname } from "@/i18n/routing";
 
 export const DRAWER_WIDTH = 360;
 
@@ -45,10 +46,12 @@ export default function Sidebars() {
     setSidebarOpen(null);
   });
 
+  const pathname = usePathname()
+
   return (
     <Box ref={sidebarsRef}>
       <Paper
-      variant="outlined"
+        variant="outlined"
         sx={{
           display: "flex",
           position: "fixed",
@@ -65,6 +68,7 @@ export default function Sidebars() {
           borderRight: 0,
           zIndex: theme.zIndex.appBar - 100,
           color: "var(--theme-palette-text-primary)",
+          ...(!sidebarOpen && pathname.startsWith("/plots") ? {border: 0, pr: 1, mt: 1 } : {})
         }}
         style={{ transition: "transform.225s" }}
       >

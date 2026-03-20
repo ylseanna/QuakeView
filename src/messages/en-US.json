@@ -55,7 +55,9 @@
       "chunk_x": "chunk {chunk}",
       "loaded": "loaded",
       "chunk_size_range": "events {start} to {end}"
-    }
+    },
+    "show_extents": "Show extents",
+    "zoom_to_full_extent": "Zoom to full extent"
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -85,7 +87,8 @@
     "Formatting": {
       "map": "2D Map",
       "plot": "plot",
-      "3D_map": "3D map"
+      "3D_map": "3D map",
+      "linear_mapping_warning": "Something went wrong while retrieving the paremeters for the linear colour mapping"
     }
   },
   "Layers": {
@@ -151,9 +154,9 @@
     "show_bottombar": "Show bottom bar"
   },
   "Navbar": {
-    "GR_plot": "GR plot",
+    "GR_plot": "Magnitude vs. frequency",
     "distribution_plot": "Histogram",
-    "stem_plot": "Stem plot",
+    "stem_plot": "Time vs. magnitude",
     "open_in_window": "Open page \"{page}\" in new window"
   },
   "Source": {

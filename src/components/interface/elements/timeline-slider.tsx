@@ -3,20 +3,16 @@ import useAnimationFrame from "use-animation-frame";
 import DeckGL from "@deck.gl/react";
 import { Box } from "@mui/material";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
-import { Dispatch, useCallback, useEffect, useMemo, useRef, useState } from "react";
-// import { fetchData } from "../datasource/load-data";
-// import { useDataStore } from "@/providers/data-store-provider";
-import { SetStateAction } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
 
-import { StemPlotLayers } from "../../map/generate-datasource-layers";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { useAppStateStore } from "@/providers/app-state-provider";
-import { minorTimeFormat } from "../../custom/time-format";
-import MapToolTip from "../../map/map-tooltip";
-import { useCatalogData } from "../../data/use-data";
-import { Earthquake } from "../../custom/types";
-import { ControllerOptions } from "../../map/types";
+import { majorTickFormat, majorTickLocator, majorTimeBoundaryLocator, minorTimeFormat } from "@/components/custom/time-format";
+import MapToolTip from "@/components/map/map-tooltip";
+import { useStemPlotLayers } from "@/components/map/use-layers";
+import { useCatalogData } from "@/components/data/use-data";
+import { Earthquake } from "@/components/custom/types";
+import { ControllerOptions } from "@/components/map/types";
 // import { useKeyPressed } from "@react-hooks-library/core";
 
 interface Bounds {
@@ -36,14 +32,16 @@ interface ViewStateMonitor {
 
 type D3Earthquake = Earthquake & { date: Date };
 
-export default function TimelineSlider() {
+export default function TimelineSlider({
+  heightToWidthRatio,
+}: {
+  heightToWidthRatio?: number;
+}) {
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
-  const { timelineBarVisible } = useAppStateStore((state) => state.appInterface.views);
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
-  const { dataSources } = useProjectStore((state) => state);
   const { data } = useCatalogData();
 
   // filtering
@@ -56,13 +54,15 @@ export default function TimelineSlider() {
 
   // animation
 
-  const { enabled: animationEnabled, isPlaying, speed: animationSpeed } = useProjectStore(
-    (state) => state.sessionInterface.animation.timeline,
-  );
-
   const {
-    setIsPlaying,
-  } = useProjectStore((state) => state.interfaceActions.animation.timeline);
+    enabled: animationEnabled,
+    isPlaying,
+    speed: animationSpeed,
+  } = useProjectStore((state) => state.sessionInterface.animation.timeline);
+
+  const { setIsPlaying } = useProjectStore(
+    (state) => state.interfaceActions.animation.timeline,
+  );
 
   // state for setting dimensions of graph in container
   const parentRef = useRef<HTMLInputElement>(null);
@@ -102,7 +102,10 @@ export default function TimelineSlider() {
     [dimensions],
   );
   const graphHeight = useMemo(
-    () => 200 - margin.top - margin.bottom,
+    () =>
+      (heightToWidthRatio ? dimensions.width * heightToWidthRatio : 200) -
+      margin.top -
+      margin.bottom,
     [dimensions],
   );
 
@@ -118,7 +121,36 @@ export default function TimelineSlider() {
 
   const minorFormat = useMemo(
     () =>
-      minorTimeFormat((bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000),
+      minorTimeFormat(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ) as (domainValue: Date | d3.NumberValue, index: number) => string,
+    [bounds.x],
+  );
+
+  const majorFormat = useMemo(
+    () =>
+      majorTickFormat(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ) as (domainValue: Date | d3.NumberValue, index: number) => string,
+    [bounds.x],
+  );
+
+  const majorLocator = useMemo(
+    () =>
+      majorTickLocator(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+        bounds.x,
+      ),
+    [bounds.x],
+  );
+
+  console.log(majorLocator);
+
+  const majorBoundaryLocator = useMemo(
+    () =>
+      majorTimeBoundaryLocator(
+        (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+      ),
     [bounds.x],
   );
 
@@ -194,6 +226,10 @@ export default function TimelineSlider() {
     viewPortScaleY = useRef<d3.ScaleLinear<number, number, never>>(null);
   // axes
   const xAxes =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
+    xAxesMajor =
+      useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
+    xAxesMajorBoundaries =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null),
     yAxes =
       useRef<d3.Selection<SVGGElement, unknown, HTMLElement, unknown>>(null);
@@ -337,7 +373,7 @@ export default function TimelineSlider() {
   // init graph
   useEffect(() => {
     const width = dimensions.width,
-      height = 200;
+      height = heightToWidthRatio ? dimensions.width * heightToWidthRatio : 200;
 
     d3.select("#chart-stem-plot").select("svg").remove();
 
@@ -366,15 +402,42 @@ export default function TimelineSlider() {
       .style("font-size", ".9rem")
       .call(d3.axisBottom(scaleX.current).tickFormat(minorFormat));
 
-    // // x axes label
-    SVG.current
-      .append("text")
-      .attr("x", graphWidth / 2)
-      .attr("y", height - 5)
-      .attr("dx", margin.left)
-      .attr("font-size", ".95rem")
-      .attr("text-anchor", "middle")
-      .text("Year");
+    // x major ticks
+    xAxesMajor.current = SVG.current
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .style("stroke-opacity", 0)
+      .style("font-size", ".95rem")
+      .call(
+        d3
+          .axisBottom(scaleX.current)
+          .tickPadding(18)
+          .tickFormat(majorFormat)
+          .tickValues(majorLocator),
+      );
+    // x major boundary divisions
+    xAxesMajorBoundaries.current = SVG.current
+      .append("g")
+      .attr("transform", `translate(0, ${height - margin.bottom})`)
+      .style("stroke-opacity", 1)
+      .style("stroke-width", 0.5)
+      .call(
+        d3
+          .axisBottom(scaleX.current)
+          .ticks(majorBoundaryLocator)
+          .tickFormat(() => "")
+          .tickSize(-graphHeight),
+      );
+
+    // // // x axes label
+    // SVG.current
+    //   .append("text")
+    //   .attr("x", graphWidth / 2)
+    //   .attr("y", height - 5)
+    //   .attr("dx", margin.left)
+    //   .attr("font-size", ".95rem")
+    //   .attr("text-anchor", "middle")
+    //   .text("Year");
 
     // y axes
     yAxes.current = SVG.current
@@ -495,7 +558,7 @@ export default function TimelineSlider() {
     }
   }, [viewStateMonitor.coordPosition, viewStateMonitor.pixelPosition]);
 
-  const layers = useMemo(() => {
+  useEffect(() => {
     if (data.allIDs) {
       if (scaleX.current && scaleY.current) {
         const minX = Math.min(
@@ -551,30 +614,41 @@ export default function TimelineSlider() {
           },
         });
 
-        const layers_to_set = data.allIDs.map((id) => {
-          if (data.byID[id]) {
-            const layer = StemPlotLayers(
-              dataSources.byID[id],
-              data.byID[id].data,
-              sessionInterface,
-              viewPortScaleX.current!,
-              viewPortScaleY.current!,
-              viewPortScaleY.current!(minY),
-              false,
-            ) as ScatterplotLayer;
+        // const layers_to_set = data.allIDs.map((id) => {
+        //   if (data.byID[id]) {
+        //     const layer = useStemPlotLayers(
+        //       dataSources.byID[id],
+        //       viewPortScaleX.current!,
+        //       viewPortScaleY.current!,
+        //       viewPortScaleY.current!(minY),
+        //       false,
+        //     ) as ScatterplotLayer;
 
-            layer.onHover = (info: PickingInfo<Earthquake>) => {
-              setHoverInfo(info);
-              return true;
-            };
-
-            return layer;
-          }
-        });
-        return layers_to_set;
+        //     return layer;
+        //   }
+        // });
+        // return layers_to_set;
       }
     }
-  }, [dimensions, dataSources.byID, data, scaleX, scaleY, sessionInterface]);
+  }, [dimensions, data.allIDs, scaleX, scaleY]);
+
+  const layers = useStemPlotLayers(
+    viewPortScaleX.current,
+    viewPortScaleY.current,
+    0,
+    false,
+  );
+
+  useEffect(() => {
+    if (layers) {
+      layers.forEach((layer) => {
+        layer!.onHover = (info: PickingInfo<Earthquake>) => {
+          setHoverInfo(info);
+          return true;
+        };
+      });
+    }
+  }, [layers]);
 
   const resetAxes = useCallback(() => {
     const minX = Math.min(
@@ -595,8 +669,6 @@ export default function TimelineSlider() {
       x: [new Date(minX), new Date(maxX)],
       y: [minY, maxY],
     });
-
-    console.log(bounds);
 
     // time filtering (make option)
     setTimeFiltering([bounds.x[0].getTime(), bounds.x[1].getTime()]);
@@ -627,7 +699,7 @@ export default function TimelineSlider() {
     resetAxes();
   }, []);
 
-  // reset based on data change
+  // // reset based on data change
   useEffect(() => {
     resetAxes();
   }, [data]);
@@ -648,6 +720,29 @@ export default function TimelineSlider() {
         .duration(0.0000001)
         .ease(d3.easeLinear)
         .call(d3.axisBottom(scaleX.current!).tickFormat(minorFormat));
+      // x major axes
+      xAxesMajor
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .tickFormat(majorFormat)
+            .tickPadding(18)
+            .tickValues(majorLocator),
+        );
+      xAxesMajorBoundaries
+        .current!.transition()
+        .duration(0.0000001)
+        .ease(d3.easeLinear)
+        .call(
+          d3
+            .axisBottom(scaleX.current!)
+            .ticks(majorBoundaryLocator)
+            .tickFormat(() => "")
+            .tickSize(-graphHeight),
+        );
       xAxesGrid
         .current!.transition()
         .duration(0.0000001)
@@ -683,7 +778,9 @@ export default function TimelineSlider() {
       style={{
         position: "relative",
         display: "block",
-        minHeight: "200px",
+        minHeight: heightToWidthRatio
+          ? dimensions.width * heightToWidthRatio
+          : "200px",
       }}
     >
       <Box
@@ -694,10 +791,10 @@ export default function TimelineSlider() {
       <DeckGL
         style={{
           position: "absolute",
-          width: graphWidth + "px",
-          height: graphHeight + "px",
-          top: margin.top + "px",
-          left: margin.left + "px",
+          width: graphWidth - 1 + "px", // account for width of axes
+          height: graphHeight - 1 + "px",
+          top: margin.top + 1 + "px",
+          left: margin.left + 1 + "px",
           pointerEvents: animationEnabled ? "none" : "inherit",
           cursor: sessionInterface.pickable ? "crosshair" : "auto",
           zIndex: "40",
@@ -710,7 +807,7 @@ export default function TimelineSlider() {
         }
         controller={
           {
-            scrollZoom: { speed: 0.1, smooth: true },
+            scrollZoom: { speed: 0.2, smooth: true },
             zoomAxis: "X",
             keyboard: { moveSpeed: -50 },
           } as ControllerOptions

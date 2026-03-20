@@ -1,5 +1,4 @@
-import { useQueries, UseQueryResult } from "@tanstack/react-query";
-import { chunk } from "lodash";
+import { keepPreviousData, useQueries, UseQueryResult } from "@tanstack/react-query";
 import { useEffect, useMemo } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
@@ -96,7 +95,11 @@ export function useCatalogData() {
   const { queryKeys } = useAppStateStore((state) => state.appInterface.queries);
 
   const { setQueryKeys, setQueryStatus, checkQueryStatusPresent } =
-    useAppStateStore((state) => state.appInterfaceActions. queryActions);
+    useAppStateStore((state) => state.appInterfaceActions.queryActions);
+
+  const setColorFormatting = useProjectStore(
+    (state) => state.dataSourceActions.setColorFormatting,
+  );
 
   useEffect(() => {
     if (dataSources) {
@@ -173,6 +176,7 @@ export function useCatalogData() {
         enabled: dataSources.byID[queryKey[1]]
           ? dataSources.byID[queryKey[1]].interface.loadable
           : false,
+        placeholderData: keepPreviousData,
       };
     }),
     combine: (results: UseQueryResult<DataQueryResponse, Error>[]) => {
@@ -213,6 +217,55 @@ export function useCatalogData() {
     () => aggregateData(queries.results, queryKeys),
     [queries],
   );
+
+  useEffect(() => {
+    if (data.allIDs) {
+      data.allIDs.forEach((dataSourceID) => {
+        if (data.byID[dataSourceID].bounds && dataSources.byID[dataSourceID]) {
+          ["twoD", "threeD", "plot"].forEach((type) => {
+            const formattingType = type as "twoD" | "threeD" | "plot";
+
+            const boundsFromData = {} as {
+              [variable: string]: [number, number] | null;
+            };
+
+            dataSources.byID[dataSourceID].metadata.variables.required_vars
+              .concat(
+                dataSources.byID[dataSourceID].metadata.variables.datetime_vars,
+              )
+              .concat(
+                dataSources.byID[dataSourceID].metadata.variables.added_vars,
+              )
+              .concat(["t"])
+              .forEach((variable) => {
+                return (boundsFromData[variable] = dataSources.byID[
+                  dataSourceID
+                ].formatting[formattingType].color.linear.domain[
+                  dataSources.byID[dataSourceID].formatting[formattingType]
+                    .color.linear.variable
+                ]
+                  ? dataSources.byID[dataSourceID].formatting[formattingType]
+                      .color.linear.domain[
+                      dataSources.byID[dataSourceID].formatting[formattingType]
+                        .color.linear.variable
+                    ]
+                  : data.byID[dataSourceID].bounds[variable]);
+              });
+
+            setColorFormatting(dataSourceID, formattingType, {
+              ...dataSources.byID[dataSourceID].formatting[formattingType]
+                .color,
+              linear: {
+                ...dataSources.byID[dataSourceID].formatting[formattingType]
+                  .color.linear,
+                domain: boundsFromData,
+              },
+            });
+          });
+        }
+      });
+    }
+  }, [data.allIDs]);
 
   return { data: data } as DataCacheResult;
 }

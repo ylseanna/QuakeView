@@ -21,7 +21,6 @@ export default function BottomBar({
   const { data } = useCatalogData();
 
   const t = useTranslations();
-  const theme = useTheme();
 
   const { bottombarVisible, timelineBarVisible } = useAppStateStore(
     (state) => state.appInterface.views,
@@ -60,10 +59,6 @@ export default function BottomBar({
     }
   }, [parentRef]);
 
-  // const [isPlaying, setIsPlaying] = useState<"playing" | "paused" | "stopped">(
-  //   "stopped",
-  // );
-
   return (
     <>
       {bottombarVisible && (
@@ -93,6 +88,7 @@ export default function BottomBar({
             direction="row"
             sx={{ display: "flex", flexDirection: "row", alignItems: "center" }}
           >
+            {" "}
             <Checkbox
               size="small"
               checked={animationEnabled}
@@ -106,12 +102,73 @@ export default function BottomBar({
               }}
               icon={<SelectionOff />}
               checkedIcon={<Selection />}
-            />
+            />{" "}
             <Divider
               orientation="vertical"
-              sx={{ ml: 1, height: BOTTOMBAR_HEIGHT }}
+              sx={{ mx: 1, height: BOTTOMBAR_HEIGHT }}
               flexItem
             />
+            <Stack
+              direction="row"
+              spacing={0.5}
+              justifyContent="space-between"
+              alignItems="center"
+            >
+              <Typography variant="formlabel" sx={{ px: 1 }}>
+                {t("Bottombar.selection")}
+              </Typography>
+              <DateTimePicker
+                readOnly
+                value={dayjs(GPU_filtering.t![0])}
+                // onChange={onChangeDateTimeInputsMin}
+                // onAccept={onAcceptDateTimeInputsMin}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      "> .MuiOutlinedInput-root": {
+                        height: "20px", // whatever height you want here
+                      },
+                      width: "200px",
+                    },
+                  },
+                }}
+                views={["year", "month", "day", "hours", "minutes", "seconds"]}
+                format="YYYY-MM-DD HH:mm:ss"
+                ampm={false}
+
+                // label={t("Slider.selection_start_time")}
+              />
+
+              <DateTimePicker
+                readOnly
+                value={dayjs(GPU_filtering.t![1])}
+                // onChange={onChangeDateTimeInputsMax}
+                // onAccept={onAcceptDateTimeInputsMax}
+                slotProps={{
+                  textField: {
+                    size: "small",
+                    sx: {
+                      "> .MuiOutlinedInput-root": {
+                        height: "20px", // whatever height you want here
+                      },
+                      width: "200px",
+                    },
+                  },
+                  popper: { className: "NoClickAwayActionPanel" },
+                  desktopPaper: { className: "NoClickAwayActionPanel" },
+                }}
+                views={["year", "month", "day", "hours", "minutes", "seconds"]}
+                format="YYYY-MM-DD HH:mm:ss"
+                ampm={false}
+                // label={t("Slider.selection_end_time")}
+              />
+              <Divider
+                orientation="vertical"
+                sx={{ ml: 1, height: BOTTOMBAR_HEIGHT }}
+                flexItem
+              />
+            </Stack>
             <Collapse orientation="horizontal" in={animationEnabled}>
               <Stack
                 direction="row"
@@ -236,73 +293,6 @@ export default function BottomBar({
                   sx={{ ml: 1, mr: 0.5, height: BOTTOMBAR_HEIGHT }}
                   flexItem
                 />
-                <Stack
-                  direction="row"
-                  spacing={0.5}
-                  justifyContent="space-between"
-                  alignItems="center"
-                >
-                  <Typography variant="formlabel" sx={{ px: 1 }}>
-                    {t("Bottombar.selection")}
-                  </Typography>
-                  <DateTimePicker
-                    readOnly
-                    value={dayjs(GPU_filtering.t![0])}
-                    // onChange={onChangeDateTimeInputsMin}
-                    // onAccept={onAcceptDateTimeInputsMin}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                        sx: {
-                          "> .MuiOutlinedInput-root": {
-                            height: "20px", // whatever height you want here
-                          },
-                        },
-                      },
-                    }}
-                    views={[
-                      "year",
-                      "month",
-                      "day",
-                      "hours",
-                      "minutes",
-                      "seconds",
-                    ]}
-                    format="YYYY-MM-DD HH:mm:ss"
-                    ampm={false}
-                    // label={t("Slider.selection_start_time")}
-                  />
-
-                  <DateTimePicker
-                    readOnly
-                    value={dayjs(GPU_filtering.t![1])}
-                    // onChange={onChangeDateTimeInputsMax}
-                    // onAccept={onAcceptDateTimeInputsMax}
-                    slotProps={{
-                      textField: {
-                        size: "small",
-                      },
-                      popper: { className: "NoClickAwayActionPanel" },
-                      desktopPaper: { className: "NoClickAwayActionPanel" },
-                    }}
-                    views={[
-                      "year",
-                      "month",
-                      "day",
-                      "hours",
-                      "minutes",
-                      "seconds",
-                    ]}
-                    format="YYYY-MM-DD HH:mm:ss"
-                    ampm={false}
-                    // label={t("Slider.selection_end_time")}
-                  />
-                  <Divider
-                    orientation="vertical"
-                    sx={{ ml: 1, height: BOTTOMBAR_HEIGHT }}
-                    flexItem
-                  />
-                </Stack>
               </Stack>
             </Collapse>
           </Stack>

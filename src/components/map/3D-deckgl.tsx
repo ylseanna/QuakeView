@@ -4,43 +4,34 @@ import "maplibre-gl/dist/maplibre-gl.css";
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Earthquake, Extent } from "@/components/custom/types";
-
-import DeckGL, { FullscreenWidget, ZoomWidget } from "@deck.gl/react";
+import DeckGL, { DeckGLRef } from "@deck.gl/react";
 import "@deck.gl/widgets/stylesheet.css";
 import {
   FlyToInterpolator,
   MapView,
   MapViewState,
   PickingInfo,
+  WebMercatorViewport,
 } from "@deck.gl/core";
-import { Button } from "@mui/material";
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ScatterplotLayer } from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
-import{ useCatalogData } from "../data/use-data";
+import { useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import { useCentroids, useExtents } from "./use-extents";
 
-// import { GeoJsonLayer } from "@deck.gl/layers";
-// import { TerrainLayer } from "@deck.gl/geo-layers";
-// import { MaskExtension } from "@deck.gl/extensions";
-// import { TerrainLoader } from "@loaders.gl/terrain";
-
-// import { GeoJsonLayer } from "@deck.gl/layers";
+import {
+  BOTTOMBAR_HEIGHT,
+  DRAWER_HEIGHT,
+} from "../interface/bottom-bar/bottom-bar";
+import { useKeyDown } from "@react-hooks-library/core";
 
 import {Deck} from '@deck.gl/core';
-import {TerrainLayer} from '@deck.gl/geo-layers';
-import {OBJLoader} from '@loaders.gl/obj';
 import {SimpleMeshLayer} from '@deck.gl/mesh-layers';
 import {QuantizedMeshLoader} from '@loaders.gl/terrain';
 import {load, parse} from '@loaders.gl/core';
-import {COORDINATE_SYSTEM} from '@deck.gl/core';
-import {Geometry} from "@luma.gl/engine";
-
-import {CubeGeometry} from '@luma.gl/engine';
-
-import {PlaneGeometry} from '@luma.gl/engine';
 
 const dem_metadata = await fetch("/api/dem_metadata?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=5").then(
     (res) => {
@@ -58,61 +49,10 @@ const options = {
 };
 
 
-
-// console.log(mesh_data.quantized_mesh)
-// const data = await load("/api/obj_data?filepath=/home/gab28/DATA/PhD/GitHub/QuakeView/liveserver_stuff/prototyping/test.obj", OBJLoader);
-// // const data2 = await load(mesh_data.quantized_mesh, QuantizedMeshLoader, options);
 const dem = await load("/api/quantized_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=5", QuantizedMeshLoader,options);
 
 
 console.log(dem)
-
-// const points = new Float32Array(mesh_data.points)
-// const indices = new Uint16Array(mesh_data.indices)
-
-// // console.log(points)
-// // console.log(indices)
-// console.log(data2)
-
-
-// const dem= new Geometry({
-//   attributes: {
-//     positions: points,
-//     indices: indices
-//   },
-//   topology: "triangle-list"
-
-// });
-// const lower_bounds = dem.header.boundingBox[0]
-// const upper_bounds = dem.header.boundingBox[1]
-
-// console.log(extent)
-
-// const dem = new CubeGeometry()
-
-// console.log(dem)
-
-// const dem= new Geometry({
-//   attributes: {
-//     positions: new Float32Array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
-//   }
-// });
-
-
-// console.log(plane)
-
-// const terrainlayer = new TerrainLayer({
-//   elevationDecoder: {
-//     rScaler: 2,
-//     gScaler: 0,
-//     bScaler: 0,
-//     offset: 0
-//   },
-//   // Digital elevation model from https://www.usgs.gov/
-//   elevationData: '/api/mesh_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/test.png',
-//   texture: '',
-//   bounds: [9.327893647604704, 40.801636788378, 9.421793782395296, 40.854169889622],
-// });
 
 
 const terrainlayer = new SimpleMeshLayer({
@@ -128,7 +68,6 @@ const terrainlayer = new SimpleMeshLayer({
   wireframe:false,
   pickable: true,
 });
-console.log(terrainlayer)
 
 interface DeckGLProps {
   extent: Extent | null;
@@ -136,13 +75,14 @@ interface DeckGLProps {
 }
 
 export default function ThreeDDeckGLView({
+  extent,
   positionOffset,
 }: DeckGLProps) {
   const INITIAL_VIEWSTATE = useMemo(
     () => ({
-      longitude: extent ? extent.centroid[0] : 0,
-      latitude: extent ? extent.centroid[1] : 0,
-      zoom: 15,
+      longitude: extent ? extent.centroid[0] : -19,
+      latitude: extent ? extent.centroid[1] : 64,
+      zoom: 12,
       pitch: 0,
       bearing: 0,
       minZoom: 1,
@@ -152,12 +92,38 @@ export default function ThreeDDeckGLView({
     }),
     [extent],
   );
-  console.log(INITIAL_VIEWSTATE)
+
   const mapContainer = useRef<HTMLElement>(null);
 
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
   const dataSources = useProjectStore((state) => state.dataSources);
+
+  const { timelineBarVisible, bottombarVisible } = useAppStateStore(
+    (state) => state.appInterface.views,
+  );
+
+  const { setZoomToTarget } = useProjectStore(
+    (state) => state.interfaceActions.map,
+  );
+
+  const { elevationOffset } = useProjectStore(
+    (state) => state.sessionInterface.threeD,
+  );
+
+  const { setElevationOffset } = useProjectStore(
+    (state) => state.interfaceActions.threeD,
+  );
+
+  useKeyDown(["PageDown"], (e) => {
+    setElevationOffset(Math.round((elevationOffset - 0.1) * 10) / 10);
+    e.preventDefault();
+  });
+
+  useKeyDown(["PageUp"], (e) => {
+    setElevationOffset(Math.round((elevationOffset + 0.1) * 10) / 10);
+    e.preventDefault();
+  });
 
   const { data } = useCatalogData();
 
@@ -184,7 +150,7 @@ export default function ThreeDDeckGLView({
           data.byID[id].data,
           sessionInterface,
           GPUfiltering,
-          positionOffset,
+          elevationOffset,
         );
 
         layer.onHover = (info: PickingInfo<Earthquake>) => {
@@ -203,33 +169,135 @@ export default function ThreeDDeckGLView({
     data,
     sessionInterface,
     GPUfiltering,
-    positionOffset,
+    elevationOffset,
   ]);
 
   // VIEWSTATE & RESET VIEW
+  const extents = useExtents("threeD");
+
+  const centroids = useCentroids();
+
+  const { threeDViewState } = useProjectStore(
+    (state) => state.sessionInterface.threeD,
+  );
+
+  const { zoomTo } = useProjectStore((state) => state.sessionInterface.map);
+
+  const { setThreeDViewState } = useProjectStore(
+    (state) => state.interfaceActions.threeD,
+  );
+
   const [initialViewState, setInitialViewState] =
-    useState<MapViewState>(INITIAL_VIEWSTATE);
+    useState<MapViewState>(threeDViewState);
 
-  const flyToDataSource = () => {
-    setInitialViewState({
-      ...INITIAL_VIEWSTATE,
-      transitionInterpolator: new FlyToInterpolator({ speed: 2 }),
-      transitionDuration: "auto",
-    });
-  };
+  useEffect(() => {
+    if (extents.main && data.allIDs && centroids.main) {
+      const viewportWebMercator = new WebMercatorViewport(threeDViewState);
 
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  useEffect(() => setInitialViewState(INITIAL_VIEWSTATE));
+      const [minLng, minLat, minDep, maxLng, maxLat, maxDep] = extents.main as [
+        number,
+        number,
+        number,
+        number,
+        number,
+        number,
+      ];
 
-  const deckRef = useRef(null);
+      try {
+        const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(
+          [
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ],
+          {
+            padding: {
+              top: 8,
+              bottom:
+                8 +
+                (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) +
+                (timelineBarVisible ? DRAWER_HEIGHT : 0),
+              left: 8,
+              right: 8,
+            },
+          },
+        );
 
-  const { mapToolsVisible } = useAppStateStore((state) => state.appInterface.views);
+        setInitialViewState({
+          ...initialViewState,
+          longitude: longitude,
+          latitude: latitude,
+          zoom: zoom,
+        });
+
+        setElevationOffset(-Math.round(centroids.main[2] * 10) / 10);
+      } catch {}
+    }
+  }, [data.allIDs]);
+
+  useEffect(() => {
+    if (extents.main && data.allIDs) {
+      const viewportWebMercator = new WebMercatorViewport(threeDViewState);
+
+      const [minLng, minLat, minDep, maxLng, maxLat, maxDep] =
+        zoomTo != "all" && zoomTo
+          ? (extents.byID[zoomTo] as [
+              number,
+              number,
+              number,
+              number,
+              number,
+              number,
+            ])
+          : (extents.main as [number, number, number, number, number, number]);
+
+      try {
+        const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(
+          [
+            [minLng, minLat],
+            [maxLng, maxLat],
+          ],
+          {
+            padding: {
+              top: 8,
+              bottom:
+                8 +
+                (bottombarVisible ? BOTTOMBAR_HEIGHT : 0) +
+                (timelineBarVisible ? DRAWER_HEIGHT : 0),
+              left: 8,
+              right: 8,
+            },
+          },
+        );
+
+        console.log(longitude, latitude, zoom);
+
+        deckRef.current!.deck?.setProps({
+          initialViewState: {
+            ...initialViewState,
+            longitude: longitude,
+            latitude: latitude,
+            zoom: zoom,
+            transitionInterpolator: new FlyToInterpolator(),
+            transitionDuration: 300,
+          },
+        });
+      } catch {}
+    }
+  }, [zoomTo]);
+
+  const deckRef = useRef<DeckGLRef<MapView>>(null);
+
+  const [viewStateMonitor, setViewStateMonitor] = useState<MapViewState>();
+
+  useEffect(() => {
+    viewStateMonitor && setThreeDViewState(viewStateMonitor);
+  }, [viewStateMonitor]);
 
   return (
     <>
       <DeckGL
         ref={deckRef}
-        views={new MapView({ farZMultiplier: 50 })}
+        views={new MapView({ farZMultiplier: 10000 })}
         controller={{
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
@@ -243,18 +311,14 @@ export default function ThreeDDeckGLView({
           backgroundColor: "var(--mui-palette-background-default)",
         }}
         useDevicePixels={false}
-        // onLoad={onMapLoad}
-      >
-        {/* {IsLoading && <LinearProgress variant="query" />} */}
-        {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
-        {mapToolsVisible && (
-          <>
-            <Button onClick={flyToDataSource} sx={{ left: "36px" }}>
-              reset view
-            </Button>
-          </>
-        )}
-      </DeckGL>
+        onViewStateChange={(changeParameters) => {
+          if (!changeParameters.interactionState.inTransition) {
+            setViewStateMonitor(changeParameters.viewState);
+            setZoomToTarget(null);
+          }
+        }}
+      />
+      {hoverInfo && <MapToolTip pickingInfo={hoverInfo} />}
     </>
   );
 }
