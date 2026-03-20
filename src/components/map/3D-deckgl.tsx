@@ -44,16 +44,16 @@ const extent = dem_metadata.extent
 
 const options = {
   'quantized-mesh': {
-    bounds: extent.bounds
+    bounds: [0, 0, 1, 1]
   }
 };
 
 
-const dem = await load("/api/quantized_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=5", QuantizedMeshLoader,options);
+const dem = await load("/api/quantized_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=3&error=5", QuantizedMeshLoader);
 
 
 console.log(dem)
-
+console.log(extent)
 
 const terrainlayer = new SimpleMeshLayer({
   id: 'SimpleMeshLayer',
@@ -61,10 +61,10 @@ const terrainlayer = new SimpleMeshLayer({
 
   getColor:[128, 128, 128, 255],
   getScale:[1, 1, 1],
-  // getTranslation:[0, 0, 0],
+  getPosition: d => d.coordinates,
 
   mesh: dem,
-  sizeScale: 100,
+  sizeScale: 1000,
   wireframe:false,
   pickable: true,
 });
@@ -80,8 +80,8 @@ export default function ThreeDDeckGLView({
 }: DeckGLProps) {
   const INITIAL_VIEWSTATE = useMemo(
     () => ({
-      longitude: extent ? extent.centroid[0] : -19,
-      latitude: extent ? extent.centroid[1] : 64,
+      longitude: 9.297714251000004,
+      latitude: 40.87531216399999,
       zoom: 12,
       pitch: 0,
       bearing: 0,
@@ -194,13 +194,11 @@ export default function ThreeDDeckGLView({
     if (extents.main && data.allIDs && centroids.main) {
       const viewportWebMercator = new WebMercatorViewport(threeDViewState);
 
-      const [minLng, minLat, minDep, maxLng, maxLat, maxDep] = extents.main as [
-        number,
-        number,
-        number,
-        number,
-        number,
-        number,
+      const [minLng, minLat, maxLng, maxLat] =[
+        8.999457194502295,
+        40.64894837350232,
+        9.59597130749771,
+        41.10167595449767,
       ];
 
       try {
@@ -238,17 +236,12 @@ export default function ThreeDDeckGLView({
     if (extents.main && data.allIDs) {
       const viewportWebMercator = new WebMercatorViewport(threeDViewState);
 
-      const [minLng, minLat, minDep, maxLng, maxLat, maxDep] =
-        zoomTo != "all" && zoomTo
-          ? (extents.byID[zoomTo] as [
-              number,
-              number,
-              number,
-              number,
-              number,
-              number,
-            ])
-          : (extents.main as [number, number, number, number, number, number]);
+      const [minLng, minLat, maxLng, maxLat] =[
+        8.999457194502295,
+        40.64894837350232,
+        9.59597130749771,
+        41.10167595449767,
+      ];
 
       try {
         const { longitude, latitude, zoom } = viewportWebMercator.fitBounds(

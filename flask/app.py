@@ -462,51 +462,51 @@ def map_data():
         )
 
 
-@app.route("/api/mesh_data")
-def mesh_data():
+# @app.route("/api/mesh_data")
+# def mesh_data():
 
 
-    tiff_path = Path(request.args.get("filepath"))
+#     tiff_path = Path(request.args.get("filepath"))
 
-    # tiff_path = "/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/test.tif"
+#     # tiff_path = "/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/test.tif"
 
-    data = riox.open_rasterio(tiff_path)
-    x_coords = asarray(data["x"], float32)
-    y_coords = asarray(data["y"], float32)
+#     data = riox.open_rasterio(tiff_path)
+#     x_coords = asarray(data["x"], float32)
+#     y_coords = asarray(data["y"], float32)
 
-    bounds = [x_coords.min(), y_coords.min(), x_coords.max(), y_coords.max()]
-    center = (x_coords.mean(), y_coords.mean())
+#     bounds = [x_coords.min(), y_coords.min(), x_coords.max(), y_coords.max()]
+#     center = (x_coords.mean(), y_coords.mean())
 
-    values = asarray(data[0], float32)
+#     values = asarray(data[0], float32)
     
-    # Create a mesh grid
-    x, y = asarray(meshgrid(data['x'], data['y']), float32)
+#     # Create a mesh grid
+#     x, y = asarray(meshgrid(data['x'], data['y']), float32)
     
-    # Set the z values and create a StructuredGrid
-    z = zeros_like(x, float32)
-    mesh = pv.StructuredGrid(x, y, z)
+#     # Set the z values and create a StructuredGrid
+#     z = zeros_like(x, float32)
+#     mesh = pv.StructuredGrid(x, y, z)
     
-    # Assign Elevation Values
-    mesh["Elevation"] = values.ravel(order='F')
-    topo = mesh.warp_by_scalar(scalars="Elevation", factor=0.000015)
+#     # Assign Elevation Values
+#     mesh["Elevation"] = values.ravel(order='F')
+#     topo = mesh.warp_by_scalar(scalars="Elevation", factor=0.000015)
 
 
-    topo_mesh = topo.triangulate().extract_surface(algorithm=None)
-    topo_mesh.translate(array(topo_mesh.center)*-1, inplace=True)
+#     topo_mesh = topo.triangulate().extract_surface(algorithm=None)
+#     topo_mesh.translate(array(topo_mesh.center)*-1, inplace=True)
 
-    points = topo_mesh.points
-    indices = delete(topo_mesh.faces, arange(0, topo_mesh.faces.size, 4))
+#     points = topo_mesh.points
+#     indices = delete(topo_mesh.faces, arange(0, topo_mesh.faces.size, 4))
 
-    app.logger.info("--- Mesh request ---")
+#     app.logger.info("--- Mesh request ---")
 
-    out_dict = {"points":points.flatten().tolist(), "indices":indices.tolist()}
+#     out_dict = {"points":points.flatten().tolist(), "indices":indices.tolist()}
 
     
 
-    return Response(
-            json.dumps(out_dict),
-            mimetype="application/json",
-        )
+#     return Response(
+#             json.dumps(out_dict),
+#             mimetype="application/json",
+#         )
 
 # @app.route("/api/mesh_data")
 # def mesh_data():
@@ -559,15 +559,15 @@ def mesh_data():
 
 #     return Response(file, mimetype="text/plain")
 
-@app.route("/api/obj_data")
-def obj_data():
+# @app.route("/api/obj_data")
+# def obj_data():
 
 
-    obj_path = Path(request.args.get("filepath"))
+#     obj_path = Path(request.args.get("filepath"))
 
-    file = open(obj_path,"r")
+#     file = open(obj_path,"r")
 
-    return Response(file, mimetype="text/plain")
+#     return Response(file, mimetype="text/plain")
 
 @app.route("/api/quantized_data")
 def quantized_data():
@@ -579,6 +579,7 @@ def quantized_data():
     tiff_path = Path(request.args.get("filepath"))
     # max_error = Path(request.args.get("maxerror"))
     vertical_exageration = int(request.args.get("verticalexag"))
+    error = int(request.args.get("error"))
 
     data = riox.open_rasterio(tiff_path)
 
@@ -606,11 +607,12 @@ def quantized_data():
 
     app.logger.info("--- Triangulating mesh ---")
 
-    tin = Delatin(values, max_error=30, z_scale=factor, z_exag=vertical_exageration)
+    tin = Delatin(values, max_error=error, z_scale=factor, z_exag=vertical_exageration)
     vertices, triangles = tin.vertices, tin.triangles
 
     # Rescale vertices linearly from pixel units to world coordinates
-    rescaled_vertices = rescale_positions(vertices, bounds,flip_y=True)
+    rescaled_vertices = rescale_positions(vertices, bounds)
+    app.logger.info(vertices)
 
     f = BytesIO()
 
@@ -647,6 +649,7 @@ def dem_metadata():
 
     values = data[0].data
     factor = 1/(111320*cos(deg2rad(mean_y)))
+    app.logger.info(factor)
 
     values[values==data.rio.nodata] = 0
 
