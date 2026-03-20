@@ -128,9 +128,8 @@ export default function BottomBar({
                     sx: {
                       "> .MuiOutlinedInput-root": {
                         height: "20px", // whatever height you want here
-                        
                       },
-                      width: "200px"
+                      width: "200px",
                     },
                   },
                 }}
@@ -152,9 +151,8 @@ export default function BottomBar({
                     sx: {
                       "> .MuiOutlinedInput-root": {
                         height: "20px", // whatever height you want here
-                        
                       },
-                      width: "200px"
+                      width: "200px",
                     },
                   },
                   popper: { className: "NoClickAwayActionPanel" },
