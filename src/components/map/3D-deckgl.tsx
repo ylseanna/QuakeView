@@ -29,20 +29,120 @@ import { useAppStateStore } from "@/providers/app-state-provider";
 
 // import { GeoJsonLayer } from "@deck.gl/layers";
 
+import {Deck} from '@deck.gl/core';
+import {TerrainLayer} from '@deck.gl/geo-layers';
+import {OBJLoader} from '@loaders.gl/obj';
+import {SimpleMeshLayer} from '@deck.gl/mesh-layers';
+import {QuantizedMeshLoader} from '@loaders.gl/terrain';
+import {load, parse} from '@loaders.gl/core';
+import {COORDINATE_SYSTEM} from '@deck.gl/core';
+import {Geometry} from "@luma.gl/engine";
+
+import {CubeGeometry} from '@luma.gl/engine';
+
+import {PlaneGeometry} from '@luma.gl/engine';
+
+const dem_metadata = await fetch("/api/dem_metadata?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=5").then(
+    (res) => {
+      return res.json();
+    },
+  );
+
+
+const extent = dem_metadata.extent
+
+const options = {
+  'quantized-mesh': {
+    bounds: extent.bounds
+  }
+};
+
+
+
+// console.log(mesh_data.quantized_mesh)
+// const data = await load("/api/obj_data?filepath=/home/gab28/DATA/PhD/GitHub/QuakeView/liveserver_stuff/prototyping/test.obj", OBJLoader);
+// // const data2 = await load(mesh_data.quantized_mesh, QuantizedMeshLoader, options);
+const dem = await load("/api/quantized_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/w45050_s10_repr.tif&verticalexag=5", QuantizedMeshLoader,options);
+
+
+console.log(dem)
+
+// const points = new Float32Array(mesh_data.points)
+// const indices = new Uint16Array(mesh_data.indices)
+
+// // console.log(points)
+// // console.log(indices)
+// console.log(data2)
+
+
+// const dem= new Geometry({
+//   attributes: {
+//     positions: points,
+//     indices: indices
+//   },
+//   topology: "triangle-list"
+
+// });
+// const lower_bounds = dem.header.boundingBox[0]
+// const upper_bounds = dem.header.boundingBox[1]
+
+// console.log(extent)
+
+// const dem = new CubeGeometry()
+
+// console.log(dem)
+
+// const dem= new Geometry({
+//   attributes: {
+//     positions: new Float32Array([0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0, 0.0])
+//   }
+// });
+
+
+// console.log(plane)
+
+// const terrainlayer = new TerrainLayer({
+//   elevationDecoder: {
+//     rScaler: 2,
+//     gScaler: 0,
+//     bScaler: 0,
+//     offset: 0
+//   },
+//   // Digital elevation model from https://www.usgs.gov/
+//   elevationData: '/api/mesh_data?filepath=/home/gab28/DATA/PhD/Data/DEMs/Tinitaly/w45050_s10/test.png',
+//   texture: '',
+//   bounds: [9.327893647604704, 40.801636788378, 9.421793782395296, 40.854169889622],
+// });
+
+
+const terrainlayer = new SimpleMeshLayer({
+  id: 'SimpleMeshLayer',
+  data: [dem],
+
+  getColor:[128, 128, 128, 255],
+  getScale:[1, 1, 1],
+  // getTranslation:[0, 0, 0],
+
+  mesh: dem,
+  sizeScale: 100,
+  wireframe:false,
+  pickable: true,
+});
+console.log(terrainlayer)
+
 interface DeckGLProps {
   extent: Extent | null;
   positionOffset: number;
 }
 
 export default function ThreeDDeckGLView({
-  extent,
   positionOffset,
 }: DeckGLProps) {
   const INITIAL_VIEWSTATE = useMemo(
     () => ({
-      longitude: extent ? extent.centroid[0] : -19,
-      latitude: extent ? extent.centroid[1] : 64,
-      zoom: 12,
+      longitude: extent ? extent.centroid[0] : 0,
+      latitude: extent ? extent.centroid[1] : 0,
+      zoom: 15,
       pitch: 0,
       bearing: 0,
       minZoom: 1,
@@ -52,7 +152,7 @@ export default function ThreeDDeckGLView({
     }),
     [extent],
   );
-
+  console.log(INITIAL_VIEWSTATE)
   const mapContainer = useRef<HTMLElement>(null);
 
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
@@ -134,7 +234,7 @@ export default function ThreeDDeckGLView({
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
         }}
-        layers={[...layers]}
+        layers={[...layers, terrainlayer]}
         initialViewState={initialViewState}
         style={{
           width: "100%",

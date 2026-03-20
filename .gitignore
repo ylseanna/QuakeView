@@ -54,3 +54,11 @@ docs/site
 docs/content/releases/*
 
 
+#meshes
+*.obj
+*.vtk
+*.mtl
+*.terrain
+*.tif
+*.ply
+*.png
