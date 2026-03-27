@@ -14,8 +14,7 @@ QuakeView is an interactive visualisation program for earthquake catalogues, dev
 
 QuakeView is an open-source program written in react/next.js, with a python back-end and runs in an electron wrapper.
 
-Binaries and how-to-guides can be found in the Github releases on this page or in the [documentation](https://quakeview.readthedocs.io/).
-
+Binaries and how-to-guides are available in the [documentation](https://quakeview.readthedocs.io/), or, for just the binaries, in the releases on this page.
 ## Features
 
 - Importing of arbitrary `.csv` catalogs, with in-program import and filtering controls
