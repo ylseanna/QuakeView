@@ -1,5 +1,5 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-import { contextBridge, ipcRenderer } from "electron";
+import { contextBridge, ipcRenderer, shell } from "electron";
 
 contextBridge.exposeInMainWorld("electron", {
   ipcRenderer: {
@@ -10,6 +10,9 @@ contextBridge.exposeInMainWorld("electron", {
 });
 
 contextBridge.exposeInMainWorld("electronAPI", {
+  openExternal: (url: string) => {
+    shell.openExternal(url);
+  },
   openFile: () => ipcRenderer.invoke("dialog:openFile"),
   platform: process.platform,
 });

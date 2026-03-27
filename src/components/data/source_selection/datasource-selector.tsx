@@ -80,7 +80,7 @@ export default function DataSelector() {
             addDataSource(initDataSource);
             setTimeFilteringGPU([0, 2147483647 * 1000]);
           }}
-          sx={{ height: "100%", mr:2 }}
+          sx={{ height: "100%", mr: 2 }}
         >
           <Folder sx={{ mr: 2 }} />
           Choose file

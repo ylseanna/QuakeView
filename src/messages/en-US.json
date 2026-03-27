@@ -151,7 +151,11 @@
     "map_tools": "Map tools",
     "show_timeline_bar": "Show timeline bar",
     "show_legend": "Show legend",
-    "show_bottombar": "Show bottom bar"
+    "show_bottombar": "Show bottom bar",
+    "documentation": "Documentation",
+    "external_link": "external link",
+    "hide_debug_window": "Hide debug menu",
+    "github_repo": "Github repository"
   },
   "Navbar": {
     "GR_plot": "Magnitude vs. frequency",

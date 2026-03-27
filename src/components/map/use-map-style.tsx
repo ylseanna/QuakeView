@@ -147,9 +147,19 @@ export const USDEMStyle: StyleSpecification = {
   ],
 };
 
+// GEBCO
+
 export const WorldCoastLines: StyleSpecification = {
   version: 8,
   sources: {
+    dem: {
+      type: "raster",
+      tiles: [
+        "https://wms.gebco.net/mapserv?request=getMap&service=wms&version=1.3.0&FORMAT=image/png&LAYERS=GEBCO_LATEST&STYLE=default&CRS=EPSG:3857&WIDTH=256&HEIGHT=256&BBOX={bbox-epsg-3857}",
+      ],
+      tileSize: 256,
+      attribution: "BODC",
+    },
     countries: {
       type: "geojson",
       data: all_countries,
@@ -157,13 +167,21 @@ export const WorldCoastLines: StyleSpecification = {
   },
   layers: [
     {
+      id: "wms-dem",
+      type: "raster",
+      source: "dem",
+      paint: {
+        "raster-opacity": 1,
+      },
+    },
+    {
       id: "countries",
       type: "line",
       source: "countries",
       paint: {
         "line-color": "#000",
-        "line-opacity": 1,
-        "line-width": 1.2,
+        "line-opacity": 0.6,
+        "line-width": 1,
       },
     },
   ],
@@ -249,7 +267,7 @@ export function useExtentLayers() {
 
   const { main: mainExtent, byID: extentPolygons } = useExtentPolygons();
 
-  const extentLayers  = useMemo(() => {
+  const extentLayers = useMemo(() => {
     const layers = {} as { [id: string]: LayerSpecification };
 
     if (extentPolygons) {
@@ -272,9 +290,7 @@ export function useExtentLayers() {
 
       if (mainExtent) {
         if (extentPolygons) {
-          if (
-            !Object.keys(layers).includes("mainExtent")
-          ) {
+          if (!Object.keys(layers).includes("mainExtent")) {
             layers["mainExtent"] = {
               id: "mainExtent",
               type: "line",

@@ -8,9 +8,12 @@ import { ChangeEvent } from "react";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { ArrowExpandAll, MagnifyExpand } from "mdi-material-ui";
+import { usePathname } from "@/i18n/routing";
 
 export default function Toolbar() {
   const t = useTranslations();
+
+  const pathname = usePathname();
 
   const { sessionInterface, interfaceActions } = useProjectStore(
     (state) => state,
@@ -44,7 +47,7 @@ export default function Toolbar() {
           />
         </Tooltip>
       </Paper>
-      <Paper
+      {!pathname.startsWith("/plots") && <Paper
         variant="outlined"
         sx={{ mt: 1 }}
         // sx={{
@@ -72,7 +75,7 @@ export default function Toolbar() {
             style={{ borderRadius: 0 }}
           />
         </Tooltip>
-      </Paper>
+      </Paper>}
     </Box>
   );
 }

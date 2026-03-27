@@ -58,11 +58,11 @@ export default function LayersSidebar() {
               }}
             >
               <MenuItem value={"Iceland"}>
-                DEM Iceland (Náttúrufræðistofnun)
+                ÍslandsDEM (annotated, Náttúrufræðistofnun)
               </MenuItem>
-              <MenuItem value={"US"}>DEM United States (USGS)</MenuItem>
+              <MenuItem value={"US"}>3DEPElevation (USGS)</MenuItem>
               <MenuItem value={"WorldCountries"}>
-                World country outlines
+                Global GEBCO (BODC)
               </MenuItem>
             </Select>
           </Box>
