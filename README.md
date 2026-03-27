@@ -1,6 +1,12 @@
 <p align="center">
   <img src="https://github.com/ylseanna/QuakeView/blob/main/resources/icons/128x128.png" alt="QuakeView Icon"/>
 </p>
+<p align="center">
+  <a href="https://www.gnu.org/licenses/gpl-3.0">
+    <img src="https://img.shields.io/badge/License-GPLv3-blue.svg" />
+  </a>
+</p>
+
 
 # QuakeView
 
