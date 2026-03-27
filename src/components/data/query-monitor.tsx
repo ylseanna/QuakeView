@@ -294,8 +294,8 @@ export default function QueryMonitor() {
             display: "flex",
             flexDirection: "column",
             zIndex: 100,
-            bottom: ["/overview_map", "/3D_map"].includes(pathname)
-              ? `${(timelineBarVisible ? DRAWER_HEIGHT : 0) + (bottombarVisible ? BOTTOMBAR_HEIGHT : 0)}px`
+            bottom: ["/overview_map", "/3D_map", "/plots/stem_plot"].includes(pathname)
+              ? `${(!pathname.startsWith("/plots") &&  timelineBarVisible ? DRAWER_HEIGHT : 0) + (bottombarVisible ? BOTTOMBAR_HEIGHT : 0)}px`
               : 0,
             left: 0,
             m: 2,

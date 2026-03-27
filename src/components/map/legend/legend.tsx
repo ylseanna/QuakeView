@@ -40,8 +40,8 @@ export default function Legend({ layerType, floating = true }: LegendProps) {
         m: 2,
         p: 2,
 
-        transform: ["/overview_map", "/3D_map"].includes(pathname)
-          ? timelineBarVisible
+        transform: ["/overview_map", "/3D_map", "/plots/stem_plot"].includes(pathname)
+          ? !pathname.startsWith("/plots") && timelineBarVisible
             ? bottombarVisible
               ? `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT + BOTTOMBAR_HEIGHT}px)`
               : `translate(-${sidebarOpen ? DRAWER_WIDTH : 0}px, -${DRAWER_HEIGHT}px)`
@@ -62,7 +62,7 @@ export default function Legend({ layerType, floating = true }: LegendProps) {
               key={`LegendElement-${id}`}
               dataSource={dataSources.byID[id]}
               layerType={layerType}
-              {...(pathname == "/plots/GR_plot" ? {singleColor: true} : {} )}
+              {...(pathname == "/plots/GR_plot" ? { singleColor: true } : {})}
             />
           ))}
       </Stack>

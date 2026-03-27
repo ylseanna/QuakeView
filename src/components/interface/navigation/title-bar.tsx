@@ -48,8 +48,8 @@ export default function TitleBar() {
       sx={{
         minHeight: "32px!important",
         borderBottom: `1px solid ${theme.palette.divider}`,
-        paddingLeft: platform != "darwin" ? "4px" : "100px",
-        paddingRight: platform != "darwin" ? "100px" : "4px",
+        paddingLeft: platform != "darwin" ? "4px" : "75px",
+        paddingRight: platform != "darwin" ? "75px" : "4px",
         justifyContent: "space-between",
         zIndex: theme.zIndex.appBar,
         backgroundColor: theme.palette.background.paper,
@@ -63,11 +63,16 @@ export default function TitleBar() {
         width="100%"
         spacing={0}
       >
-        <Box sx={{ pr: platform != "darwin" ? "8px" : 0,  pl: platform != "darwin" ? 0 : "8px",}}>
+        <Box
+          sx={{
+            pr: platform != "darwin" ? "8px" : 0,
+            pl: platform != "darwin" ? 0 : "8px",
+          }}
+        >
           <Image src="/icon.png" alt="app icon" width={22} height={22} />
         </Box>
         <Box>
-          <PopupState variant="popover" popupId="file-popup-menu">
+          {/* <PopupState variant="popover" popupId="file-popup-menu">
             {(popupState) => (
               <Fragment>
                 <Button
@@ -97,7 +102,7 @@ export default function TitleBar() {
                 </Menu>
               </Fragment>
             )}
-          </PopupState>
+          </PopupState> */}
           <ViewMenu />
           <PopupState variant="popover" popupId="help-popup-menu">
             {(popupState) => (
@@ -118,12 +123,13 @@ export default function TitleBar() {
                     },
                   }}
                   transitionDuration={150}
+                  sx={{ zIndex: 10000 }}
                 >
                   <MenuList dense disablePadding>
-                    <MenuItem onClick={popupState.close}>
+                    {/* <MenuItem onClick={popupState.close}>
                       <Link href={"tutorial"}>Tutorial page</Link>
                     </MenuItem>
-                    <Divider />
+                    <Divider /> */}
                     <MenuItem
                       sx={{
                         pt: 0,

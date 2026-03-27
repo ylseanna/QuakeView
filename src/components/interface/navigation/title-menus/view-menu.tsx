@@ -61,9 +61,10 @@ export default function ViewMenu() {
               },
             }}
             transitionDuration={150}
+            sx={{ zIndex: 10000 }}
           >
             <MenuList dense disablePadding>
-              <MenuItem
+              {/* <MenuItem
                 sx={{
                   pt: 0,
                   pb: 0,
@@ -74,7 +75,7 @@ export default function ViewMenu() {
               >
                 <ListItemText>{t("Titlebar.language")}</ListItemText>
                 <LanguageSwitcher />
-              </MenuItem>
+              </MenuItem> */}
               <MenuItem
                 sx={{
                   pt: 0,

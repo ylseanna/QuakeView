@@ -9,6 +9,7 @@ import { ChangeEvent, RefObject, useEffect, useState } from "react";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useCatalogData } from "@/components/data/use-data";
+import { usePathname } from "@/i18n/routing";
 
 export const DRAWER_HEIGHT = 200;
 export const BOTTOMBAR_HEIGHT = 48;
@@ -19,6 +20,7 @@ export default function BottomBar({
   parentRef?: RefObject<HTMLElement>;
 }) {
   const { data } = useCatalogData();
+  const pathname = usePathname();
 
   const t = useTranslations();
 
@@ -74,7 +76,7 @@ export default function BottomBar({
             justifyContent: "space-between",
             width: "100%",
             transform:
-              timelineBarVisible && data
+              !pathname.startsWith("/plots") && timelineBarVisible && data
                 ? `translateY(-${DRAWER_HEIGHT}px)`
                 : "translateY(0)",
             transition: "transform.225s",
@@ -169,7 +171,10 @@ export default function BottomBar({
                 flexItem
               />
             </Stack>
-            <Collapse orientation="horizontal" in={animationEnabled}>
+            <Collapse
+              orientation="horizontal"
+              in={!pathname.startsWith("/plots") && animationEnabled}
+            >
               <Stack
                 direction="row"
                 sx={{
@@ -296,23 +301,25 @@ export default function BottomBar({
               </Stack>
             </Collapse>
           </Stack>
-          <Stack direction="row">
-            <Divider
-              orientation="vertical"
-              sx={{ mx: 1, height: BOTTOMBAR_HEIGHT }}
-              flexItem
-            />
-            <Tooltip
-              title={
-                timelineBarVisible == true ? "" : t("Formatting.formatting")
-              }
-              placement="top"
-            >
-              <Button onClick={toggleTimelineBarVisible}>
-                {t("Common.timeline")}
-              </Button>
-            </Tooltip>
-          </Stack>
+          {!pathname.startsWith("/plots") && (
+            <Stack direction="row">
+              <Divider
+                orientation="vertical"
+                sx={{ mx: 1, height: BOTTOMBAR_HEIGHT }}
+                flexItem
+              />
+              <Tooltip
+                title={
+                  timelineBarVisible == true ? "" : t("Formatting.formatting")
+                }
+                placement="top"
+              >
+                <Button onClick={toggleTimelineBarVisible}>
+                  {t("Common.timeline")}
+                </Button>
+              </Tooltip>
+            </Stack>
+          )}
         </Paper>
       )}
     </>

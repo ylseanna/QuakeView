@@ -99,10 +99,10 @@ export default function DashboardPagesLayout(props: { children: ReactNode }) {
               {debugVisible && <DebugWindow />}
               {props.children}
 
-              {["/overview_map", "/3D_map"].includes(pathname) && (
+              {["/overview_map", "/3D_map", "/plots/stem_plot"].includes(pathname) && (
                 <>
                   {bottombarVisible && <BottomBar />}
-                  <TimelineBar />
+                  {pathname != "/plots/stem_plot" && <TimelineBar />}
                 </>
               )}
               {[
