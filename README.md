@@ -10,11 +10,12 @@
 
 # QuakeView
 
-QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland. It aims to allow for rapid importing and analysis of large earthquake catalogs.
+QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland. It aims to allow for rapid importing and analysis of large earthquake catalogs. It is still in active development.
 
 QuakeView is an open-source program written in react/next.js, with a python back-end and runs in an electron wrapper.
 
 Binaries and how-to-guides are available in the [documentation](https://quakeview.readthedocs.io/), or, for just the binaries, in the releases on this page.
+
 ## Features
 
 - Importing of arbitrary `.csv` catalogs, with in-program import and filtering controls
@@ -25,7 +26,11 @@ Binaries and how-to-guides are available in the [documentation](https://quakevie
 
 ## Contact
 
+The developer can be contacted at:
+
 <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#121;&#97;&#100;&#50;&#64;&#104;&#105;&#46;&#105;&#115;">&#89;&#108;&#115;&#101;&#32;&#65;&#110;&#110;&#97;&#32;&#100;&#101;&#32;&#86;&#114;&#105;&#101;&#115;</a> (<a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#121;&#97;&#100;&#50;&#64;&#104;&#105;&#46;&#105;&#115;">&#121;&#97;&#100;&#50;&#64;&#104;&#105;&#46;&#105;&#115;</a>)
+
+If you find a bug or wish to request a feature, you can go to the [issues](https://github.com/ylseanna/QuakeView/issues).
 
 ## Building from source
 
