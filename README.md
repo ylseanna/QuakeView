@@ -24,6 +24,10 @@ Binaries and how-to-guides can be found in the Github releases on this page or i
 - Select graph-based views
 - Dynamic GPU-based time filtering of events, which can be animated to show temporal evolution of the data
 
+## Contact
+
+Main developer: <a href="&#109;&#97;&#105;&#108;&#116;&#111;&#58;&#121;&#97;&#100;&#50;&#64;&#104;&#105;&#46;&#105;&#115;">&#89;&#108;&#115;&#101;&#32;&#65;&#110;&#110;&#97;&#32;&#100;&#101;&#32;&#86;&#114;&#105;&#101;&#115;</a>
+
 ## Building from source
 
 Create and activate a python environment (e.g. in conda) for running the flask python backend, by installing all the requirements in flask/requirement.txt:
