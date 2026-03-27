@@ -1,24 +1,58 @@
+<p align="center">
+  <img src="https://github.com/ylseanna/QuakeView/blob/main/resources/icons/128x128.png" alt="QuakeView Icon"/>
+</p>
+
 # QuakeView
 
-QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland for use in Iceland. It aims to allow for rapid importing and analysis of user-made catalogs.
+QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland. It aims to allow for rapid importing and analysis of large earthquake catalogs.
 
 QuakeView is an open-source program written in react/next.js, with a python back-end and runs in an electron wrapper.
+
+Binaries and how-to-guides can be found in the Github releases on this page or in the [documentation](https://quakeview.readthedocs.io/).
 
 ## Features
 
 - Importing of arbitrary `.csv` catalogs, with in-program import and filtering controls
-- 2D and 3D maps of the imported events (tested up to 60.000 events)
-- Dynamic formatting of events, e.g. scaling, opacity, color(maps)
-- GPU acceleration of 3D maps and plots
+- GPU powered 2D and 3D maps of the imported events (tested up to 1.8 million events)
+- Dynamic formatting of events, e.g. opacity, color(maps)
+- Select graph-based views
+- Dynamic GPU-based time filtering of events, which can be animated to show temporal evolution of the data
 
-## To build from source
+## Building from source
 
-Create a python environment for running the flask backend, by installing all the requirements in requirement.txt.
+Create and activate a python environment (e.g. in conda) for running the flask python backend, by installing all the requirements in flask/requirement.txt:
 
-Then run "npm i".
+```
+pip install -r flask/requirements.txt
+```
 
-Activate the python environment.
+To set up the node requirements run:
 
-Run "npm run dev" for the development environment.
+```
+npm install
+```
 
-Then the commands "npm run build" and "npm run electron:dist:deb" can be used to create the distributable (currently only working for linux).
+### Development
+
+For the development version, which will run an electron instance with live updates for the code, we run:
+```
+npm run dev
+```
+
+### Production
+
+Before the program can be packaged, flask, next.js and electron have to be built individually:
+```
+npm run build
+```
+Then the packaged distributables (output in /release) are created by running:
+```
+npm run dist:<deb|msi|mac>
+```
+for linux, windows and mac respectively.
+
+## Declarations
+
+### Funding
+
+The software was developed as part of a PhD project funded by grant nr. 2410397-051 from the Icelandic Centre for Research (RANNÍS). 
