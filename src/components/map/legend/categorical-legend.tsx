@@ -1,7 +1,7 @@
 import { Rectangle } from "mdi-material-ui";
 import { Grid, Stack, Typography } from "@mui/material";
 import { useTranslations } from "next-intl";
-import * as _ from "lodash";
+import { orderBy } from "lodash";
 import { useEffect, useRef, useState } from "react";
 
 import { ColorMapping } from "@/components/interface/sidebars/formatting/color-mapping";
@@ -87,7 +87,7 @@ export default function CategoricalLegend({
           i++;
         }
 
-        const sorted_categories = _.orderBy(
+        const sorted_categories = orderBy(
           categories,
           ["frequency", "value"],
           ["desc", "asc"],
@@ -109,7 +109,12 @@ export default function CategoricalLegend({
         setVariableDataDescription(varDataDescription);
       }
     }
-  }, [data, dataSource.formatting, dataSource.metadata.variables.by_id, layerType]);
+  }, [
+    data,
+    dataSource.formatting,
+    dataSource.metadata.variables.by_id,
+    layerType,
+  ]);
 
   return (
     <div ref={parentRef}>

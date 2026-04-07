@@ -13,7 +13,6 @@ export const viewport: Viewport = {
 };
 
 import "@fontsource-variable/archivo";
-import "@fontsource-variable/ibm-plex-sans";
 
 import { theme } from "./theme";
 
