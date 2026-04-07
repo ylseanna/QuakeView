@@ -47,6 +47,7 @@ cache
 
 #flask
 *app.spec
+venv
 
 #docs
 docs/site.zip

@@ -8,7 +8,7 @@ from logging.config import dictConfig
 from mmap import mmap
 from pathlib import Path
 
-import pandas as pd
+from pandas import read_csv, to_datetime
 from numpy import concatenate, float64, int64, isnan
 
 # from shapely import multipoints
@@ -71,7 +71,7 @@ def hello():
 
 @app.route("/api/testdata")
 def testdata():
-    df = pd.read_csv("data/BB_2017-157_to_2017-257_prelim.csv")
+    df = read_csv("data/BB_2017-157_to_2017-257_prelim.csv")
 
     df = df.rename(columns={"EventID": "id"})
 
@@ -124,7 +124,7 @@ def map_data():
         seperator = request.args.get("sep") if not initial_request else ","
         index = request.args.get("index") if not initial_request else "from_file"
 
-        preview_df = pd.read_csv(filepath, sep=seperator, nrows=10)
+        preview_df = read_csv(filepath, sep=seperator, nrows=10)
 
         # if not initial_request:
         #     varmap = get_varmap(vars, varmaps, preview_df.columns)
@@ -436,7 +436,7 @@ def map_data():
 
         filename = "data/" + filename
 
-        df = pd.read_csv(filename)
+        df = read_csv(filename)
 
         variable = request.args.get("variable")
 
@@ -481,7 +481,7 @@ def generate_event_dict(nlines=None):
     seperator = request.args.get("sep")
     index = request.args.get("index")
 
-    df = pd.read_csv(filepath, sep=seperator)
+    df = read_csv(filepath, sep=seperator)
 
     # SLICE
 
@@ -528,7 +528,7 @@ def generate_event_dict(nlines=None):
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
     elif datetime_format == "date_string-time_string":
-        df["datetime"] = pd.to_datetime(
+        df["datetime"] = to_datetime(
             df[varmap["date"]].values + "T" + df[varmap["time"]].values
         )
 
@@ -547,7 +547,7 @@ def generate_event_dict(nlines=None):
 
         app.logger.debug(df["datetime"][:10])
     elif datetime_format == "year-month-day-hour-minute-second":
-        df["datetime"] = pd.to_datetime(
+        df["datetime"] = to_datetime(
             df[
                 [
                     varmap["year"],
