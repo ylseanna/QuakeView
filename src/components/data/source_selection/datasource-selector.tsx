@@ -2,6 +2,7 @@
 
 import {
   Autocomplete,
+  Box,
   Button,
   ButtonGroup,
   Divider,
@@ -37,16 +38,18 @@ export default function DataSelector() {
   );
 
   return (
-    <Paper sx={{ mb: 3, display: "flex", flexDirection: "column" }}>
+    <Box sx={{ p: 2, display: "flex", flexDirection: "column" }}>
       {/* {isLoading && <LinearProgress />} */}
       <Stack
         direction="row"
         justifyContent="space-between"
-        alignItems={"center"}
+        alignItems="center"
       >
-        <Typography sx={{ m: 2 }} variant="h6">
+        <Typography variant="h6">
           {t("data_sources")}
         </Typography>
+
+        
 
         <Button
           variant="contained"
@@ -80,7 +83,7 @@ export default function DataSelector() {
             addDataSource(initDataSource);
             setTimeFilteringGPU([0, 2147483647 * 1000]);
           }}
-          sx={{ height: "100%", mr: 2 }}
+          sx={{ height: "100%"}}
         >
           <Folder sx={{ mr: 2 }} />
           Choose file
@@ -155,6 +158,6 @@ export default function DataSelector() {
           </ButtonGroup>
         </Grid>
       </Grid> */}
-    </Paper>
+    </Box>
   );
 }

@@ -8,7 +8,6 @@ import next from "next";
 import { join } from "path";
 import { parse } from "url";
 
-
 console.log("Starting Electron app");
 
 if (!is.dev) {
@@ -17,6 +16,7 @@ if (!is.dev) {
 
 const createWindow = () => {
   const mainWindow = new BrowserWindow({
+    backgroundColor: '#fafafa',
     // Init
     webPreferences: {
       preload: join(__dirname, "..", "preload", "preload.mjs"),

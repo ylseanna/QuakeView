@@ -95,7 +95,6 @@ export default function NavBar() {
 
   const theme = useTheme();
 
-
   return (
     <Toolbar
       sx={{
@@ -110,7 +109,13 @@ export default function NavBar() {
         direction="row"
         spacing={2}
         divider={<Divider orientation="vertical" flexItem />}
-        sx={{ height: "80px", alignItems: "center", overflowX: "scroll", scrollbarWidth: "none", "::-webkit-scrollbar" : {display: "none"} }}
+        sx={{
+          height: "80px",
+          alignItems: "center",
+          overflowX: "scroll",
+          scrollbarWidth: "none",
+          "::-webkit-scrollbar": { display: "none" },
+        }}
       >
         {NavigationSections.map((NavigationSection) => (
           <Box
@@ -158,7 +163,7 @@ export default function NavBar() {
                             p: "4px",
                             fontSize: "0.8rem",
                             textTransform: "none",
-                            textWrap: "nowrap"
+                            textWrap: "nowrap",
                           }}
                           disabled={!NavigationItem.enabled}
                         >

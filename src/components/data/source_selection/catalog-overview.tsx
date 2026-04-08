@@ -1,7 +1,8 @@
 "use client";
 
-import { Edit, EditOff } from "@mui/icons-material";
+import { Close, Edit, EditOff } from "@mui/icons-material";
 import {
+  Box,
   ClickAwayListener,
   Divider,
   IconButton,
@@ -30,7 +31,7 @@ import { useState } from "react";
 import { DataSource } from "../../custom/types";
 import { updatedMetaDataUrl } from "../data-source-query";
 import { DataGrid } from "@mui/x-data-grid";
-import { Folder } from "mdi-material-ui";
+import { Folder, TrashCan } from "mdi-material-ui";
 import { useProjectStore } from "@/providers/project-store-provider";
 
 interface DataTabProps {
@@ -89,8 +90,12 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   const theme = useTheme();
 
+  const removeDataSource = useProjectStore(
+    (state) => state.dataSourceActions.removeDataSource,
+  );
+
   return (
-    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1}}>
+    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
       <Stack
         sx={{
           ".full-row": {
@@ -112,6 +117,19 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
           <Typography variant="h6" sx={{ my: 1 }}>
             {t("Sources.earthquake_catalog")}
           </Typography>
+          <Tooltip title={t("Sources.remove_data_source")}>
+            <Box sx={{ display: "flex", mt: .5, height: "2rem", width: "2rem"}}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  removeDataSource(dataSource.internal_id);
+                  // removeData(dataSource.internal_id);
+                }}
+              >
+                <TrashCan />
+              </IconButton>
+            </Box>
+          </Tooltip>
         </Stack>
         <ClickAwayListener
           onClickAway={() => {

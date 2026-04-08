@@ -60,30 +60,8 @@ export default function DataTab({ id }: DataTabProps) {
   const theme = useTheme();
 
   return (
-    <Accordion>
-      <Box sx={{ display: "flex" }}>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls="panel1a-content"
-          id="panel2a-header"
-          sx={{ flexGrow: 1 }}
-        >
-          {dataSource.interface.loadable ? (
-            <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
-          ) : (
-            <Warning sx={{ mr: 1, color: theme.palette.warning.main }} />
-          )}
-          <Typography
-            sx={
-              dataSource.interface.loadable
-                ? {}
-                : { color: theme.palette.warning.main }
-            }
-          >
-            {dataSource.name}
-          </Typography>
-        </AccordionSummary>
-        <Tooltip title={t("Sources.remove_data_source")}>
+    <Box sx={{p: 2, mb: 2}}>
+      {/* <Tooltip title={t("Sources.remove_data_source")}>
           <Box sx={{ display: "flex", p: 1, pl: 0 }}>
             <IconButton
               size="small"
@@ -95,13 +73,10 @@ export default function DataTab({ id }: DataTabProps) {
               <Close />
             </IconButton>
           </Box>
-        </Tooltip>
-      </Box>
-      <AccordionDetails>
+        </Tooltip> */}
         <CatalogOverview dataSource={dataSource} />
         <ParsingForm dataSource={dataSource} />
         <OtherOptionsForm dataSource={dataSource} />
-      </AccordionDetails>
-    </Accordion>
+    </Box>
   );
 }
