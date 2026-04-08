@@ -1,4 +1,4 @@
-import { Box, Skeleton } from "@mui/material";
+import { Box, Skeleton, useTheme } from "@mui/material";
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import * as d3 from "d3";
 
@@ -69,6 +69,8 @@ export default function GutenbergRichterPlot() {
     setPointData(dataSourcesPointData);
   }, [data, dataSources.allIDs]);
 
+  const theme = useTheme()
+
   useEffect(() => {
     setIsLoading(true);
 
@@ -128,6 +130,7 @@ export default function GutenbergRichterPlot() {
       .attr("y", height - margin.top - 4)
       .attr("dx", margin.left)
       .attr("font-size", "1rem")
+      .attr("fill", theme.palette.text.primary)
       .attr("text-anchor", "middle")
       .text("Magnitude");
 
@@ -152,6 +155,7 @@ export default function GutenbergRichterPlot() {
       .attr("y", -margin.left) // Relative to the y axis.
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
+      .attr("fill", theme.palette.text.primary)
       .attr("dy", "1rem")
       .text("log\u2081\u2080\u004E(≥M)");
 
@@ -239,6 +243,7 @@ export default function GutenbergRichterPlot() {
     margin.right,
     margin.top,
     width,
+    theme.palette
   ]);
 
   return (
