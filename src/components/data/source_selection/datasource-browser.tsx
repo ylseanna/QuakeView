@@ -38,7 +38,7 @@ export default function DataSourceBrowser() {
   };
 
   return (
-    <Stack display="flex" flexDirection="row" height="100%" width="100%">
+    <Stack display="flex" flexDirection="row" height="100%" width="100%" sx={{backgroundColor: theme.palette.background.default}}>
       <Stack
         width={`${TAB_WIDTH}px`}
         height={"100%"}
