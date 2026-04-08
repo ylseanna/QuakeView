@@ -1,7 +1,6 @@
 "use client";
 
-import * as React from "react";
-import { Container, Paper, Typography, Box } from "@mui/material";
+import { Container, Paper, Typography, Box, useTheme } from "@mui/material";
 import GutenbergRichterPlot from "@/components/plots/gutenberg-richter-plot";
 import Sidebars from "@/components/interface/sidebars/sidebars";
 import Legend from "@/components/map/legend/legend";
@@ -9,8 +8,9 @@ import MagnitudeDistributionPlot from "@/components/plots/magnitude-distribution
 import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 
 export default function Page() {
+  const theme = useTheme()
   return (
-    <Box sx={{h: "100%", w: "100%", ...ScrollBarStyling}}>
+    <Box sx={{h: "100%", w: "100%", ...ScrollBarStyling, backgroundColor: theme.palette.background.default }}>
       <Legend layerType="plot"/>
       <Sidebars />
       <Container sx={{ mt: 2, mb: 2, pb: 2}}>

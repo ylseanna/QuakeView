@@ -20,14 +20,11 @@ import { AppRouterCacheProvider } from "@mui/material-nextjs/v15-appRouter";
 
 import { NextIntlClientProvider } from "next-intl";
 import { getMessages } from "next-intl/server";
-import { notFound } from "next/navigation";
-import { routing } from "@/i18n/routing";
 
 import { ProjectStoreProvider } from "@/providers/project-store-provider";
 import { ThemeProvider } from "@mui/material/styles";
 import { ReactNode } from "react";
 import { AppStateStoreProvider } from "@/providers/app-state-provider";
-import Box from "@mui/material/Box";
 
 declare module "@mui/material/styles" {
   interface TypographyVariants {
