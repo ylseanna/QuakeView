@@ -37,8 +37,6 @@ export default function DataSelector() {
           {t("data_sources")}
         </Typography>
 
-        
-
         <Button
           variant="contained"
           disableElevation

@@ -13,11 +13,9 @@ import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 import { useTheme } from "@mui/material/styles";
 import Typography from "@mui/material/Typography";
 import { ScatterPlot, Warning } from "@mui/icons-material";
-import { useTranslations } from "next-intl";
 
 export default function DataSourceBrowser() {
   const theme = useTheme();
-  const t = useTranslations();
 
   // state
 
@@ -31,28 +29,16 @@ export default function DataSourceBrowser() {
 
   const TAB_WIDTH = 500;
 
-  const [value, setValue] = useState<string | null>(null);
+  const [value, setValue] = useState(
+    dataSources.allIDs ? dataSources.allIDs[0] : null,
+  );
 
   const handleChange = (event: React.SyntheticEvent, newValue: string) => {
     setValue(newValue);
   };
 
-  useEffect(() => {
-    if (dataSources.allIDs) {
-      setValue(dataSources.allIDs[0]);
-    } else {
-      setValue(null);
-    }
-  }, [dataSources.allIDs]);
-
   return (
-    <Stack
-      display="flex"
-      flexDirection="row"
-      height="100%"
-      width="100%"
-      sx={{ backgroundColor: theme.palette.background.default }}
-    >
+    <Stack display="flex" flexDirection="row" height="100%" width="100%">
       <Stack
         width={`${TAB_WIDTH}px`}
         height={"100%"}
@@ -64,7 +50,7 @@ export default function DataSourceBrowser() {
         <Divider />
         <Tabs
           orientation="vertical"
-          value={value ? value : false}
+          value={value}
           onChange={handleChange}
           variant="fullWidth"
         >
@@ -116,23 +102,7 @@ export default function DataSourceBrowser() {
           ...ScrollBarStyling,
         }}
       >
-        {value ? (
-          <DataTab id={value} />
-        ) : (
-          <Box
-            sx={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              height: "100%",
-              minWidth: `calc(100vw - ${TAB_WIDTH}px)`,
-            }}
-          >
-            <Typography sx={{ fontSize: "1.2rem", opacity: 0.67 }}>
-              {t("Sources.select_datasource")}
-            </Typography>
-          </Box>
-        )}
+        {value ? <DataTab id={value} /> : null}
       </Box>
     </Stack>
   );

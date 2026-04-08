@@ -1,8 +1,7 @@
 "use client";
 
-import { Close, Edit, EditOff } from "@mui/icons-material";
+import { Edit, EditOff } from "@mui/icons-material";
 import {
-  Box,
   ClickAwayListener,
   Divider,
   IconButton,
@@ -31,9 +30,8 @@ import { useState } from "react";
 import { DataSource } from "../../custom/types";
 import { updatedMetaDataUrl } from "../data-source-query";
 import { DataGrid } from "@mui/x-data-grid";
-import { Folder, TrashCan } from "mdi-material-ui";
+import { Folder } from "mdi-material-ui";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { SubAccordionDetails } from "@/components/custom/accordion";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -91,10 +89,6 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
 
   const theme = useTheme();
 
-  const removeDataSource = useProjectStore(
-    (state) => state.dataSourceActions.removeDataSource,
-  );
-
   return (
     <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
       <Stack
@@ -114,140 +108,139 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
           },
         }}
       >
-        <Box display="flex" sx={{ mx: 2, mt: 1, mb: 2 }}>
-          <Typography sx={{ fontWeight: "bold", m: 0 }}>
-            {t("Sources.overview")}
+        <Stack className="full-row">
+          <Typography variant="h6" sx={{ my: 1 }}>
+            {t("Sources.earthquake_catalog")}
           </Typography>
-        </Box>
-        <SubAccordionDetails sx={{pt: 1.5}}>
-          <ClickAwayListener
-            onClickAway={() => {
-              setAmEditingName(false);
-            }}
-          >
-            <Stack className="full-row">
-              <Stack className="first-bit" direction="row" flex={1}>
-                <Typography className="row-header" noWrap>
-                  <b>{t("Sources.name")}:</b>
-                </Typography>
+        </Stack>
+        <ClickAwayListener
+          onClickAway={() => {
+            setAmEditingName(false);
+          }}
+        >
+          <Stack className="full-row">
+            <Stack className="first-bit" direction="row" flex={1}>
+              <Typography className="row-header" noWrap>
+                <b>{t("Sources.name")}:</b>
+              </Typography>
 
-                {dataSource.name != dataSource.filename || amEditingName ? (
-                  <TextField
-                    sx={{ mb: "-4px", mr: 2 }}
-                    size="small"
-                    variant="standard"
-                    value={dataSource.name}
-                    fullWidth
-                    slotProps={{ input: { sx: { height: 24 } } }}
-                    onChange={(event) => {
-                      setName(dataSource.internal_id, event.target!.value);
-                    }}
-                  />
-                ) : (
-                  <Typography
-                    onClick={() => {
-                      setAmEditingName(true);
-                    }}
-                  >
-                    {dataSource.name}
-                  </Typography>
-                )}
-              </Stack>
-              <IconButton
-                onClick={() => {
-                  setAmEditingName(!amEditingName);
-                }}
-              >
-                {amEditingName ? <EditOff /> : <Edit />}
-              </IconButton>
-            </Stack>
-          </ClickAwayListener>
-          {dataSource.filename != dataSource.name && (
-            <Stack className="full-row">
-              <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
-                <Typography className="row-header">
-                  <b>{t("Sources.filename")}:</b>
+              {dataSource.name != dataSource.filename || amEditingName ? (
+                <TextField
+                  sx={{ mb: "-4px", mr: 2 }}
+                  size="small"
+                  variant="standard"
+                  value={dataSource.name}
+                  fullWidth
+                  slotProps={{ input: { sx: { height: 24 } } }}
+                  onChange={(event) => {
+                    setName(dataSource.internal_id, event.target!.value);
+                  }}
+                />
+              ) : (
+                <Typography
+                  onClick={() => {
+                    setAmEditingName(true);
+                  }}
+                >
+                  {dataSource.name}
                 </Typography>
-
-                <Typography noWrap textOverflow="ellipsis">
-                  {dataSource.filename}
-                </Typography>
-              </Stack>
+              )}
             </Stack>
-          )}
+            <IconButton
+              onClick={() => {
+                setAmEditingName(!amEditingName);
+              }}
+            >
+              {amEditingName ? <EditOff /> : <Edit />}
+            </IconButton>
+          </Stack>
+        </ClickAwayListener>
+        {dataSource.filename != dataSource.name && (
           <Stack className="full-row">
             <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
               <Typography className="row-header">
-                <b>{t("Sources.filepath")}:</b>
+                <b>{t("Sources.filename")}:</b>
               </Typography>
-              <NoMaxWidthTooltip
-                placement="bottom-start"
-                title={dataSource.filepath}
-              >
-                <Typography noWrap textOverflow="ellipsis">
-                  {dataSource.filepath}
-                </Typography>
-              </NoMaxWidthTooltip>
-            </Stack>
-            <IconButton>
-              <Folder />
-            </IconButton>
-          </Stack>
-          <Stack className="full-row" direction="row">
-            <Stack className="first-bit" direction="row">
-              <Typography className="row-header" noWrap>
-                <b>{t("Sources.num_events")}:</b>
-              </Typography>
-              <Typography>
-                {format.number(dataSource.metadata.num_events)}
+
+              <Typography noWrap textOverflow="ellipsis">
+                {dataSource.filename}
               </Typography>
             </Stack>
           </Stack>
-          <Divider sx={{ my: 1, mx: 2 }} />
-          <Stack className="full-row" direction="row" sx={{ mb: -1 }}>
-            <Stack className="first-bit" direction="row">
-              <Typography className="row-header" noWrap>
-                <b>{t("Sources.data_preview")}</b>
-              </Typography>
-            </Stack>
-            <ToggleButtonGroup
-              size="small"
-              color="primary"
-              value={previewType}
-              exclusive
-              onChange={(event) =>
-                setPreviewType((event.target as HTMLInputElement).value)
-              }
-              aria-label="mode"
-              sx={{ height: "24px", alignSelf: "end" }}
+        )}
+        <Stack className="full-row">
+          <Stack className="first-bit" direction="row" sx={{ minWidth: 0 }}>
+            <Typography className="row-header">
+              <b>{t("Sources.filepath")}:</b>
+            </Typography>
+            <NoMaxWidthTooltip
+              placement="bottom-start"
+              title={dataSource.filepath}
             >
-              <ToggleButton value="parsed" sx={sxButton}>
-                {t("Source.parsed_preview_option")}
-              </ToggleButton>
-              <ToggleButton value="raw" sx={sxButton}>
-                {t("Source.raw_preview_option")}
-              </ToggleButton>
-            </ToggleButtonGroup>
+              <Typography noWrap textOverflow="ellipsis">
+                {dataSource.filepath}
+              </Typography>
+            </NoMaxWidthTooltip>
           </Stack>
-          {previewType == "raw" ? (
-            <Paper variant="outlined" sx={{ m: 2, px: 3, pt: 2, pb: 1 }}>
-              {dataSource.metadata.preview.raw.map((line, index) => (
-                <Stack key={"rawPreviewCatalogLine" + index} direction="row">
-                  <Typography
-                    variant="rawtext"
-                    sx={{
-                      minWidth: "1.7rem",
-                      opacity: 0.6,
-                      justifyContent: "center",
-                    }}
-                  >
-                    {index != 0 ? index : "#"}
-                  </Typography>
-                  <Typography noWrap variant="rawtext">
-                    {line}
-                  </Typography>
-                </Stack>
-              ))}
+          <IconButton>
+            <Folder />
+          </IconButton>
+        </Stack>
+        <Stack className="full-row" direction="row">
+          <Stack className="first-bit" direction="row">
+            <Typography className="row-header" noWrap>
+              <b>{t("Sources.num_events")}:</b>
+            </Typography>
+            <Typography>
+              {format.number(dataSource.metadata.num_events)}
+            </Typography>
+          </Stack>
+        </Stack>
+        <Divider sx={{ my: 1, mx: 2 }} />
+        <Stack className="full-row" direction="row" sx={{ mb: -1 }}>
+          <Stack className="first-bit" direction="row">
+            <Typography className="row-header" noWrap>
+              <b>{t("Sources.data_preview")}</b>
+            </Typography>
+          </Stack>
+          <ToggleButtonGroup
+            size="small"
+            color="primary"
+            value={previewType}
+            exclusive
+            onChange={(event) =>
+              setPreviewType((event.target as HTMLInputElement).value)
+            }
+            aria-label="mode"
+            sx={{ height: "24px", alignSelf: "end" }}
+          >
+            <ToggleButton value="parsed" sx={sxButton}>
+              {t("Source.parsed_preview_option")}
+            </ToggleButton>
+            <ToggleButton value="raw" sx={sxButton}>
+              {t("Source.raw_preview_option")}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Stack>
+        {previewType == "raw" ? (
+          <Paper variant="outlined" sx={{ m: 2, px: 3, pt: 2, pb: 1 }}>
+            {dataSource.metadata.preview.raw.map((line, index) => (
+              <Stack key={"rawPreviewCatalogLine" + index} direction="row">
+                <Typography
+                  variant="rawtext"
+                  sx={{
+                    minWidth: "1.7rem",
+                    opacity: 0.6,
+                    justifyContent: "center",
+                  }}
+                >
+                  {index != 0 ? index : "#"}
+                </Typography>
+                <Typography noWrap variant="rawtext">
+                  {line}
+                </Typography>
+              </Stack>
+            ))}
             <Stack key={"rawPreviewCatalogFinalLine"} direction="row">
               <Typography
                 variant="rawtext"
@@ -281,12 +274,21 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
                           : key,
                     width: 120,
                   };
-                }),
-              ]}
-              rows={dataSource.metadata.preview.parsed}
-            />
-          )}
-        </SubAccordionDetails>
+                },
+              ),
+            ]}
+            autosizeOptions={autosizeOptions}
+            autosizeOnMount
+            hideFooter
+            sx={{
+              m: 2,
+              ".MuiDataGrid-row--lastVisible": {
+                opacity: theme.palette.action.disabledOpacity,
+              },
+            }}
+            rows={dataSource.metadata.preview.parsed}
+          />
+        )}
       </Stack>
     </Paper>
   );
