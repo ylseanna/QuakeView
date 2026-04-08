@@ -7,6 +7,7 @@ import { Box, Container, useTheme } from "@mui/material";
 import { ScrollBarStyling } from "@/components/custom/scrollbar-styling";
 
 export default function Page() {
+  const theme = useTheme();
   return (
         <DataSourceBrowser />
   );

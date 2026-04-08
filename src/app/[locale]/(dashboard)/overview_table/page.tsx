@@ -1,6 +1,6 @@
 "use client";
 
-import { styled } from "@mui/material/styles";
+import { styled, useTheme } from "@mui/material/styles";
 import {
   Paper,
   Box,
@@ -42,7 +42,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ViewColumnIcon from "@mui/icons-material/ViewColumn";
 import { useProjectStore } from "@/providers/project-store-provider";
 
-const paginationModel = { page: 0, pageSize: 10 };
+const paginationModel = { page: 0, pageSize: 20 };
 
 type OwnerState = {
   expanded: boolean;
@@ -369,8 +369,10 @@ export default function Page() {
     }
   }, [sessionInterface.table.dataSourceID, data.allIDs]);
 
+  const theme = useTheme()
+
   return (
-    <Box sx={{ ...ScrollBarStyling, pb: 2 }}>
+    <Box sx={{minHeight: "100%", ...ScrollBarStyling, pb: 2, backgroundColor: theme.palette.background.default, }}>
       <DataGrid
         localeText={locale_text}
         rows={
@@ -381,7 +383,7 @@ export default function Page() {
         }
         columns={columns}
         initialState={{ pagination: { paginationModel } }}
-        pageSizeOptions={[10, 20, 50, 100]}
+        pageSizeOptions={[20, 50, 100]}
         sx={{ borderTop: 0 }}
         slots={{ toolbar: CustomToolbar }}
         showToolbar
