@@ -1,7 +1,7 @@
 import useAnimationFrame from "use-animation-frame";
 /* eslint-disable react-hooks/exhaustive-deps */
 import DeckGL from "@deck.gl/react";
-import { Box } from "@mui/material";
+import { Box, useTheme } from "@mui/material";
 import { OrthographicView, PickingInfo, ScatterplotLayer } from "deck.gl";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import * as d3 from "d3";
@@ -37,6 +37,7 @@ export default function TimelineSlider({
 }: {
   heightToWidthRatio?: number;
 }) {
+  const theme = useTheme();
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
 
@@ -456,6 +457,7 @@ export default function TimelineSlider({
       .attr("text-anchor", "middle")
       .attr("font-size", "1rem")
       .attr("dy", "1rem")
+      .attr("fill", theme.palette.text.primary)
       .text("Magnitude");
 
     // Add top stroke
@@ -517,7 +519,7 @@ export default function TimelineSlider({
     brushRef.current = brush;
 
     // setIsLoading(true);
-  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data]);
+  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data, theme.palette]);
 
   // set bounds based on ViewState
   useEffect(() => {
