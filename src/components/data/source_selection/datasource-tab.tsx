@@ -8,7 +8,6 @@ import {
   AccordionSummary,
   Box,
   IconButton,
-  Stack,
   Tooltip,
   Typography,
   useTheme,
@@ -23,7 +22,6 @@ import { updatedMetaDataUrl } from "../data-source-query";
 import ParsingForm from "./parsing-options-form";
 import OtherOptionsForm from "./other-options-form";
 import CatalogOverview from "./catalog-overview";
-import { TrashCan } from "mdi-material-ui";
 import DataSourceWarnings from "./warnings-tab";
 
 interface DataTabProps {
@@ -63,30 +61,49 @@ export default function DataTab({ id }: DataTabProps) {
   const theme = useTheme();
 
   return (
-    <Box sx={{p: 2, mb: 2}}>
-      { dataSource &&
-      <><Stack direction="row" sx={{justifyContent:"space-between", mb: 2, alignItems: "center"}} >
-          <Typography variant="h6" sx={{ my: 0 }}>
-            {t("Sources.earthquake_catalog")}
+    <Accordion>
+      <Box sx={{ display: "flex" }}>
+        <AccordionSummary
+          expandIcon={<ExpandMore />}
+          aria-controls="panel1a-content"
+          id="panel2a-header"
+          sx={{ flexGrow: 1 }}
+        >
+          {dataSource.interface.loadable ? (
+            <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
+          ) : (
+            <Warning sx={{ mr: 1, color: theme.palette.warning.main }} />
+          )}
+          <Typography
+            sx={
+              dataSource.interface.loadable
+                ? {}
+                : { color: theme.palette.warning.main }
+            }
+          >
+            {dataSource.name}
           </Typography>
-          <Tooltip title={t("Sources.remove_data_source")}>
-            <Box sx={{ display: "flex", mt: 0, height: "2rem", width: "2rem"}}>
-              <IconButton
-                size="small"
-                onClick={() => {
-                  removeDataSource(dataSource.internal_id);
-                  // removeData(dataSource.internal_id);
-                }}
-              >
-                <TrashCan />
-              </IconButton>
-            </Box>
-          </Tooltip>
-        </Stack>
+        </AccordionSummary>
+        <Tooltip title={t("Sources.remove_data_source")}>
+          <Box sx={{ display: "flex", p: 1, pl: 0 }}>
+            <IconButton
+              size="small"
+              onClick={() => {
+                removeDataSource(dataSource.internal_id);
+                // removeData(dataSource.internal_id);
+              }}
+            >
+              <Close />
+            </IconButton>
+          </Box>
+        </Tooltip>
+      </Box>
+      <AccordionDetails>
         <CatalogOverview dataSource={dataSource} />
         <DataSourceWarnings dataSource={dataSource}/>
         <ParsingForm dataSource={dataSource} />
-        <OtherOptionsForm dataSource={dataSource} /></>}
-    </Box>
+        <OtherOptionsForm dataSource={dataSource} />
+      </AccordionDetails>
+    </Accordion>
   );
 }
