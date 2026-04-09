@@ -8,6 +8,7 @@ import {
   AccordionSummary,
   Box,
   IconButton,
+  Stack,
   Tooltip,
   Typography,
   useTheme,
@@ -22,6 +23,7 @@ import { updatedMetaDataUrl } from "../data-source-query";
 import ParsingForm from "./parsing-options-form";
 import OtherOptionsForm from "./other-options-form";
 import CatalogOverview from "./catalog-overview";
+import { TrashCan } from "mdi-material-ui";
 
 interface DataTabProps {
   id: string;
@@ -61,19 +63,24 @@ export default function DataTab({ id }: DataTabProps) {
 
   return (
     <Box sx={{p: 2, mb: 2}}>
-      {/* <Tooltip title={t("Sources.remove_data_source")}>
-          <Box sx={{ display: "flex", p: 1, pl: 0 }}>
-            <IconButton
-              size="small"
-              onClick={() => {
-                removeDataSource(dataSource.internal_id);
-                // removeData(dataSource.internal_id);
-              }}
-            >
-              <Close />
-            </IconButton>
-          </Box>
-        </Tooltip> */}
+      <Stack direction="row" sx={{justifyContent:"space-between", mb: 1}} >
+          <Typography variant="h6" sx={{ my: 0 }}>
+            {t("Sources.earthquake_catalog")}
+          </Typography>
+          <Tooltip title={t("Sources.remove_data_source")}>
+            <Box sx={{ display: "flex", mt: .5, height: "2rem", width: "2rem"}}>
+              <IconButton
+                size="small"
+                onClick={() => {
+                  removeDataSource(dataSource.internal_id);
+                  // removeData(dataSource.internal_id);
+                }}
+              >
+                <TrashCan />
+              </IconButton>
+            </Box>
+          </Tooltip>
+        </Stack>
         <CatalogOverview dataSource={dataSource} />
         <ParsingForm dataSource={dataSource} />
         <OtherOptionsForm dataSource={dataSource} />

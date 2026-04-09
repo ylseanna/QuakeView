@@ -122,7 +122,8 @@
     "parseable_datetime_string": "datetime string",
     "year-month-day-hour-minute-second": "year+month+day+hour+minute+second",
     "date_string-time_string": "Date string+time string",
-    "index": "Numerical index as ID"
+    "index": "Numerical index as ID",
+    "overview": "Overview"
   },
   "Table": {
     "dep": "Depth (km)",
