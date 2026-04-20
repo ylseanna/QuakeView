@@ -124,10 +124,10 @@
     "parseable_datetime_string": "datetime string",
     "year-month-day-hour-minute-second": "year+month+day+hour+minute+second",
     "date_string-time_string": "Date string+time string",
-    "index": "Numerical index as ID",
+    "index": "Automatically assign an integer ID ",
+    "custom_header": "Custom column names",
     "overview": "Overview",
-    "select_datasource": "Select a datasource",
-    "custom_header": "Custom column names"
+    "select_datasource": "Select a datasource"
   },
   "Table": {
     "dep": "Depth (km)",

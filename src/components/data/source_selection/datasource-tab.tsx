@@ -57,7 +57,6 @@ export default function DataTab({ id }: DataTabProps) {
   useEffect(() => {
     updateMetadata(dataSource);
   }, [dataSource.metadata.sep, dataSource.metadata.header]);
-
   const theme = useTheme();
 
   return (

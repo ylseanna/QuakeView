@@ -29,12 +29,12 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import DataSourceVariableForm from "../variables/variable-form";
 import { DataSource } from "../../custom/types";
 import { updatedMetaDataUrl } from "../data-source-query";
-import { useEffect } from "react";
 import { PathParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
 import { headerFilteringStateInitializer } from "@mui/x-data-grid/internals";
 import { Height } from "@mui/icons-material/index";
 import { metadata } from "../../../app/[locale]/layout";
 import { ChangeEvent } from "react";
+import { useEffect } from "react";
 
 interface DataTabProps {
   dataSource: DataSource;
