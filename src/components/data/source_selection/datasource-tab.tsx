@@ -39,36 +39,18 @@ export default function DataTab({ id }: DataTabProps) {
   const dataSource = useProjectStore((state) => state.dataSources.byID[id]);
   const removeDataSource = useProjectStore(
     (state) => state.dataSourceActions.removeDataSource,
-  );
-
-  const setMetadata = useProjectStore(
-    (state) => state.dataSourceActions.setMetadata,
-  );
-
-  const updateMetadata = async (dataSource: DataSource) => {
-    // update bounds and metadata after setting mapped variables
-
-    // fetch updated metadata
-    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
-
-    // set metadata
-    setMetadata(dataSource.internal_id, updatedMetadata);
-  };
-
-  useEffect(() => {
-    updateMetadata(dataSource);
-  }, [dataSource.metadata.sep]);
-
+  );  
   const theme = useTheme();
 
   return (
     <Box sx={{p: 2, mb: 2}}>
-      <Stack direction="row" sx={{justifyContent:"space-between", mb: 1}} >
+      { dataSource &&
+      <><Stack direction="row" sx={{justifyContent:"space-between", mb: 2, alignItems: "center"}} >
           <Typography variant="h6" sx={{ my: 0 }}>
             {t("Sources.earthquake_catalog")}
           </Typography>
           <Tooltip title={t("Sources.remove_data_source")}>
-            <Box sx={{ display: "flex", mt: .5, height: "2rem", width: "2rem"}}>
+            <Box sx={{ display: "flex", mt: 0, height: "2rem", width: "2rem"}}>
               <IconButton
                 size="small"
                 onClick={() => {
@@ -83,7 +65,7 @@ export default function DataTab({ id }: DataTabProps) {
         </Stack>
         <CatalogOverview dataSource={dataSource} />
         <ParsingForm dataSource={dataSource} />
-        <OtherOptionsForm dataSource={dataSource} />
+        <OtherOptionsForm dataSource={dataSource} /></>}
     </Box>
   );
 }

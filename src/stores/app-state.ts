@@ -50,6 +50,7 @@ export type AppState = {
       legendVisible: boolean;
       debugVisible: boolean;
       popperOpen: boolean;
+      dayFormat: "DayOfMonth" | "DayOfYear";
     };
     queries: {
       queryKeys: QueryKeys;
@@ -75,6 +76,7 @@ export type AppActions = {
       toggleDebugVisible: () => void;
       signalPopperOpen: () => void;
       signalPopperClosed: () => void;
+      setDayFormat: (value: "DayOfMonth" | "DayOfYear") => void;
     };
     queryActions: {
       setQueryKeys: (keys: QueryKeys) => void;
@@ -97,6 +99,7 @@ export const defaultInitState: AppState = {
       legendVisible: true,
       debugVisible: false,
       popperOpen: false,
+      dayFormat: "DayOfMonth",
     },
     queries: {
       queryKeys: [],
@@ -153,6 +156,10 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
             signalPopperClosed: () =>
               set((state) => {
                 state.appInterface.views.popperOpen = false;
+              }),
+            setDayFormat: (value) =>
+              set((state) => {
+                state.appInterface.views.dayFormat = value;
               }),
           },
           queryActions: {

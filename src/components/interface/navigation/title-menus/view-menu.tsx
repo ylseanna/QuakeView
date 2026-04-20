@@ -13,12 +13,13 @@ import {
 } from "@mui/material";
 
 import { useTranslations } from "next-intl";
-import LanguageSwitcher from "../language-switcher";
-import ThemeSwitcher from "../theme-switcher";
+// import LanguageSwitcher from "../switchers/language-switcher";
+import ThemeSwitcher from "../switchers/theme-switcher";
 import PopupState, { bindTrigger, bindMenu } from "material-ui-popup-state";
 import { Fragment } from "react";
 import { Check } from "@mui/icons-material";
 import { useAppStateStore } from "@/providers/app-state-provider";
+import DayFormatSwitcher from "../switchers/day-format-switcher";
 
 export const SxTopNavButton = {
   opacity: 0.87,
@@ -64,7 +65,7 @@ export default function ViewMenu() {
             sx={{ zIndex: 10000 }}
           >
             <MenuList dense disablePadding>
-              {/* <MenuItem
+              <MenuItem
                 sx={{
                   pt: 0,
                   pb: 0,
@@ -73,9 +74,9 @@ export default function ViewMenu() {
                 }}
                 disableRipple
               >
-                <ListItemText>{t("Titlebar.language")}</ListItemText>
-                <LanguageSwitcher />
-              </MenuItem> */}
+                <ListItemText>{t("Titlebar.dayFormat")}</ListItemText>
+                <DayFormatSwitcher />
+              </MenuItem>
               <MenuItem
                 sx={{
                   pt: 0,

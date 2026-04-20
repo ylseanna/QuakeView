@@ -4,7 +4,7 @@ import { Button, Tooltip } from "@mui/material";
 import { Link, useRouter, usePathname } from "@/i18n/routing";
 import { useLocale } from "next-intl";
 
-import { SxTopNavButton } from "./title-bar";
+import { SxTopNavButton } from "../title-bar";
 
 
 export default function LanguageSwitcher() {

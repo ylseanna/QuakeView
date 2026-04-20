@@ -8,6 +8,7 @@ import * as d3 from "d3";
 
 import { useProjectStore } from "@/providers/project-store-provider";
 import { majorTickFormat, majorTickLocator, majorTimeBoundaryLocator, minorTimeFormat } from "@/components/custom/time-format";
+import { useAppStateStore } from "@/providers/app-state-provider";
 import MapToolTip from "@/components/map/map-tooltip";
 import { useStemPlotLayers } from "@/components/map/use-layers";
 import { useCatalogData } from "@/components/data/use-data";
@@ -40,6 +41,10 @@ export default function TimelineSlider({
   const theme = useTheme();
   // TOOLTIP
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
+
+  const dayFormat = useAppStateStore(
+    (state) => state.appInterface.views.dayFormat,
+  );
 
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
   // app stores
@@ -124,16 +129,18 @@ export default function TimelineSlider({
     () =>
       minorTimeFormat(
         (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+        dayFormat,
       ) as (domainValue: Date | d3.NumberValue, index: number) => string,
-    [bounds.x],
+    [bounds.x, dayFormat],
   );
 
   const majorFormat = useMemo(
     () =>
       majorTickFormat(
         (bounds.x![1].valueOf() - bounds.x![0].valueOf()) / 1000,
+        dayFormat,
       ) as (domainValue: Date | d3.NumberValue, index: number) => string,
-    [bounds.x],
+    [bounds.x, dayFormat],
   );
 
   const majorLocator = useMemo(
@@ -519,7 +526,17 @@ export default function TimelineSlider({
     brushRef.current = brush;
 
     // setIsLoading(true);
-  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data, theme.palette]);
+  }, [
+    dimensions,
+    margin.bottom,
+    margin.left,
+    margin.right,
+    margin.top,
+    data,
+    theme.palette,
+    minorFormat,
+    majorFormat,
+  ]);
 
   // set bounds based on ViewState
   useEffect(() => {
@@ -756,7 +773,7 @@ export default function TimelineSlider({
             .tickSize(-graphHeight),
         );
     }
-  }, [bounds.x]);
+  }, [bounds.x, minorFormat, majorFormat]);
 
   //  listen for viewport changes
   useEffect(() => {

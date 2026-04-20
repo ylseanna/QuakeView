@@ -26,6 +26,7 @@ import { useProjectStore } from "@/providers/project-store-provider";
 import DataSourceVariableForm from "../variables/variable-form";
 import { DataSource } from "../../custom/types";
 import { updatedMetaDataUrl } from "../data-source-query";
+import { useEffect } from "react";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -45,60 +46,29 @@ export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
 export default function ParsingForm({ dataSource }: DataTabProps) {
   const t = useTranslations();
 
-  // // dataSourceSubactions
-  // const setFormatting = useProjectStore(
-  //   (state) => state.dataSourceActions.setFormatting,
-  // );
 
   const { setIndex, setSep, setDatetimeFormat } = useProjectStore(
     (state) => state.metadataActions,
   );
 
-  // const setMetadata = useProjectStore(
-  //   (state) => state.dataSourceActions.setMetadata,
-  // );
-  // const updateMetadata = async (dataSource: DataSource) => {
-  //   // update bounds and metadata after setting mapped variables
 
-  //   // // fetch updated metadata
-  //   // const updatedMetadata = await fetchUpdatedMetadata(dataSource);
+  const setMetadata = useProjectStore(
+    (state) => state.dataSourceActions.setMetadata,
+  );
 
-  //   // // set metadata
-  //   // setMetadata(dataSource.internal_id, updatedMetadata);
+  const updateMetadata = async (dataSource: DataSource) => {
+    // update bounds and metadata after setting mapped variables
 
-  //   // colormapBounds
-  //   const colormapsBounds = Object.keys(dataSource.metadata.variables.by_id).map(
-  //     (variable: string) => {
-  //       const obj: { [variable: string]: [number, number] } = {};
-  //       obj[variable] = dataSource.metadata.variables.by_id[variable].bounds;
-  //       return obj;
-  //     },
-  //   );
+    // fetch updated metadata
+    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
 
-  //   console.log(colormapsBounds);
+    // set metadata
+    setMetadata(dataSource.internal_id, updatedMetadata);
+  };
 
-  //   const updatedColorFormatting = {
-  //     ...dataSource.formatting.color,
-  //     linear: {
-  //       ...dataSource.formatting.color.linear,
-  //       domain: Object.assign({}, ...colormapsBounds),
-  //     },
-  //   };
-
-  //   console.log(updatedColorFormatting);
-
-  //   // updatedColorFormatting.linear.domain = ;
-
-  //   setFormatting(
-  //     dataSource.internal_id,
-  //     "color",
-  //     updatedColorFormatting as never,
-  //   );
-  // };
-
-  // useEffect(() => {
-  //   updateMetadata(dataSource);
-  // }, [dataSource.metadata.sep]);
+  useEffect(() => {
+    updateMetadata(dataSource);
+  }, [dataSource.metadata.sep]);
 
   return (
     <Paper variant="outlined" sx={{ overflow: "hidden", mb: 2 }}>

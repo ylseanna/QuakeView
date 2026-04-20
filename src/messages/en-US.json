@@ -57,7 +57,9 @@
       "chunk_size_range": "events {start} to {end}"
     },
     "show_extents": "Show extents",
-    "zoom_to_full_extent": "Zoom to full extent"
+    "zoom_to_full_extent": "Zoom to full extent",
+    "dayOfYear": "Day of year",
+    "dayOfMonth": "Day of month"
   },
   "Filtering": {
     "add_filter": "Add filter",
@@ -123,7 +125,8 @@
     "year-month-day-hour-minute-second": "year+month+day+hour+minute+second",
     "date_string-time_string": "Date string+time string",
     "index": "Numerical index as ID",
-    "overview": "Overview"
+    "overview": "Overview",
+    "select_datasource": "Select a datasource"
   },
   "Table": {
     "dep": "Depth (km)",
@@ -156,7 +159,8 @@
     "documentation": "Documentation",
     "external_link": "external link",
     "hide_debug_window": "Hide debug menu",
-    "github_repo": "Github repository"
+    "github_repo": "Github repository",
+    "dayFormat": "Day format"
   },
   "Navbar": {
     "GR_plot": "Magnitude vs. frequency",
