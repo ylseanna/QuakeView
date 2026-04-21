@@ -10,12 +10,11 @@
   </a>
 </p>
 
-
 # QuakeView
 
 QuakeView is an interactive visualisation program for earthquake catalogues, developed at the University of Iceland. It aims to allow for rapid importing and analysis of large earthquake catalogs. It is still in active development.
 
-QuakeView is an open-source program written in react/next.js, with a python back-end and runs in an electron wrapper.
+QuakeView is an open-source program written in React/Next.js, with a Python back-end and runs in an Electron wrapper.
 
 Binaries and how-to-guides are available in the [documentation](https://quakeview.readthedocs.io/), or, for just the binaries, in the releases on this page.
 
@@ -39,37 +38,42 @@ If you find a bug or wish to request a feature, you can go to the [issues](https
 
 Create and activate a python environment (e.g. in conda) for running the flask python backend, by installing all the requirements in flask/requirement.txt:
 
-```
+```bash
 pip install -r flask/requirements.txt
 ```
 
 To set up the node requirements run:
 
-```
+```bash
 npm install
 ```
 
 ### Development
 
 For the development version, which will run an electron instance with live updates for the code, we run:
-```
+
+```bash
 npm run dev
 ```
 
 ### Production
 
 Before the program can be packaged, flask, next.js and electron have to be built individually:
-```
+
+```bash
 npm run build
 ```
+
 Then the packaged distributables (output in /release) are created by running:
-```
+
+```bash
 npm run dist:<deb|msi|mac>
 ```
+
 for linux, windows and mac respectively.
 
 ## Declarations
 
 ### Funding
 
-The software was developed as part of a PhD project funded by grant nr. 2410397-051 from the Icelandic Centre for Research (RANNÍS). 
+The software was developed as part of a PhD project funded by grant nr. 2410397-051 from the Icelandic Centre for Research (RANNÍS).

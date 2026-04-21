@@ -2,7 +2,9 @@
 
 QuakeView is a packaged and compiled application, with releases available on this website. Installation instructions are specific to each operating system, but should follow the typical installation procedure for each platform.
 
-It is possible to run development versions and build the applications from source.
+Note that the QuakeView installers are currently unsigned. Hence some safety warnings may show up on your operating system during installation.
+
+It is possible to run [development versions](dev.md#development-build) or [build the application from source](dev.md#production-build).
 
 ## Releases
 
