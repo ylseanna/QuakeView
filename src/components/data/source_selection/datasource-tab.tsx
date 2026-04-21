@@ -22,6 +22,7 @@ import { updatedMetaDataUrl } from "../data-source-query";
 import ParsingForm from "./parsing-options-form";
 import OtherOptionsForm from "./other-options-form";
 import CatalogOverview from "./catalog-overview";
+import DataSourceWarnings from "./warnings-tab";
 
 interface DataTabProps {
   id: string;
@@ -99,6 +100,7 @@ export default function DataTab({ id }: DataTabProps) {
       </Box>
       <AccordionDetails>
         <CatalogOverview dataSource={dataSource} />
+        <DataSourceWarnings dataSource={dataSource}/>
         <ParsingForm dataSource={dataSource} />
         <OtherOptionsForm dataSource={dataSource} />
       </AccordionDetails>
