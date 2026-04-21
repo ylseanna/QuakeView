@@ -483,6 +483,10 @@ def generate_event_dict(nlines=None):
 
     df = read_csv(filepath, sep=seperator)
 
+    df.columns = df.columns.str.strip()
+
+    app.logger.debug(f"\n{df[:10]}")
+
     # SLICE
 
     slice_text = request.args.get("slice")
@@ -547,7 +551,7 @@ def generate_event_dict(nlines=None):
 
         app.logger.debug(df["datetime"][:10])
     elif datetime_format == "year-month-day-hour-minute-second":
-        df["datetime"] = to_datetime(
+        app.logger.debug(
             df[
                 [
                     varmap["year"],
@@ -557,7 +561,34 @@ def generate_event_dict(nlines=None):
                     varmap["minute"],
                     varmap["second"],
                 ]
-            ],
+            ].rename(
+                columns={
+                    "year": varmap["year"],
+                    "month": varmap["month"],
+                    "day": varmap["day"],
+                    "hour": varmap["hour"],
+                    "minute": varmap["minute"],
+                    "second": varmap["second"],
+                },
+            )
+        )
+        df_dt = df[
+            [
+                varmap["year"],
+                varmap["month"],
+                varmap["day"],
+                varmap["hour"],
+                varmap["minute"],
+                varmap["second"],
+            ]
+        ]
+
+        df_dt.columns = ["year", "month", "day", "hour", "minute", "second"]
+
+        app.logger.debug(f"\n{df_dt[0:10]}")
+
+        df["datetime"] = to_datetime(
+            df_dt,
             yearfirst=True,
         )
 
@@ -568,7 +599,7 @@ def generate_event_dict(nlines=None):
         varmap["dt"] = "dt"
         varmap["doy"] = "doy"
 
-        app.logger.debug(df["datetime"][:10])
+        app.logger.debug(f"\n{df[:10]}")
 
     # GENERATE BOUNDS
     app.logger.info("getting bounds...")
@@ -614,6 +645,8 @@ def generate_event_dict(nlines=None):
         app.logger.debug(varmap)
         unfiltered_bounds = bounds
 
+        app.logger.debug(f"Unfiltered bounds:\n{unfiltered_bounds}")
+
         bounds = {
             var: (
                 [float(df[varmap[var]].min()), float(df[varmap[var]].max())]
@@ -627,7 +660,8 @@ def generate_event_dict(nlines=None):
             for var in required_vars + optional_vars
             if varmap[var]
         }
-        app.logger.debug(bounds)
+
+        app.logger.debug(f"Filtered bounds:\n{bounds}")
     else:
         app.logger.info("skipping filters...")
         unfiltered_bounds = bounds
@@ -680,53 +714,45 @@ def generate_event_dict(nlines=None):
         + optional_vars
     ]
 
+    ### find missing values
+    warnings = {}
+    if df.isnull().any().any():
+        app.logger.warning("NaN values found")
+
+        na_df = reduced_df[reduced_df.isna().any(axis="columns")]
+
+        app.logger.debug(f"\n{na_df}")
+
+        reduced_df = reduced_df.dropna()
+
+        warnings["Missing values"] = [
+            f"Row {i}{f' (event id: {row[varmap["id"]]})' if index != 'numerical' else ''}, row not loaded; missing values in column(s): {', '.join(row[row.isna()].index.values)}"
+            for i, row in na_df.iterrows()
+        ]
+
+        app.logger.debug(warnings["Missing values"])
+
     ### mapping parameters
 
-    column_mapping = {
-        varmap["mag"]: "mag",
-        varmap["dep"]: "dep",
-        varmap["lon"]: "lon",
-        varmap["lat"]: "lat",
-    }
-
-    if not index == "numerical":
-        column_mapping[varmap["id"]] = "id"
-
-    app.logger.info(f"column mapping: {column_mapping}")
-
-    reduced_df.rename(columns=column_mapping, inplace=True)
+    reduced_df.columns = ["id", "t", "dt", "mag", "dep", "lon", "lat"] + optional_vars
 
     app.logger.info(f"columns: {reduced_df.columns}")
 
-    # CONVERT TO JSON
-    # app.logger.info("converting to json...")
-    # event_list = []
-    # for row_index, row in df.iterrows():
-    #     if not isnan(row[varmap["mag"]]):
-    #         event_row = {
-    #             "id": row[varmap["id"]] if not index == "numerical" else row_index,
-    #             "t": row["t"],
-    #             "dt": row["dt"],
-    #             "mag": row[varmap["mag"]],
-    #             "dep": row[varmap["dep"]],
-    #             "lon": row[varmap["lon"]],
-    #             "lat": row[varmap["lat"]],
-    #         }
+    app.logger.debug(f"reduced_df: \n{reduced_df[:10]}")
 
-    #         for var in optional_vars:
-    #             event_row[var] = row[var]
-
-    #         event_list.append(event_row)
+    ### RETURNING
 
     app.logger.info("returning data object...")
+    df_dict = reduced_df.to_dict(orient="records")
     return {
-        "data": reduced_df.to_dict(orient="records"),
+        "data": df_dict,
         "bounds": bounds,
         "unfiltered_bounds": unfiltered_bounds,
         "extent": {
             "centroid": centroid if coords_calculatable else None,
             "bounds": extent if coords_calculatable else None,
         },
+        "warnings": warnings,
     }
 
 

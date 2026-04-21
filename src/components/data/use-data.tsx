@@ -15,6 +15,7 @@ export type DataQueryResponse = {
   unfiltered_bounds: { [variable: string]: [number, number] | null };
   extent: Extent;
   filters: DataSourceFiltering;
+  warnings: {[warning_index: string] : string[]}
 };
 
 export type DataCache = {

@@ -24,6 +24,7 @@ import ParsingForm from "./parsing-options-form";
 import OtherOptionsForm from "./other-options-form";
 import CatalogOverview from "./catalog-overview";
 import { TrashCan } from "mdi-material-ui";
+import DataSourceWarnings from "./warnings-tab";
 
 interface DataTabProps {
   id: string;
@@ -64,6 +65,7 @@ export default function DataTab({ id }: DataTabProps) {
           </Tooltip>
         </Stack>
         <CatalogOverview dataSource={dataSource} />
+        <DataSourceWarnings dataSource={dataSource}/>
         <ParsingForm dataSource={dataSource} />
         <OtherOptionsForm dataSource={dataSource} /></>}
     </Box>

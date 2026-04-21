@@ -125,8 +125,10 @@ export default function DebugWindow() {
                   <JSONTree
                     data={{
                       bounds: data.byID[key].bounds,
+                      unfiltered_bounds: data.byID[key].unfiltered_bounds,
                       extent: data.byID[key].extent,
                       filters: data.byID[key].filters,
+                      warnings: data.byID[key].warnings,
                     }}
                     theme={JSONTheme}
                     hideRoot
