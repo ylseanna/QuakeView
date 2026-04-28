@@ -725,10 +725,14 @@ def generate_event_dict(nlines=None):
 
         reduced_df = reduced_df.dropna()
 
+        event_id_var = varmap["id"]
+
         warnings["Missing values"] = [
-            f"Row {i}{f' (event id: {row[varmap["id"]]})' if index != 'numerical' else ''}, row not loaded; missing values in column(s): {', '.join(row[row.isna()].index.values)}"
+            f"Row {i}{f' (event id: {varmap[event_id_var]})' if index != 'numerical' else ''}, row not loaded; missing values in column(s): {', '.join(row[row.isna()].index.values)}"
             for i, row in na_df.iterrows()
         ]
+
+        del event_id_var
 
         app.logger.debug(warnings["Missing values"])
 
