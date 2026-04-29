@@ -728,7 +728,7 @@ def generate_event_dict(nlines=None):
         event_id_var = varmap["id"]
 
         warnings["Missing values"] = [
-            f"Row {i}{f' (event id: {varmap[event_id_var]})' if index != 'numerical' else ''}, row not loaded; missing values in column(s): {', '.join(row[row.isna()].index.values)}"
+            f"Row {i}{f' (event id: {row[event_id_var]})' if index != 'numerical' else ''}, row not loaded; missing values in column(s): {', '.join(row[row.isna()].index.values)}"
             for i, row in na_df.iterrows()
         ]
 

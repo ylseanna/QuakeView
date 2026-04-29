@@ -2,7 +2,7 @@
   "name": "quakeview",
   "description": "QuakeView is an interactive visualization program for earthquake catalogs, allowing for rapid importing and analysis of large earthquake catalogs.",
   "author": "Ylse Anna de Vries (ylseanna) <yad2@hi.is>",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "license": "GPL-3.0-or-later",
   "homepage": "https://github.com/ylseanna/QuakeView",
   "private": true,
