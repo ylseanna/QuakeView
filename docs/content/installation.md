@@ -10,8 +10,8 @@ It is possible to run [development versions](dev.md#development-build) or [build
 
 | Platform | Distribution | Version   | File(s)                                                                                                       |
 | -------- | ------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
-| Linux    | Ubuntu       | 24.04 LTS | [quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb](/releases/quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb){:download} |
-| MacOS    |              | 15 arm    | [quakeview_1.0.3_macos-15-arm_arm64.pkg](/releases/quakeview_1.0.3_macos-15-arm_arm64.pkg){:download}         |
-| Windows  |              | 2022      | [quakeview_1.0.3_windows-2022_x64.exe](/releases/quakeview_1.0.3_windows-2022_x64.exe){:download}             |
+| Linux    | Ubuntu       | 24.04 LTS | [quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb](https://github.com/ylseanna/QuakeView/releases/download/v1.0.3/quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb){:download} |
+| MacOS    |              | 15 arm    | [quakeview_1.0.3_macos-15-arm_arm64.pkg](https://github.com/ylseanna/QuakeView/releases/download/v1.0.3/quakeview_1.0.3_macos-15-arm_arm64.pkg){:download}         |
+| Windows  |              | 2022      | [quakeview_1.0.3_windows-2022_x64.exe](https://github.com/ylseanna/QuakeView/releases/download/v1.0.3/quakeview_1.0.3_windows-2022_x64.exe){:download}             |
 
 <!-- ## Platform-specific instructions -->
