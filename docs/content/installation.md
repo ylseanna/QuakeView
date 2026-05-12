@@ -6,13 +6,12 @@ Note that the QuakeView installers are currently unsigned. Hence some safety war
 
 It is possible to run [development versions](dev.md#development-build) or [build the application from source](dev.md#production-build).
 
-## Releases
+## Pre-built installers
 
-> _Currently the choice of operating systems is limited._
-
-| Platform | Distribution | Version   | File(s)                                                                                  |
-| -------- | ------------ | --------- | ---------------------------------------------------------------------------------------- |
-| Linux    | Ubuntu       | 24.04 LTS | [quakeview_0.8.0_ubuntu_24.04.deb](releases/quakeview_0.8.0_ubuntu_24.04.deb){:download} |
-|          |              | 22.04 LTS | [quakeview_0.8.0_ubuntu_22.04.deb](releases/quakeview_0.8.0_ubuntu_22.04.deb){:download} |
+| Platform | Distribution | Version   | File(s)                                                                                                       |
+| -------- | ------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
+| Linux    | Ubuntu       | 24.04 LTS | [quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb](/releases/quakeview_1.0.3_ubuntu-24.04-x64_amd64.deb){:download} |
+| MacOS    |              | 15 arm    | [quakeview_1.0.3_macos-15-arm_arm64.pkg](/releases/quakeview_1.0.3_macos-15-arm_arm64.pkg){:download}         |
+| Windows  |              | 2022      | [quakeview_1.0.3_windows-2022_x64.exe](/releases/quakeview_1.0.3_windows-2022_x64.exe){:download}             |
 
 <!-- ## Platform-specific instructions -->
