@@ -10,6 +10,6 @@ markdown_extensions:
 nav:
   - Home: index.md
   - installation.md
-  - userguide.md
+  - manual.md
   - dev.md
 docs_dir: content
