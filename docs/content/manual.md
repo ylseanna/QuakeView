@@ -1,5 +1,7 @@
 # Manual
 
+> _This manual is still being written - sorry for the inconvenience - images are provided to serve as an initial guide._
+
 This guide assumes you have succesfully [installed](installation.md) the program on your operating system.
 
 ## Importing files
