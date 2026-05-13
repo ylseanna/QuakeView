@@ -7,6 +7,7 @@ from itertools import islice
 from logging.config import dictConfig
 from mmap import mmap
 from pathlib import Path
+from platform import system
 
 from pandas import read_csv, to_datetime
 from numpy import concatenate, float64, int64, isnan
@@ -810,6 +811,11 @@ def get_varmap(vars, varmaps, columns):
 def handle_errors(e):
     return e.response(), e.status_code
 
-
 if __name__ == "__main__":
-    fastpysgi.run(wsgi_app=app, host="0.0.0.0", port=8100, workers=4)
+    # fastpysgi uses fork() to spawn subprocesses which doesn´t exist in windows
+    platform = system()
+
+    if platform != "Windows":
+        fastpysgi.run(wsgi_app=app, host="0.0.0.0", port=8100, workers=4)
+    else:
+        fastpysgi.run(wsgi_app=app, host="0.0.0.0", port=8100)
