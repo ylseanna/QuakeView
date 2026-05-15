@@ -6,9 +6,21 @@ This guide assumes you have succesfully [installed](installation.md) the program
 
 ## Importing files
 
-![Configuration Tab](img/manual/Page 1.png)
+QuakeView is primarily an earthquake catalog visualisation program, hence the first step is almost always to load an earthquake catalog into the program. Catalogs are loaded as delimiter-seperated values text files, where currently supported delimiters are commas (CSV file format) and whitespaces.
 
-Catalogs are loaded as .csv files.
+/// details | **Usage tip:** Check your catalogs
+    type: warning
+Always inspect catalogs before loading them into QuakeView, sometimes - particularly when working cross-platform - file formats may get confused, special characters may invalidate entries, or missing values (e.g. `NaN`) can break internal consistency. All of these issues, and more, may break loading into QuakeView.
+
+_If you encounter an issue that you believe should not invalidate your catalog, feel free to contact the developers or submit an issue on [Github](www.github.com/ylseanna/QuakeView/issues), so we can see if we can add support for a new feature._
+///
+
+To select a file, hit the "Choose file" button in the configuration tab (Figure )
+
+![Configuration Tab](img/manual/Page 1.png)
+/// figure-caption | #file-loading
+File selection
+///
 
 ### File overview
 

@@ -56,7 +56,7 @@ For the development version, which will run an electron instance with live updat
 npm run dev
 ```
 
-> **_NOTE:_** The branch "develop" is used for new features of QuakeView, it is semi-stable and is frequently rebased, so if you end up developing for QuakeView it may be of interest to start here. 
+> **_NOTE:_** The branch "develop" is used for new features of QuakeView, it is semi-stable and is frequently rebased, so if you end up developing for QuakeView it may be of interest to start here.
 
 ### Production
 
