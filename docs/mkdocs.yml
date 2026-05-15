@@ -7,6 +7,10 @@ theme:
   logo: img/quakeview_white_vertical.png
 markdown_extensions:
   - attr_list
+  - pymdownx.blocks.caption
+  - pymdownx.blocks.definition
+  - pymdownx.blocks.admonition
+  - pymdownx.blocks.details
 nav:
   - Home: index.md
   - installation.md
