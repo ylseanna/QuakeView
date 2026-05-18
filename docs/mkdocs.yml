@@ -6,6 +6,7 @@ theme:
   name: readthedocs
   logo: img/quakeview_white_vertical.png
 markdown_extensions:
+  - toc
   - attr_list
   - pymdownx.blocks.caption
   - pymdownx.blocks.definition
