@@ -158,7 +158,7 @@ The following sections are concerned with the interface elements that are used a
 
 The timeline bar ([Figure 9](##timelinebar-view)) can be opened by hitting the "timeline" button in the bottom right. The timeline bar will show a time vs. magnitude plot that allows the checking of the temporal evolution of the loaded catalogs, which mirrors the [time vs. magnitude plot](#time-vs-magnitude-plot).
 
-The plot can be zoomed into by using the scroll wheel, except when the selection mode is toggled to be on ([Figure 9](##timelinebar-view), "toggle selection mode"). When the selection mode is toggled, zooming is disable but clicking and dragging allows for an time period of the plot to be selected, where the map will then only display the earthquakes that are within this period.
+The plot can be zoomed into by using the scroll wheel, except when the selection mode is toggled to be on ([Figure 9](##timelinebar-view), "toggle selection mode"). When the selection mode is toggled, zooming is disabled but clicking and dragging allows for a time period of the plot to be selected, where the map will then only display the earthquakes that are within this period.
 
 The bottom bar elements ([Figure 9](##timelinebar-view), "selection overview") will show the exact time periods selected.
 
@@ -169,9 +169,9 @@ Screenshot of QuakeView of the "map" tab with the timeline bar opened and visibl
 
 #### Selection area controls
 
-When an area is selected it is possible to drag the area bag and forth, in addition to enabling the selection area to be animated and moved through time, which enables the user to easily visualise the temporal evolution of the catalog. The animated area will reset to the start of the catalog when it exits the viewing area (changes dynamically based on zoom).
+When an area is selected it is possible to drag the area bag and forth. It is also possible to animate the selection area and move it through time, which enables the user to easily visualise the temporal evolution of the catalog. The animated area will reset to the start of the catalog when it exits the viewing area (changes dynamically based on zoom).
 
-The animation controls include a play and pause button, a speed controller (which is clamped to take into account possibly changing rendering time), and finally a button to make the size of the earthquake dots taper off towards the end of the selected period, allowing for a clear "popping-in" of the latest earthquakes.
+The animation controls include a play and pause button, a speed controller (which is clamped to take into account possibly changing rendering time, i.e. it should work in proper time), and finally a button to make the size of the earthquake dots taper off towards the end of the selected period, allowing for a clear "popping-in" of the latest earthquakes.
 
 ![Table view](img/manual/Page 7.png)
 /// figure-caption | #timelinebar-controls-view
@@ -182,23 +182,23 @@ Screenshot of QuakeView of the "map" tab with the timeline bar opened and visibl
 
 #### Layer tab
 
-![Table view](img/manual/Page 8.png)
+![Layer tab](img/manual/Page 8.png)
 
 #### Formatting tab
 
-![Table view](img/manual/Page 9.png)
+![Formatting tab](img/manual/Page 9.png)
 
-![Table view](img/manual/Page 10.png)
+![Formatting tab, zoom on linear color mapping](img/manual/Page 10.png)
 
 #### Filtering tab
 
-![Table view](img/manual/Page 11.png)
+![Filtering tab](img/manual/Page 11.png)
 
 ## App configuration
 
-#### View menu
+### View menu
 
-#### Help menu
+### Help menu
 
 
 <style>
