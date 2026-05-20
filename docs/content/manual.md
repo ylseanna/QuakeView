@@ -31,7 +31,7 @@ Screenshot of QuakeView of the "configure tab" annotated to show relevant button
 
 ### File configuration
 
-You can configure relevant parameters for any loaded catalogue by expanding the catalog tab ([Figure 1](#file-loading), "open file configuration").
+You can configure relevant parameters for any loaded catalog by expanding the catalog tab ([Figure 1](#file-loading), "open file configuration").
 
 #### File overview
 
@@ -50,7 +50,7 @@ The next pane is a menu for configuring the parsing of the file. The top-most el
 
 - whether a listed id is used to uniquely identify the earthquakes or whether an programatically assigned increasing integer id is used.
 - the delimiter (comma or whitespace)
-- how the dates are listed in the catalogue, varying between as a single datetime string, seperate date and time strings or individual columns for year, month, day, hour, minute and second values.
+- how the dates are listed in the catalog, varying between as a single datetime string, seperate date and time strings or individual columns for year, month, day, hour, minute and second values.
 
 Below these options is a table for setting the individual per earthquake parameter parsing parameters. Initially only the minimum required parameters are listed (id, date, longitude, latitude, depth, magnitude).
 
@@ -64,7 +64,7 @@ The columns of the table are:
 - **Variable:** A simple name of the variable as it is interpreted by QuakeView.
 - **Display name:** The name that will be shown in graphs or the information tool when selecting a single earthquake.
 - **Unit:** A human-readable name of the unit for the parameter.
-- **Mapped column names** A list of the column names that are looked for in the catalogue file (favoring those earlier in the list) to use as the column for the respective parameter. Some parameters are given initially as defaults, but they can be removed.
+- **Mapped column names** A list of the column names that are looked for in the catalog file (favoring those earlier in the list) to use as the column for the respective parameter. Some parameters are given initially as defaults, but they can be removed.
 
 While they may not be immediately visible in the software, it is possible to add further columns to include in the loading into QuakeView (by default all other columns are ignored), and these can then be queried using the information tool and used for [color mapping](#formatting-tab).
 
