@@ -180,6 +180,8 @@ Screenshot of QuakeView of the "map" tab with the timeline bar opened and visibl
 
 ### Sidebars
 
+The sidebars contain the per-layer configuration that is typically common to the whole app, although it may sometimes be split by type of visualisation. Upon clicking any of the buttons (See, for instance, [Figure 5](#map-view), top right), the side panel will open. The following sections are concerned with the configuration available in these tabs.
+
 #### Layer tab
 
 ![Layer tab](img/manual/Page 8.png)
