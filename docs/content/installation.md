@@ -10,8 +10,6 @@ It is possible to run [development versions](dev.md#development-build) or [build
 
 ### QuakeView 1.0.4 - latest release
 
-https://github.com/ylseanna/QuakeView/releases/download/v1.0.4/quakeview_1.0.4_debian_12_amd64.deb
-
 | Platform | Distribution | Version   | File(s)                                                                                                       |
 | -------- | ------------ | --------- | ------------------------------------------------------------------------------------------------------------- |
 | Linux    | Ubuntu       | 24.04 LTS | [quakeview_1.0.4_ubuntu-24.04-x64_amd64.deb](https://github.com/ylseanna/QuakeView/releases/download/v1.0.4/quakeview_1.0.4_ubuntu-24.04-x64_amd64.deb){:download} |
