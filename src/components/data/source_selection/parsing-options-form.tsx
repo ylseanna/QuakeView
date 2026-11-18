@@ -86,6 +86,35 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
             sx={{ alignItems: "center", minHeight: "40px" }}
           >
             <Grid size={2.5}>
+              <Typography variant="formlabel">{t("Sources.custom_header")}</Typography>
+            </Grid>
+            <Grid
+              size="grow"
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
+            >
+              <Switch
+                size="small"
+                checked={
+                  dataSource.metadata.index == "numerical" ? true : false
+                }
+                onChange={(event) => {
+                  setIndex(
+                    dataSource.internal_id,
+                    event.target!.checked ? "numerical" : "from_file",
+                  );
+                }}
+                slotProps={{ input: { "aria-label": "controlled" } }}
+              />
+            </Grid>
+          </Grid>
+          <Grid
+            container
+            spacing={2}
+            sx={{ alignItems: "center", minHeight: "40px" }}
+          >
+            <Grid size={2.5}>
               <Typography variant="formlabel">{t("Sources.index")}</Typography>
             </Grid>
             <Grid

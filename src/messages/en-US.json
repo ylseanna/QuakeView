@@ -126,7 +126,8 @@
     "date_string-time_string": "Date string+time string",
     "index": "Numerical index as ID",
     "overview": "Overview",
-    "select_datasource": "Select a datasource"
+    "select_datasource": "Select a datasource",
+    "custom_header": "Custom column names"
   },
   "Table": {
     "dep": "Depth (km)",

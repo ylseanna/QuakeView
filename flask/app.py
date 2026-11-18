@@ -122,10 +122,24 @@ def map_data():
         with filepath.open() as input_file:
             raw_file_preview = list(islice(input_file, 10))
 
+        # file loading parameters
         seperator = request.args.get("sep") if not initial_request else ","
         index = request.args.get("index") if not initial_request else "from_file"
+        header = (
+            "infer"
+            if not initial_request
+            else None if request.args.get("header") == "None" else "infer"
+        )
+        header_names = request.args.get("columns") if not initial_request else None
+        header_replace = True if request.args.get("replace_header") == "True" else False
 
-        preview_df = read_csv(filepath, sep=seperator, nrows=10)
+        preview_df = read_csv(
+            filepath,
+            sep=seperator,
+            nrows=10,
+            header=header if not header_replace else 0,
+            names=header_names,
+        )
 
         # if not initial_request:
         #     varmap = get_varmap(vars, varmaps, preview_df.columns)
@@ -810,6 +824,7 @@ def get_varmap(vars, varmaps, columns):
 @app.errorhandler(ArgumentError)
 def handle_errors(e):
     return e.response(), e.status_code
+
 
 if __name__ == "__main__":
     # fastpysgi uses fork() to spawn subprocesses which doesn´t exist in windows
