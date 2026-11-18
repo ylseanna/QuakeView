@@ -8,6 +8,7 @@ import {
   Grid,
   IconButton,
   Stack,
+  Switch,
   TextField,
   Tooltip,
   Typography,
@@ -21,6 +22,7 @@ import { useTranslations } from "next-intl";
 import {
   ChangeEvent,
   MouseEventHandler,
+  ReactNode,
   SyntheticEvent,
   useEffect,
 } from "react";
@@ -44,11 +46,13 @@ function VariableEditingRow({
   onRemove,
   required,
   dataSource,
+  children,
 }: {
   dataDescription: DataSourceDataDescription;
   onRemove?: MouseEventHandler;
   required?: boolean;
   dataSource: DataSource;
+  children?: ReactNode | ReactNode[];
 }) {
   const t = useTranslations();
 
@@ -219,6 +223,7 @@ function VariableEditingRow({
             />
           )}
         />
+        {children}
         {!required && onRemove && (
           <IconButton sx={{ ml: 1 }} onClick={onRemove}>
             <Clear />
@@ -240,10 +245,10 @@ export default function DataSourceVariableForm({
     (state) => state.dataSourceActions.setAddedVars,
   );
 
+  const { setIndex } = useProjectStore((state) => state.metadataActions);
   const clearAllVariableMaps = useProjectStore(
     (state) => state.metadataActions.clearAllVariableMaps,
   );
-
 
   return (
     <Box sx={{ p: 2 }}>
@@ -318,10 +323,41 @@ export default function DataSourceVariableForm({
             </Stack>
           </Grid>
         </Grid>
+        <Box>
+          <VariableEditingRow
+            dataDescription={dataSource.metadata.variables.by_id["id"]}
+            dataSource={dataSource}
+            required={dataSource.metadata.index == "numerical" ? false : true}
+          >
+            <Grid
+              size={6}
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
+            >
+              <Typography variant="formlabel">{t("Sources.index")}</Typography>
+              <Switch
+                size="small"
+                checked={
+                  dataSource.metadata.index == "numerical" ? true : false
+                }
+                onChange={(event) => {
+                  setIndex(
+                    dataSource.internal_id,
+                    event.target!.checked ? "numerical" : "from_file",
+                  );
+                }}
+                slotProps={{ input: { "aria-label": "controlled" } }}
+              />
+            </Grid>
+          </VariableEditingRow>
+        </Box>
+        <Divider textAlign="left" sx={{ mb: 1 }}>
+          <span style={{ opacity: 0.4 }}>{t("Variables.time_variables")}</span>
+        </Divider>
         {dataSource.metadata.datetime_format ==
         "year-month-day-hour-minute-second"
           ? [
-              ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
               ...dataSource.metadata.variables.datetime_vars.filter(
                 (variable) => !["doy", "date", "time"].includes(variable),
               ),
@@ -353,7 +389,6 @@ export default function DataSourceVariableForm({
             ))
           : dataSource.metadata.datetime_format == "date_string-time_string"
             ? [
-                ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
                 ...dataSource.metadata.variables.datetime_vars.filter(
                   (variable) =>
                     ![
