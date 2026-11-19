@@ -153,6 +153,7 @@ export default function FilteringForm({
           .concat(dataSource.metadata.variables.added_vars)
           .filter(
             (variable) =>
+              dataSource.metadata.variables.by_id[variable] && 
               dataSource.metadata.variables.by_id[variable].data_type ==
                 "number" && // || el.data_type == "dt_timestamp"
               !Object.keys(dataSource.filtering).includes(variable) &&

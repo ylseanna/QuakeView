@@ -122,7 +122,7 @@
     "parseable_datetime_string": "datetime string",
     "year-month-day-hour-minute-second": "year+month+day+hour+minute+second",
     "date_string-time_string": "Date string+time string",
-    "index": "Numerical index as ID",
+    "index": "Automatically assign an integer ID ",
     "custom_header": "Custom column names"
   },
   "Table": {
@@ -138,9 +138,16 @@
     "unit": "Unit",
     "variable": "Variable",
     "variables": "Variables",
-    "mapping_warning": "Please fill in a correct column to variable mapping",
+    "mapping_warning": "Please fill in a valid column to variable mapping",
     "time_variables": "Date & Time variables",
-    "clear_all_maps": "clear all variable maps"
+    "clear_all_maps": "clear all variable maps",
+    "format": "Format",
+    "datetime": "Date & time",
+    "general_options": "General options",
+    "location": "Location",
+    "optional": "Optional",
+    "magnitude": "Magnitude",
+    "catalog_header": "Catalog header "
   },
   "Titlebar": {
     "language": "Language",
