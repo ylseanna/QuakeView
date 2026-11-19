@@ -8,8 +8,9 @@ import {
   ToggleButtonGroup,
   Typography,
   Grid,
-  Switch,
+  Chip,
   Divider,
+  styled
 } from "@mui/material";
 
 // import {
@@ -27,6 +28,8 @@ import DataSourceVariableForm from "../variables/variable-form";
 import { DataSource } from "../../custom/types";
 import { updatedMetaDataUrl } from "../data-source-query";
 import { useEffect } from "react";
+import { PathParamsContext } from "next/dist/shared/lib/hooks-client-context.shared-runtime";
+import { headerFilteringStateInitializer } from "@mui/x-data-grid/internals";
 
 interface DataTabProps {
   dataSource: DataSource;
@@ -39,13 +42,90 @@ const sxButton = {
   h: 3,
 };
 
+const ListItem = styled('li')(({ theme }) => ({
+  margin: theme.spacing(0.5),
+}));
+
+function GeneralParsingOptionsForm({ dataSource }: { dataSource: DataSource }) {
+  const t = useTranslations();
+
+  const { setSep } = useProjectStore((state) => state.metadataActions);
+
+  return (
+    <Box sx={{ px: 2 }}>
+      <Typography sx={{ fontWeight: "bold", mt: 1 }}>
+        {t("Variables.general_options")}
+      </Typography>
+      <Grid
+        container
+        spacing={2}
+        sx={{ alignItems: "center", minHeight: "40px" }}
+      >
+        <Grid size={2.5}>
+          <Typography variant="formlabel">{t("Sources.delimiter")}</Typography>
+        </Grid>
+        <Grid
+          size="grow"
+          display="flex"
+          justifyContent="end"
+          alignItems="center"
+        >
+          <ToggleButtonGroup
+            color="primary"
+            value={dataSource.metadata.sep}
+            exclusive
+            onChange={(event) => {
+              setSep(
+                dataSource.internal_id,
+                (event.target as HTMLInputElement).value,
+              );
+            }}
+            aria-label="mode"
+            sx={{ height: "24px" }}
+          >
+            <ToggleButton value="\s+" sx={sxButton}>
+              {t("Sources.whitespace")}
+            </ToggleButton>
+            <ToggleButton value="," sx={sxButton}>
+              {t("Sources.comma")}
+            </ToggleButton>
+          </ToggleButtonGroup>
+        </Grid>
+      </Grid>
+    </Box>
+  );
+}
+
+function HeaderForm({ dataSource }: { dataSource: DataSource }) {
+  const t = useTranslations();
+
+
+  return (
+    <Box sx={{ px: 2 }}>
+      <Typography sx={{ fontWeight: "bold", mt: 1 }}>
+        {t("Variables.catalog_header")}
+      </Typography>
+      <Paper
+        variant="outlined"
+        sx={{ p: 2, my: 2, flexWrap: "wrap", listStyle: "none", display: 'flex',
+        justifyContent: 'left', }}
+        component="ul"
+      >
+        {dataSource.metadata.catalog_headers.map((header_name) => (
+           <ListItem key={"HeaderChip" + header_name}>
+          <Chip variant="outlined" label={header_name} /></ListItem>
+        ))}
+      </Paper>
+    </Box>
+  );
+}
+
 export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
 };
 
 export default function ParsingForm({ dataSource }: DataTabProps) {
   const t = useTranslations();
-
 
   const { setIndex, setSep, setDatetimeFormat } = useProjectStore(
     (state) => state.metadataActions,
@@ -79,151 +159,10 @@ export default function ParsingForm({ dataSource }: DataTabProps) {
       </Box>
 
       <SubAccordionDetails>
-        <Box sx={{ px: 2 }}>
-          <Grid
-            container
-            spacing={2}
-            sx={{ alignItems: "center", minHeight: "40px" }}
-          >
-            <Grid size={2.5}>
-              <Typography variant="formlabel">{t("Sources.custom_header")}</Typography>
-            </Grid>
-            <Grid
-              size="grow"
-              display="flex"
-              justifyContent="end"
-              alignItems="center"
-            >
-              <Switch
-                size="small"
-                checked={
-                  dataSource.metadata.index == "numerical" ? true : false
-                }
-                onChange={(event) => {
-                  setIndex(
-                    dataSource.internal_id,
-                    event.target!.checked ? "numerical" : "from_file",
-                  );
-                }}
-                slotProps={{ input: { "aria-label": "controlled" } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
-            sx={{ alignItems: "center", minHeight: "40px" }}
-          >
-            <Grid size={2.5}>
-              <Typography variant="formlabel">{t("Sources.index")}</Typography>
-            </Grid>
-            <Grid
-              size="grow"
-              display="flex"
-              justifyContent="end"
-              alignItems="center"
-            >
-              <Switch
-                size="small"
-                checked={
-                  dataSource.metadata.index == "numerical" ? true : false
-                }
-                onChange={(event) => {
-                  setIndex(
-                    dataSource.internal_id,
-                    event.target!.checked ? "numerical" : "from_file",
-                  );
-                }}
-                slotProps={{ input: { "aria-label": "controlled" } }}
-              />
-            </Grid>
-          </Grid>
-          <Grid
-            container
-            spacing={2}
-            sx={{ alignItems: "center", minHeight: "40px" }}
-          >
-            <Grid size={2.5}>
-              <Typography variant="formlabel">
-                {t("Sources.delimiter")}
-              </Typography>
-            </Grid>
-            <Grid
-              size="grow"
-              display="flex"
-              justifyContent="end"
-              alignItems="center"
-            >
-              <ToggleButtonGroup
-                color="primary"
-                value={dataSource.metadata.sep}
-                exclusive
-                onChange={(event) => {
-                  setSep(
-                    dataSource.internal_id,
-                    (event.target as HTMLInputElement).value,
-                  );
-                }}
-                aria-label="mode"
-                sx={{ height: "24px" }}
-              >
-                <ToggleButton value="\s+" sx={sxButton}>
-                  {t("Sources.whitespace")}
-                </ToggleButton>
-                <ToggleButton value="," sx={sxButton}>
-                  {t("Sources.comma")}
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
-          </Grid>
-
-          <Grid
-            container
-            spacing={2}
-            sx={{ alignItems: "center", minHeight: "40px", mb: 2 }}
-          >
-            <Grid size={2.5}>
-              <Typography variant="formlabel">
-                {t("Sources.datetime_format")}
-              </Typography>
-            </Grid>
-            <Grid
-              size="grow"
-              display="flex"
-              justifyContent="end"
-              alignItems="center"
-            >
-              <ToggleButtonGroup
-                color="primary"
-                value={dataSource.metadata.datetime_format}
-                exclusive
-                onChange={(event) => {
-                  setDatetimeFormat(
-                    dataSource.internal_id,
-                    (event.target as HTMLInputElement).value,
-                  );
-                }}
-                aria-label="mode"
-                sx={{ height: "24px" }}
-              >
-                <ToggleButton value="parseable_datetime_string" sx={sxButton}>
-                  {t("Sources.parseable_datetime_string")}
-                </ToggleButton>
-                <ToggleButton value="date_string-time_string" sx={sxButton}>
-                  {t("Sources.date_string-time_string")}
-                </ToggleButton>
-                <ToggleButton
-                  value="year-month-day-hour-minute-second"
-                  sx={sxButton}
-                >
-                  {t("Sources.year-month-day-hour-minute-second")}
-                </ToggleButton>
-              </ToggleButtonGroup>
-            </Grid>
-          </Grid>
-        </Box>
-        <Divider sx={{ mx: 2 }} />
-
+        <GeneralParsingOptionsForm dataSource={dataSource} />
+        <Divider sx={{ mx: 2, mt: 1, mb: 2 }} />
+        <HeaderForm dataSource={dataSource} />
+        <Divider sx={{ mx: 2, mt: 1 }} />
         <DataSourceVariableForm dataSource={dataSource} />
       </SubAccordionDetails>
     </Paper>
