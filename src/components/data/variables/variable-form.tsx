@@ -156,7 +156,7 @@ function VariableEditingRow({
         ).includes(requiredVar)
           ? description.mapped_var
               .map((mapped_var) =>
-                dataSource.metadata.catalog_headers.includes(mapped_var),
+                dataSource.metadata.column_names.includes(mapped_var),
               )
               .some((check) => check)
           : true;
@@ -170,7 +170,7 @@ function VariableEditingRow({
       required
         ? dataDescription.mapped_var
             .map((mapped_var) =>
-              dataSource.metadata.catalog_headers.includes(mapped_var),
+              dataSource.metadata.column_names.includes(mapped_var),
             )
             .some((check) => check)
           ? true
@@ -263,7 +263,7 @@ function VariableEditingRow({
                   .mapped_var
               : [dataDescription.variable]
           }
-          options={dataSource.metadata.catalog_headers}
+          options={dataSource.metadata.column_names}
           getOptionLabel={(option: string) => option}
           size="small"
           fullWidth
@@ -289,7 +289,7 @@ function VariableEditingRow({
                 dataDescription.mapped_var
                   ? !dataDescription.mapped_var
                       .map((mapped_var) =>
-                        dataSource.metadata.catalog_headers.includes(
+                        dataSource.metadata.column_names.includes(
                           mapped_var,
                         ),
                       )
@@ -519,7 +519,7 @@ export default function DataSourceVariableForm({
         <Typography variant="formlabel">{t("Variables.optional")}</Typography>
         {dataSource.metadata.variables.added_vars
           .filter((variable) =>
-            dataSource.metadata.catalog_headers.includes(variable),
+            dataSource.metadata.column_names.includes(variable),
           )
           .map((variable: string) => (
             <VariableEditingRow

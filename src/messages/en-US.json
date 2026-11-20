@@ -147,7 +147,15 @@
     "location": "Location",
     "optional": "Optional",
     "magnitude": "Magnitude",
-    "catalog_header": "Catalog header "
+    "catalog_header": "Catalog header ",
+    "column_names": "Column names",
+    "header_from_file": "From file",
+    "add_header": "Add header",
+    "override_header": "Override header",
+    "column_name_file": "Column name (file)",
+    "column_name": "Column name",
+    "column_preview": "Column preview",
+    "column_number": "Column number"
   },
   "Titlebar": {
     "language": "Language",

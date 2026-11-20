@@ -67,7 +67,7 @@ export default function DataSelector() {
                     .map(
                       // check if the mapped vars are contained in the catalog headers
                       (mapped_var) =>
-                        initDataSource.metadata.catalog_headers.includes(
+                        initDataSource.metadata.column_names.includes(
                           mapped_var,
                         ),
                     )
@@ -109,7 +109,7 @@ export default function DataSelector() {
                       .map(
                         // check if the mapped vars are contained in the catalog headers
                         (mapped_var) =>
-                          initDataSource.metadata.catalog_headers.includes(
+                          initDataSource.metadata.column_names.includes(
                             mapped_var,
                           ),
                       )

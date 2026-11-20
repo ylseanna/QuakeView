@@ -37,8 +37,10 @@ export type DataSourceMetaData = {
     | "parseable_datetime_string"
     | "date_string-time_string"
     | "year-month-day-hour-minute-second";
+  header: "from_file" | "add_header" | "override_header";
+  file_column_names: string[];
+  column_names: string[];
   preview: { parsed: { [key: string]: number | string }[]; raw: string[] };
-  catalog_headers: string[];
   variables: {
     by_id: { [variable: string]: DataSourceDataDescription };
     required_vars: string[];
