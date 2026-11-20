@@ -118,6 +118,8 @@ export type ProjectActions = {
     setIndex: (id: string, value: "from_file" | "numerical") => void;
     setSep: (id: string, value: string) => void;
     setDatetimeFormat: (id: string, value: string) => void;
+    setHeader: (id: string, value: string) => void;
+    setColumnName: (id: string, index: number, value: string) => void;
     clearAllVariableMaps: (id: string) => void;
   };
 };
@@ -268,7 +270,7 @@ export const createProjectStore = (
                 1,
               );
               if (state.sessionInterface.table.dataSourceID == id) {
-                state.sessionInterface.table.dataSourceID = null
+                state.sessionInterface.table.dataSourceID = null;
               }
             }),
           setName: (id, value) =>
@@ -327,7 +329,19 @@ export const createProjectStore = (
             set((state) => {
               state.dataSources.byID[id].metadata.datetime_format = value as
                 | "parseable_datetime_string"
+                | "date_string-time_string"
                 | "year-month-day-hour-minute-second";
+            }),
+          setHeader: (id, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata.header = value as
+                | "from_file"
+                | "add_header"
+                | "override_header";
+            }),
+          setColumnName: (id, index, value) =>
+            set((state) => {
+              state.dataSources.byID[id].metadata.column_names[index] = value;
             }),
           clearAllVariableMaps: (id) =>
             set((state) => {

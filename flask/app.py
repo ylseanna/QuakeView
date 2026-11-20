@@ -125,20 +125,19 @@ def map_data():
         # file loading parameters
         seperator = request.args.get("sep") if not initial_request else ","
         index = request.args.get("index") if not initial_request else "from_file"
-        header = (
-            "infer"
-            if not initial_request
-            else None if request.args.get("header") == "None" else "infer"
-        )
-        header_names = request.args.get("columns") if not initial_request else None
-        header_replace = True if request.args.get("replace_header") == "True" else False
+        header = request.args.get("header") if not initial_request else "from_file"
 
+        # load initially (also serves as preview dws)
         preview_df = read_csv(
             filepath,
             sep=seperator,
             nrows=10,
-            header=header if not header_replace else 0,
-            names=header_names,
+        )
+
+        column_names = (
+            preview_df.columns.to_list()
+            # if header=="from_file"
+            # else request.args.get("column_names")
         )
 
         # if not initial_request:
@@ -417,11 +416,13 @@ def map_data():
                 ],
                 "raw": raw_file_preview,
             },
-            "catalog_headers": [
+            "header": header,
+            "file_column_names": [
                 str(header)
                 for header in preview_df.columns
                 if (header not in ("dt", "t"))
             ],
+            "column_names": column_names,
             "variables": {
                 "by_id": optional_data_descr
                 | datetime_variable_descr

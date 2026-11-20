@@ -40,6 +40,12 @@ export function updatedMetaDataUrl(dataSource: DataSource) {
 
   const DTFormat = encodeURIComponent(dataSource.metadata.datetime_format);
 
+  const header = encodeURIComponent(dataSource.metadata.header);
+
+  const columnNames = encodeURIComponent(
+    "[" + dataSource.metadata.column_names.toString() + "]",
+  );
+
   const var_maps = Object.fromEntries(
     dataSource.metadata.variables.required_vars
       .concat(dataSource.metadata.variables.datetime_vars)
@@ -59,5 +65,5 @@ export function updatedMetaDataUrl(dataSource: DataSource) {
     ),
   );
 
-  return `/api/map_data?mode=metadata_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
+  return `/api/map_data?mode=metadata_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}&header=${header}&column_names=${columnNames}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
 }
