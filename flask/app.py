@@ -3,7 +3,7 @@ from logging.config import dictConfig
 from platform import system
 
 import fastpysgi
-from datasources.earthquake_catalog import generate_data_dict, generate_metadata_dict
+from datasources.earthquake_catalog import data_dict, metadata_dict
 
 from flask import Flask, Response, request
 
@@ -70,13 +70,13 @@ def earthquake_catalog():
         app.logger.info("--- Metadata request ---")
 
         return Response(
-            json.dumps(generate_metadata_dict()), mimetype="application/json"
+            json.dumps(metadata_dict()), mimetype="application/json"
         )
     if mode == "data" or mode is None:
         app.logger.info("--- Data request ---")
 
         return Response(
-            json.dumps(generate_data_dict()),
+            json.dumps(data_dict()),
             mimetype="application/json",
         )
 

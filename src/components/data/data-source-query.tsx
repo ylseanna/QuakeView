@@ -24,20 +24,24 @@ export function dataSourceDataUrl(dataSource: DataSource) {
   const index = encodeURIComponent(dataSource.metadata.index);
   const DTFormat = encodeURIComponent(dataSource.metadata.datetime_format);
 
+  const header = encodeURIComponent(dataSource.metadata.header);
+  const columnNames = encodeURIComponent(
+    "[" + dataSource.metadata.column_names.toString() + "]",
+  );
+
+
   const filtering = dataSource.filtering;
   let encoded_filtering = "";
   if (filtering) {
     encoded_filtering = encodeURIComponent(JSON.stringify(filtering));
   }
 
-  return `/api/map_data?mode=data_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}${filtering ? "&filtering=" + encoded_filtering : ""}`;
+  return `/api/earthquake_catalog?mode=data&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}&header=${header}&column_names=${columnNames}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}${filtering ? "&filtering=" + encoded_filtering : ""}`;
 }
 
 export function updatedMetaDataUrl(dataSource: DataSource) {
   const sep = encodeURIComponent(dataSource.metadata.sep);
-
   const index = encodeURIComponent(dataSource.metadata.index);
-
   const DTFormat = encodeURIComponent(dataSource.metadata.datetime_format);
 
   const header = encodeURIComponent(dataSource.metadata.header);
@@ -65,5 +69,5 @@ export function updatedMetaDataUrl(dataSource: DataSource) {
     ),
   );
 
-  return `/api/map_data?mode=metadata_query&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}&header=${header}&column_names=${columnNames}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
+  return `/api/earthquake_catalog?mode=metadata&filepath=${dataSource.filepath}&sep=${sep}&index=${index}&datetimeformat=${DTFormat}&header=${header}&column_names=${columnNames}${"&vars=" + encoded_vars}${"&var_maps=" + encoded_var_maps}`;
 }
