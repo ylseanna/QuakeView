@@ -115,7 +115,7 @@ function HeaderToggle({ dataSource }: { dataSource: DataSource }) {
       minHeight="36px"
     >
       <Typography variant="formlabel" sx={{ mr: 1 }}>
-        {t("Variables.format")}
+        {t("Variables.column_names_origin")}
       </Typography>
       <ToggleButtonGroup
         color="primary"

@@ -11,7 +11,6 @@ from flask import Flask, request
 
 app = Flask(__name__)
 
-
 def count(filename: Path):
     with filename.open(mode="r+") as f:
         buf = mmap(f.fileno(), 0)
@@ -21,8 +20,7 @@ def count(filename: Path):
             lines += 1
         return lines
 
-
-def generate_metadata_dict():
+def metadata_dict():
     argument_dict = request.args.to_dict()
 
     # IS INITIAL REQUEST?
@@ -282,7 +280,7 @@ def generate_metadata_dict():
     return meta_data_dict
 
 
-def generate_data_dict(nlines=None):
+def data_dict(nlines=None):
     # LOAD DATAFRAME
     app.logger.info("loading...")
     filepath = request.args.get("filepath")
@@ -340,6 +338,10 @@ def generate_data_dict(nlines=None):
         df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
+        
+        for variable in ["date", "time", "year", "month", "day", "doy", "hour", "minute", "second"]:
+            if variable in varmap:
+                del varmap[variable]
     elif datetime_format == "date_string-time_string":
         df["datetime"] = to_datetime(
             df[varmap["date"]].values + "T" + df[varmap["time"]].values
@@ -350,13 +352,9 @@ def generate_data_dict(nlines=None):
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
         varmap["dt"] = "dt"
-        varmap["year"] = "year"
-        varmap["month"] = "month"
-        varmap["day"] = "day"
-        varmap["doy"] = "doy"
-        varmap["hour"] = "hour"
-        varmap["minute"] = "minute"
-        varmap["second"] = "second"
+        for variable in ["year", "month", "day", "doy", "hour", "minute", "second"]:
+            if variable in varmap:
+                del varmap[variable]
 
         app.logger.debug(df["datetime"][:10])
     elif datetime_format == "year-month-day-hour-minute-second":
@@ -406,7 +404,9 @@ def generate_data_dict(nlines=None):
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
 
         varmap["dt"] = "dt"
-        varmap["doy"] = "doy"
+        for variable in ["date", "time", "doy"]:
+            if variable in varmap:
+                del varmap[variable]
 
         app.logger.debug(f"\n{df[:10]}")
 
@@ -424,7 +424,7 @@ def generate_data_dict(nlines=None):
             else None
         )
         for var in required_vars + optional_vars
-        if varmap[var]
+        if var in varmap
     }
     app.logger.debug(bounds)
 
@@ -455,6 +455,8 @@ def generate_data_dict(nlines=None):
         unfiltered_bounds = bounds
 
         app.logger.debug(f"Unfiltered bounds:\n{unfiltered_bounds}")
+        
+        app.logger.debug(df)
 
         bounds = {
             var: (

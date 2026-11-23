@@ -159,7 +159,8 @@
     "column_name_file": "Column name (file)",
     "column_name": "Column name",
     "column_preview": "Column preview",
-    "column_number": "Column number"
+    "column_number": "Column number",
+    "column_names_origin": "Column names origin"
   },
   "Titlebar": {
     "language": "Language",
