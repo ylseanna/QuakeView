@@ -40,7 +40,26 @@ export default function DataTab({ id }: DataTabProps) {
   const dataSource = useProjectStore((state) => state.dataSources.byID[id]);
   const removeDataSource = useProjectStore(
     (state) => state.dataSourceActions.removeDataSource,
-  );  
+  );
+
+  const setMetadata = useProjectStore(
+    (state) => state.dataSourceActions.setMetadata,
+  );
+
+  const updateMetadata = async (dataSource: DataSource) => {
+    // update bounds and metadata after setting mapped variables
+
+    // fetch updated metadata
+    const updatedMetadata = await fetchUpdatedMetadata(dataSource);
+
+    // set metadata
+    setMetadata(dataSource.internal_id, updatedMetadata);
+  };
+
+  useEffect(() => {
+    updateMetadata(dataSource);
+  }, [dataSource.metadata.sep, dataSource.metadata.header]);
+
   const theme = useTheme();
 
   return (

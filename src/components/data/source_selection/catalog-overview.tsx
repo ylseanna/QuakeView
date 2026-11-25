@@ -96,7 +96,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
   );
 
   return (
-    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 0 }}>
+    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
       <Stack
         sx={{
           ".full-row": {
@@ -248,42 +248,41 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
                   </Typography>
                 </Stack>
               ))}
-              <Stack key={"rawPreviewCatalogFinalLine"} direction="row">
-                <Typography
-                  variant="rawtext"
-                  sx={{
-                    minWidth: "1.7rem",
-                    opacity: 0.6,
-                    ml: "2px",
-                  }}
-                >
-                  &#8942;
-                </Typography>
-              </Stack>
-            </Paper>
-          ) : (
-            <DataGrid
-              disableColumnMenu
-              disableColumnSorting
-              columnHeaderHeight={36}
-              columnVisibilityModel={{ id: false, t: false, dt: false }}
-              rowHeight={36}
-              columns={[
-                ...Object.keys(dataSource.metadata.preview.parsed[0]).map(
-                  (key) => {
-                    return { field: key, headerName: key, width: 120 };
-                  },
-                ),
+            <Stack key={"rawPreviewCatalogFinalLine"} direction="row">
+              <Typography
+                variant="rawtext"
+                sx={{
+                  minWidth: "1.7rem",
+                  opacity: 0.6,
+                  ml: "2px",
+                }}
+              >
+                &#8942;
+              </Typography>
+            </Stack>
+          </Paper>
+        ) : (
+          <DataGrid
+            disableColumnMenu
+            disableColumnSorting
+            columnHeaderHeight={36}
+            columnVisibilityModel={{ id: false, t: false, dt: false }}
+            rowHeight={36}
+            columns={[
+              ...Object.keys(dataSource.metadata.preview.parsed[0]).map(
+                (key, index) => {
+                  return {
+                    field: key,
+                    headerName:
+                      dataSource.metadata.header == "add_header"
+                        ? dataSource.metadata.column_names[index]
+                        : dataSource.metadata.header == "override_header"
+                          ? dataSource.metadata.column_names[index - 1]
+                          : key,
+                    width: 120,
+                  };
+                }),
               ]}
-              autosizeOptions={autosizeOptions}
-              autosizeOnMount
-              hideFooter
-              sx={{
-                m: 2,
-                ".MuiDataGrid-row--lastVisible": {
-                  opacity: theme.palette.action.disabledOpacity,
-                },
-              }}
               rows={dataSource.metadata.preview.parsed}
             />
           )}

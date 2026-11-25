@@ -26,9 +26,8 @@ export function dataSourceDataUrl(dataSource: DataSource) {
 
   const header = encodeURIComponent(dataSource.metadata.header);
   const columnNames = encodeURIComponent(
-    "[" + dataSource.metadata.column_names.toString() + "]",
+    JSON.stringify(dataSource.metadata.column_names),
   );
-
 
   const filtering = dataSource.filtering;
   let encoded_filtering = "";
@@ -47,7 +46,7 @@ export function updatedMetaDataUrl(dataSource: DataSource) {
   const header = encodeURIComponent(dataSource.metadata.header);
 
   const columnNames = encodeURIComponent(
-    "[" + dataSource.metadata.column_names.toString() + "]",
+    JSON.stringify(dataSource.metadata.column_names),
   );
 
   const var_maps = Object.fromEntries(

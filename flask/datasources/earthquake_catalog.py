@@ -4,12 +4,13 @@ from itertools import islice
 from mmap import mmap
 from pathlib import Path
 
-from numpy import concatenate, float64, int64, isnan
+from numpy import concatenate, float64, int64, isnan, array_equiv
 from pandas import read_csv, to_datetime
 
 from flask import Flask, request
 
 app = Flask(__name__)
+
 
 def count(filename: Path):
     with filename.open(mode="r+") as f:
@@ -19,6 +20,7 @@ def count(filename: Path):
         while readline():
             lines += 1
         return lines
+
 
 def metadata_dict():
     argument_dict = request.args.to_dict()
@@ -42,18 +44,43 @@ def metadata_dict():
     index = request.args.get("index") if not initial_request else "from_file"
     header = request.args.get("header") if not initial_request else "from_file"
 
+    # load header (best to do seperate and have it be explicit)
+    if seperator == r"\s+":
+        file_column_names = open(filepath).readline().rstrip().strip().split()
+    else:
+        file_column_names = [
+            column_name.strip()
+            for column_name in open(filepath).readline().rstrip().split(seperator)
+        ]
+
+    app.logger.info(file_column_names)
+
     # load initially (also serves as preview dws)
     preview_df = read_csv(
         filepath,
+        header=None if header == "add_header" else "infer",
         sep=seperator,
         nrows=10,
     )
 
-    column_names = (
-        preview_df.columns.to_list()
-        # if header=="from_file"
-        # else request.args.get("column_names")
-    )
+    # file_column_names = preview_df.columns.to_list()
+
+    if header == "from_file":
+        column_names = file_column_names
+    if header == "add_header":
+        column_names = json.loads(request.args.get("column_names"))
+        if array_equiv(column_names, file_column_names):
+            column_names = [str(index + 1) for index in range(len(file_column_names))]
+    if header == "override_header":
+        column_names = json.loads(request.args.get("column_names"))
+        if array_equiv(column_names, file_column_names) or array_equiv(
+            column_names, [str(index + 1) for index in range(len(file_column_names))]
+        ):
+            column_names = file_column_names
+
+    # preview_df.columns = column_names
+
+    print(preview_df)
 
     # DEFINE REQUIRED PARAMS
 
@@ -236,7 +263,9 @@ def metadata_dict():
     # OUTPUT
 
     meta_data_dict = {
-        "num_events": count(filepath) - 1,
+        "num_events": (
+            count(filepath) - 1 if header != "add_header" else count(filepath)
+        ),
         "sep": seperator,
         "index": index,
         "datetime_format": datetime_format,
@@ -250,9 +279,11 @@ def metadata_dict():
             "raw": raw_file_preview,
         },
         "header": header,
-        "file_column_names": [
-            str(header) for header in preview_df.columns if (header not in ("dt", "t"))
-        ],
+        "file_column_names": (
+            [str(num + 1) for num in range(len(file_column_names))]
+            if header == "add_header"
+            else file_column_names
+        ),
         "column_names": column_names,
         "variables": {
             "by_id": optional_data_descr
@@ -287,8 +318,17 @@ def data_dict(nlines=None):
 
     seperator = request.args.get("sep")
     index = request.args.get("index")
+    header = request.args.get("header")
 
-    df = read_csv(filepath, sep=seperator)
+    df = read_csv(
+        filepath,
+        sep=seperator,
+        header=None if header == "add_header" else "infer",
+    )
+
+    column_names = json.loads(request.args.get("column_names"))
+
+    df.columns = column_names
 
     df.columns = df.columns.str.strip()
 
@@ -338,8 +378,18 @@ def data_dict(nlines=None):
         df["t"] = [dt.timestamp() * 1000 for dt in df["datetime"]]
 
         df["dt"] = [dt.isoformat() for dt in df["datetime"]]
-        
-        for variable in ["date", "time", "year", "month", "day", "doy", "hour", "minute", "second"]:
+
+        for variable in [
+            "date",
+            "time",
+            "year",
+            "month",
+            "day",
+            "doy",
+            "hour",
+            "minute",
+            "second",
+        ]:
             if variable in varmap:
                 del varmap[variable]
     elif datetime_format == "date_string-time_string":
@@ -455,7 +505,7 @@ def data_dict(nlines=None):
         unfiltered_bounds = bounds
 
         app.logger.debug(f"Unfiltered bounds:\n{unfiltered_bounds}")
-        
+
         app.logger.debug(df)
 
         bounds = {
