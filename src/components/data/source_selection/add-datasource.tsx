@@ -5,7 +5,7 @@ import { DataSource, DataSourceFormatting, DataSourceMetaData } from "../../cust
 
 export const getInitDataSource = async (filepath: string) => {
   const initDataSource = await fetch(
-    `/api/map_data?mode=metadata_query&filepath=${encodeURIComponent(filepath)}`,
+    `/api/earthquake_catalog?mode=metadata&filepath=${encodeURIComponent(filepath)}`,
   )
     .then((res) => res.json())
     .then((metadata: DataSourceMetaData) => {

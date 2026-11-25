@@ -4,13 +4,16 @@
 import {
   Autocomplete,
   Box,
+  Checkbox,
   Divider,
   Grid,
   IconButton,
   Stack,
   TextField,
+  ToggleButton,
   Tooltip,
   Typography,
+  ToggleButtonGroup,
 } from "@mui/material";
 
 import {
@@ -21,13 +24,15 @@ import { useTranslations } from "next-intl";
 import {
   ChangeEvent,
   MouseEventHandler,
+  ReactNode,
   SyntheticEvent,
   useEffect,
+  useState,
 } from "react";
-import { Clear } from "@mui/icons-material";
+import { Check, CheckBox, Clear } from "@mui/icons-material";
 import { useProjectStore } from "@/providers/project-store-provider";
 import { updatedMetaDataUrl } from "../data-source-query";
-import { Nuke } from "mdi-material-ui";
+import { Nuke, Numeric, Numeric0, NumericOff } from "mdi-material-ui";
 import {
   datePlusTimeStringRequiredVars,
   dateTimeAsNumbersRequiredVars,
@@ -39,16 +44,86 @@ export const fetchUpdatedMetadata = async (dataSource: DataSource) => {
   return await fetch(updatedMetaDataUrl(dataSource)).then((res) => res.json());
 };
 
+const sxButton = {
+  padding: "4px 8px 4px 8px",
+  textTransform: "capitalize",
+  lineHeight: 1,
+  h: 3,
+};
+
+function DateTimeFormatToggle({ dataSource }: { dataSource: DataSource }) {
+  const t = useTranslations();
+
+  const { setDatetimeFormat } = useProjectStore(
+    (state) => state.metadataActions,
+  );
+
+  return (
+    <Grid
+      container
+      spacing={2}
+      sx={{
+        alignItems: "end",
+        justifyContent: "end",
+        minHeight: "36px",
+        my: -0.5,
+      }}
+    >
+      <Grid size={2.5} sx={{ mb: "4px" }}>
+        <Typography variant="formlabel" sx={{ fontSize: 14 }}>
+          {t("Variables.datetime")}
+        </Typography>
+      </Grid>
+      <Grid
+        size="grow"
+        display="flex"
+        justifyContent="end"
+        alignItems="center"
+        minHeight="36px"
+      >
+        <Typography variant="formlabel" sx={{ mr: 1 }}>
+          {t("Variables.format")}
+        </Typography>
+        <ToggleButtonGroup
+          color="primary"
+          value={dataSource.metadata.datetime_format}
+          exclusive
+          onChange={(event) => {
+            setDatetimeFormat(
+              dataSource.internal_id,
+              (event.target as HTMLInputElement).value,
+            );
+          }}
+          aria-label="mode"
+          sx={{ height: "24px" }}
+        >
+          <ToggleButton value="parseable_datetime_string" sx={sxButton}>
+            {t("Sources.parseable_datetime_string")}
+          </ToggleButton>
+          <ToggleButton value="date_string-time_string" sx={sxButton}>
+            {t("Sources.date_string-time_string")}
+          </ToggleButton>
+          <ToggleButton value="year-month-day-hour-minute-second" sx={sxButton}>
+            {t("Sources.year-month-day-hour-minute-second")}
+          </ToggleButton>
+        </ToggleButtonGroup>
+      </Grid>
+    </Grid>
+  );
+}
+
 function VariableEditingRow({
   dataDescription,
   onRemove,
   required,
   dataSource,
+  children,
 }: {
   dataDescription: DataSourceDataDescription;
   onRemove?: MouseEventHandler;
   required?: boolean;
   dataSource: DataSource;
+  children?: ReactNode | ReactNode[];
 }) {
   const t = useTranslations();
 
@@ -59,6 +134,8 @@ function VariableEditingRow({
   const setLoadable = useProjectStore(
     (state) => state.dataSourceActions.setLoadable,
   );
+
+  const [isValid, setIsValid] = useState<boolean>(false);
 
   useEffect(() => {
     let mappedVarCheck = false;
@@ -79,7 +156,7 @@ function VariableEditingRow({
         ).includes(requiredVar)
           ? description.mapped_var
               .map((mapped_var) =>
-                dataSource.metadata.catalog_headers.includes(mapped_var),
+                dataSource.metadata.column_names.includes(mapped_var),
               )
               .some((check) => check)
           : true;
@@ -89,9 +166,25 @@ function VariableEditingRow({
     if (mappedVarCheck != dataSource.interface.loadable) {
       setLoadable(dataSource.internal_id, mappedVarCheck);
     }
-
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [dataDescription.mapped_var]);
+    setIsValid(
+      required
+        ? dataDescription.mapped_var
+            .map((mapped_var) =>
+              dataSource.metadata.column_names.includes(mapped_var),
+            )
+            .some((check) => check)
+          ? true
+          : false
+        : true,
+    );
+  }, [
+    dataDescription.variable,
+    dataDescription.mapped_var,
+    dataSource.metadata.sep,
+    dataSource.metadata.datetime_format,
+    dataSource.metadata.index,
+    dataSource.metadata.column_names
+  ]);
 
   const SharedTextFieldProps = {
     sx: {
@@ -102,7 +195,12 @@ function VariableEditingRow({
   };
 
   return (
-    <Grid container spacing={1} alignItems="flex-start">
+    <Grid
+      container
+      spacing={1}
+      alignItems="flex-start"
+      sx={{ mb: isValid ? 0 : -0.5 }}
+    >
       <Grid sx={{ width: "120px" }}>
         <TextField value={dataDescription.variable} size="small" disabled />
       </Grid>
@@ -155,7 +253,7 @@ function VariableEditingRow({
         size="grow"
         display="flex"
         justifyContent="center"
-        alignItems="center"
+        alignItems="start"
       >
         <Autocomplete
           multiple
@@ -166,7 +264,7 @@ function VariableEditingRow({
                   .mapped_var
               : [dataDescription.variable]
           }
-          options={dataSource.metadata.catalog_headers}
+          options={dataSource.metadata.column_names}
           getOptionLabel={(option: string) => option}
           size="small"
           fullWidth
@@ -192,7 +290,7 @@ function VariableEditingRow({
                 dataDescription.mapped_var
                   ? !dataDescription.mapped_var
                       .map((mapped_var) =>
-                        dataSource.metadata.catalog_headers.includes(
+                        dataSource.metadata.column_names.includes(
                           mapped_var,
                         ),
                       )
@@ -200,25 +298,14 @@ function VariableEditingRow({
                   : false
               }
               helperText={
-                required ? (
-                  dataDescription.mapped_var ? (
-                    !dataDescription.mapped_var
-                      .map((mapped_var) =>
-                        dataSource.metadata.catalog_headers.includes(
-                          mapped_var,
-                        ),
-                      )
-                      .some((check) => check) ? (
-                      <span>{t("Variables.mapping_warning")}</span>
-                    ) : undefined
-                  ) : (
-                    <span>{t("Variables.mapping_warning")}</span>
-                  )
-                ) : undefined
+                isValid ? undefined : (
+                  <span>{t("Variables.mapping_warning")}</span>
+                )
               }
             />
           )}
         />
+        {children}
         {!required && onRemove && (
           <IconButton sx={{ ml: 1 }} onClick={onRemove}>
             <Clear />
@@ -240,10 +327,10 @@ export default function DataSourceVariableForm({
     (state) => state.dataSourceActions.setAddedVars,
   );
 
+  const { setIndex } = useProjectStore((state) => state.metadataActions);
   const clearAllVariableMaps = useProjectStore(
     (state) => state.metadataActions.clearAllVariableMaps,
   );
-
 
   return (
     <Box sx={{ p: 2 }}>
@@ -318,17 +405,44 @@ export default function DataSourceVariableForm({
             </Stack>
           </Grid>
         </Grid>
+        <Box>
+          <VariableEditingRow
+            dataDescription={dataSource.metadata.variables.by_id["id"]}
+            dataSource={dataSource}
+            required={dataSource.metadata.index == "numerical" ? false : true}
+          >
+            <Grid
+              sx={{ height: "40px", ml: 1 }}
+              display="flex"
+              justifyContent="end"
+              alignItems="center"
+            >
+              <Tooltip title={t("Sources.index")}>
+                <Checkbox
+                  checked={
+                    dataSource.metadata.index == "numerical" ? true : false
+                  }
+                  onChange={(event) => {
+                    setIndex(
+                      dataSource.internal_id,
+                      event.target!.checked ? "numerical" : "from_file",
+                    );
+                  }}
+                  icon={<NumericOff />}
+                  checkedIcon={<Numeric />}
+                  slotProps={{ input: { "aria-label": "controlled" } }}
+                />
+              </Tooltip>
+            </Grid>
+          </VariableEditingRow>
+        </Box>
+        <Divider textAlign="left" sx={{ mt: 0.5 }} />
+        <DateTimeFormatToggle dataSource={dataSource} />
         {dataSource.metadata.datetime_format ==
-        "year-month-day-hour-minute-second"
-          ? [
-              ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
-              ...dataSource.metadata.variables.datetime_vars.filter(
-                (variable) => !["doy", "date", "time"].includes(variable),
-              ),
-              ...dataSource.metadata.variables.required_vars.filter(
-                (variable) => !["id", "dt", "t"].includes(variable),
-              ),
-            ].map((variable: string, index) => (
+        "year-month-day-hour-minute-second" ? (
+          dataSource.metadata.variables.datetime_vars
+            .filter((variable) => !["doy", "date", "time"].includes(variable))
+            .map((variable: string, index) => (
               <Box key={"EditingElement-" + variable}>
                 {dataSource.metadata.index == "from_file" && index == 1 ? (
                   <Divider textAlign="left" sx={{ mb: 1 }}>
@@ -351,79 +465,78 @@ export default function DataSourceVariableForm({
                 />
               </Box>
             ))
-          : dataSource.metadata.datetime_format == "date_string-time_string"
-            ? [
-                ...(dataSource.metadata.index == "from_file" ? ["id"] : []),
-                ...dataSource.metadata.variables.datetime_vars.filter(
-                  (variable) =>
-                    ![
-                      "year",
-                      "month",
-                      "day",
-                      "doy",
-                      "hour",
-                      "minute",
-                      "second",
-                    ].includes(variable),
-                ),
-                ...dataSource.metadata.variables.required_vars.filter(
-                  (variable) => !["id", "dt", "t"].includes(variable),
-                ),
-              ].map((variable: string, index) => (
-                <Box key={"EditingElement-" + variable}>
-                  {dataSource.metadata.index == "from_file" && index == 1 ? (
-                    <Divider textAlign="left" sx={{ my: 1, mb: 2 }}>
-                      <span style={{ opacity: 0.4 }}>
-                        {t("Variables.time_variables")}
-                      </span>
-                    </Divider>
-                  ) : (
-                    index ==
-                      (dataSource.metadata.index == "from_file" ? 3 : 2) && (
-                      <Divider sx={{ my: 1, mb: 2 }} />
-                    )
-                  )}
-                  <VariableEditingRow
-                    dataDescription={
-                      dataSource.metadata.variables.by_id[variable]
-                    }
-                    dataSource={dataSource}
-                    required
-                  />
-                </Box>
-              ))
-            : dataSource.metadata.variables.required_vars.map(
-                (variable: string) =>
-                  !(
-                    dataSource.metadata.index == "from_file"
-                      ? ["t"]
-                      : ["t", "id"]
-                  ).includes(variable) && (
-                    <VariableEditingRow
-                      key={"EditingElement-" + variable}
-                      dataDescription={
-                        dataSource.metadata.variables.by_id[variable]
-                      }
-                      dataSource={dataSource}
-                      required
-                    />
-                  ),
-              )}
-        {dataSource.metadata.variables.added_vars.map((variable: string) => (
+        ) : dataSource.metadata.datetime_format == "date_string-time_string" ? (
+          dataSource.metadata.variables.datetime_vars
+            .filter(
+              (variable) =>
+                ![
+                  "year",
+                  "month",
+                  "day",
+                  "doy",
+                  "hour",
+                  "minute",
+                  "second",
+                ].includes(variable),
+            )
+            .map((variable: string, index) => (
+              <VariableEditingRow
+                key={"EditingElement-" + variable}
+                dataDescription={dataSource.metadata.variables.by_id[variable]}
+                dataSource={dataSource}
+                required
+              />
+            ))
+        ) : (
           <VariableEditingRow
-            key={"EditingElement-" + variable}
-            dataDescription={dataSource.metadata.variables.by_id[variable]}
+            key={"EditingElement-dt"}
+            dataDescription={dataSource.metadata.variables.by_id["dt"]}
             dataSource={dataSource}
-            onRemove={() => {
-              setAddedVars(
-                dataSource.internal_id,
-                dataSource.metadata.variables.added_vars.filter(
-                  (el) => el != variable,
-                ),
-              );
-            }}
+            required
           />
-        ))}
+        )}
+        <Divider textAlign="left" sx={{ my: 1 }} />
+        <Typography variant="formlabel">{t("Variables.location")}</Typography>
+
+        {dataSource.metadata.variables.required_vars
+          .filter((variable) => !["id", "dt", "t", "mag"].includes(variable))
+          .map((variable: string, index) => (
+            <VariableEditingRow
+              key={"EditingElement-" + variable}
+              dataDescription={dataSource.metadata.variables.by_id[variable]}
+              dataSource={dataSource}
+              required
+            />
+          ))}
+        <Divider textAlign="left" sx={{ my: 1 }} />
+        <Typography variant="formlabel">{t("Variables.magnitude")}</Typography>
+        <VariableEditingRow
+          key={"EditingElement-mag"}
+          dataDescription={dataSource.metadata.variables.by_id["mag"]}
+          dataSource={dataSource}
+          required
+        />
+        <Divider textAlign="left" sx={{ my: 1 }} />
+        <Typography variant="formlabel">{t("Variables.optional")}</Typography>
+        {dataSource.metadata.variables.added_vars
+          .filter((variable) =>
+            dataSource.metadata.column_names.includes(variable),
+          )
+          .map((variable: string) => (
+            <VariableEditingRow
+              key={"EditingElement-" + variable}
+              dataDescription={dataSource.metadata.variables.by_id[variable]}
+              dataSource={dataSource}
+              onRemove={() => {
+                setAddedVars(
+                  dataSource.internal_id,
+                  dataSource.metadata.variables.added_vars.filter(
+                    (el) => el != variable,
+                  ),
+                );
+              }}
+            />
+          ))}
         <Grid container spacing={1} alignItems="center">
           <Grid sx={{ width: "120px" }}>
             <Autocomplete

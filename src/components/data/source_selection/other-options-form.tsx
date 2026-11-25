@@ -84,8 +84,10 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
           </SubAccordionSummary>
         </Box>
         <SubAccordionDetails>
-          {dataSource.interface.loadable && allDomainsPresent && (
-            <DataSourceFormattingForms dataSource={dataSource} />
+          {dataSource.interface.loadable && allDomainsPresent ? (
+           <DataSourceFormattingForms dataSource={dataSource} />
+          ) : (
+            <span>Not Loadable</span>
           )}
         </SubAccordionDetails>
       </SubAccordion>
@@ -106,11 +108,14 @@ export default function OtherOptionsForm({ dataSource }: DataTabProps) {
           </SubAccordionSummary>
         </Box>
         <SubAccordionDetails>
-          {dataSource.interface.loadable && (
+          {dataSource.interface.loadable ? (
             <FilteringForm dataSource={dataSource} />
+          ) : (
+            <span>Not Loadable</span>
           )}
         </SubAccordionDetails>
       </SubAccordion>
+
     </Paper>
   );
 }

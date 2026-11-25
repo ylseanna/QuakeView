@@ -90,7 +90,7 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
   const theme = useTheme();
 
   return (
-    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1}}>
+    <Paper variant="outlined" sx={{ mb: 2, pt: 1, pb: 1 }}>
       <Stack
         sx={{
           ".full-row": {
@@ -263,8 +263,17 @@ export default function CatalogOverview({ dataSource }: DataTabProps) {
             rowHeight={36}
             columns={[
               ...Object.keys(dataSource.metadata.preview.parsed[0]).map(
-                (key) => {
-                  return { field: key, headerName: key, width: 120 };
+                (key, index) => {
+                  return {
+                    field: key,
+                    headerName:
+                      dataSource.metadata.header == "add_header"
+                        ? dataSource.metadata.column_names[index]
+                        : dataSource.metadata.header == "override_header"
+                          ? dataSource.metadata.column_names[index - 1]
+                          : key,
+                    width: 120,
+                  };
                 },
               ),
             ]}

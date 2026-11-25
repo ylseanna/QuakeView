@@ -3,13 +3,16 @@ import { Extent } from "../custom/types";
 export type BoundsDict = { [variable: string]: [number, number] | null };
 
 export const combineBounds = (boundsDicts: BoundsDict[]) => {
-  console.log(boundsDicts)
+  console.log(boundsDicts);
   return Object.fromEntries(
     Object.keys(boundsDicts[0]).map((variable) => {
       if (
         boundsDicts
           .map((boundsDict) => boundsDict[variable]!)
-          .some((el) => el != null)
+          .some((el) => el != null) &&
+        boundsDicts
+          .map((boundsDict) => variable in boundsDict)
+          .every((el) => el)
       ) {
         return [
           variable,
