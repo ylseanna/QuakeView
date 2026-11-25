@@ -172,7 +172,13 @@
     "documentation": "Documentation",
     "external_link": "external link",
     "hide_debug_window": "Hide debug menu",
-    "github_repo": "Github repository"
+    "github_repo": "Github repository",
+    "3D_map_elements": "3D map elements",
+    "show_3D_map_depths": "Show depth indicators",
+    "show_3D_depth_indicators": "Show depth indicators",
+    "show_3D_full_extent": "Show full extent",
+    "show_3D_geo_extent": "Show geographic extent indicator",
+    "show_3D_ground_plane": "Show ground plane"
   },
   "Navbar": {
     "GR_plot": "Magnitude vs. frequency",

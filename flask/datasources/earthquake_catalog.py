@@ -519,7 +519,7 @@ def data_dict(nlines=None):
                 else None
             )
             for var in required_vars + optional_vars
-            if varmap[var]
+            if var in varmap
         }
 
         app.logger.debug(f"Filtered bounds:\n{bounds}")
