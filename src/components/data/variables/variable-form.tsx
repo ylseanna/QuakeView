@@ -183,6 +183,7 @@ function VariableEditingRow({
     dataSource.metadata.sep,
     dataSource.metadata.datetime_format,
     dataSource.metadata.index,
+    dataSource.metadata.column_names
   ]);
 
   const SharedTextFieldProps = {

@@ -214,11 +214,21 @@ function ColumnEditorRow({
           <Typography noWrap>
             {dataSource.metadata.preview.parsed.map((value, index) => (
               <span
-                key={"previeNum" + index}
+                key={"previewNum" + index}
                 style={{ opacity: index < 9 ? 0.8 : 0.5 }}
               >
-                {(index == 0 ? "" : ", ") +
-                  value[dataSource.metadata.file_column_names[columnIndex]]}
+                {(dataSource.metadata.header == "add_header"
+                  ? value[columnIndex]
+                  : value[
+                      dataSource.metadata.file_column_names[columnIndex]
+                    ]) != undefined
+                  ? (index == 0 ? "" : ", ") +
+                    (dataSource.metadata.header == "add_header"
+                      ? value[columnIndex]
+                      : value[
+                          dataSource.metadata.file_column_names[columnIndex]
+                        ])
+                  : " "}
               </span>
             ))}
             <span style={{ opacity: 0.5 }}>{"..."}</span>
