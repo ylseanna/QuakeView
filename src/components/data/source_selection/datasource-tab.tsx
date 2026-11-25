@@ -3,7 +3,7 @@
 
 import { Close, ExpandMore, ScatterPlot, Warning } from "@mui/icons-material";
 import {
-  Accordion,
+  Stack,
   AccordionDetails,
   AccordionSummary,
   Box,
@@ -60,13 +60,12 @@ export default function DataTab({ id }: DataTabProps) {
   const theme = useTheme();
 
   return (
-    <Accordion>
-      <Box sx={{ display: "flex" }}>
-        <AccordionSummary
-          expandIcon={<ExpandMore />}
-          aria-controls="panel1a-content"
-          id="panel2a-header"
-          sx={{ flexGrow: 1 }}
+    <Box sx={{pb: 2}}>
+      <Box sx={{ display: "flex", pt:1 }}>
+        <Stack
+        direction="row"
+        alignItems="center"  
+                sx={{ px:2, flexGrow: 1 }}
         >
           {dataSource.interface.loadable ? (
             <ScatterPlot sx={{ opacity: 0.6, mr: 1 }} />
@@ -82,7 +81,7 @@ export default function DataTab({ id }: DataTabProps) {
           >
             {dataSource.name}
           </Typography>
-        </AccordionSummary>
+        </Stack>
         <Tooltip title={t("Sources.remove_data_source")}>
           <Box sx={{ display: "flex", p: 1, pl: 0 }}>
             <IconButton
@@ -103,6 +102,6 @@ export default function DataTab({ id }: DataTabProps) {
         <ParsingForm dataSource={dataSource} />
         <OtherOptionsForm dataSource={dataSource} />
       </AccordionDetails>
-    </Accordion>
+    </Box>
   );
 }
