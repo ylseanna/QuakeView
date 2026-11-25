@@ -202,58 +202,58 @@ export function useMapStyle() {
           ? USDEMStyle
           : WorldCoastLines;
 
-    if (showExtents) {
-      if (extentPolygons) {
-        Object.keys(extentPolygons).forEach((dataSourceID) => {
-          if (extentPolygons[dataSourceID]) {
-            mapStyle.sources["extent-source-" + dataSourceID] = {
-              type: "geojson",
-              data: extentPolygons[dataSourceID],
-            };
-            // if (
-            //   !mapStyle.layers
-            //     .map((layer) => layer.id)
-            //     .includes("extent-" + dataSourceID)
-            // ) {
-            //   mapStyle.layers.push({
-            //     id: "extent-" + dataSourceID,
-            //     type: "line",
-            //     source: "extent-source-" + dataSourceID,
-            //     paint: {
-            //       "line-color": "#000",
-            //       "line-opacity": 1,
-            //       "line-width": 1.2,
-            //     },
-            //   });
-            // }
-          }
-        });
-      }
+    // if (showExtents) {
+    //   if (extentPolygons) {
+    //     Object.keys(extentPolygons).forEach((dataSourceID) => {
+    //       if (extentPolygons[dataSourceID]) {
+    //         mapStyle.sources["extent-source-" + dataSourceID] = {
+    //           type: "geojson",
+    //           data: extentPolygons[dataSourceID],
+    //         };
+    //         // if (
+    //         //   !mapStyle.layers
+    //         //     .map((layer) => layer.id)
+    //         //     .includes("extent-" + dataSourceID)
+    //         // ) {
+    //         //   mapStyle.layers.push({
+    //         //     id: "extent-" + dataSourceID,
+    //         //     type: "line",
+    //         //     source: "extent-source-" + dataSourceID,
+    //         //     paint: {
+    //         //       "line-color": "#000",
+    //         //       "line-opacity": 1,
+    //         //       "line-width": 1.2,
+    //         //     },
+    //         //   });
+    //         // }
+    //       }
+    //     });
+    //   }
 
-      if (mainExtent) {
-        if (extentPolygons) {
-          mapStyle.sources["mainExtent"] = {
-            type: "geojson",
-            data: mainExtent,
-          };
-          // if (
-          //   !mapStyle.layers.map((layer) => layer.id).includes("mainExtent")
-          // ) {
-          //   mapStyle.layers.push({
-          //     id: "mainExtent",
-          //     type: "line",
-          //     source: "mainExtent",
-          //     paint: {
-          //       "line-dasharray": [1, 1],
-          //       "line-color": "#000",
-          //       "line-opacity": 1,
-          //       "line-width": 1.2,
-          //     },
-          //   });
-          // }
-        }
-      }
-    }
+      // if (mainExtent) {
+      //   if (extentPolygons) {
+      //     mapStyle.sources["mainExtent"] = {
+      //       type: "geojson",
+      //       data: mainExtent,
+      //     };
+      //     // if (
+      //     //   !mapStyle.layers.map((layer) => layer.id).includes("mainExtent")
+      //     // ) {
+      //     //   mapStyle.layers.push({
+      //     //     id: "mainExtent",
+      //     //     type: "line",
+      //     //     source: "mainExtent",
+      //     //     paint: {
+      //     //       "line-dasharray": [1, 1],
+      //     //       "line-color": "#000",
+      //     //       "line-opacity": 1,
+      //     //       "line-width": 1.2,
+      //     //     },
+      //     //   });
+      //     // }
+      //   }
+      // }
+    // }
     return mapStyle;
   }, [selectedStyle, extentPolygons, showExtents]);
 
