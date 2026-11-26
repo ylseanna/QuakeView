@@ -300,7 +300,8 @@ export function useDepthIndicatorLayers() {
   }, [
     // dataSources.allIDs,
     dataSources.byID,
-    sessionInterface,
+    sessionInterface.threeD.threeDViewState.zoom,
+    sessionInterface.threeD.threeDViewState.bearing,
     GPUfiltering,
     elevationOffset,
     depthIndicatorsVisible,

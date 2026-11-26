@@ -80,7 +80,7 @@ export function useGeoExtentIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "NBbound",
+            id: "NBboundGE",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[4],
@@ -98,7 +98,7 @@ export function useGeoExtentIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "SBbound",
+            id: "SBboundGE",
             getSourcePosition: [
               main3Dextents[3],
               main3Dextents[4],
@@ -116,7 +116,7 @@ export function useGeoExtentIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "EBbound",
+            id: "EBboundGE",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[1],
@@ -134,7 +134,7 @@ export function useGeoExtentIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "WBbound",
+            id: "WBboundGE",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[4],
@@ -155,7 +155,7 @@ export function useGeoExtentIndicatorLayers() {
           layers_to_set.push(
             new LineLayer({
               ...commonArgsLine,
-              id: "xtick" + xtickvalue,
+              id: "xtickGE" + xtickvalue,
               getSourcePosition: [
                 xtickvalue,
                 main3Dextents[1],
@@ -173,7 +173,7 @@ export function useGeoExtentIndicatorLayers() {
             new TextLayer({
               ...commonArgsText,
               id:
-                "xticktext" +
+                "xticktextGE" +
                 xtickvalue + "-" +
                 (
                   sessionInterface.threeD.threeDViewState.bearing! >= 0 && sessionInterface.threeD.threeDViewState.bearing! < 30
@@ -253,7 +253,7 @@ export function useGeoExtentIndicatorLayers() {
           layers_to_set.push(
             new LineLayer({
               ...commonArgsLine,
-              id: "xtick" + ytickvalue,
+              id: "xtickGE" + ytickvalue,
               getSourcePosition: [
                 main3Dextents[0],
                 ytickvalue,
@@ -271,7 +271,7 @@ export function useGeoExtentIndicatorLayers() {
             new TextLayer({
               ...commonArgsText,
               id:
-                "yticktext" +
+                "yticktextGE" +
                 ytickvalue + "-" +
                 (
                   sessionInterface.threeD.threeDViewState.bearing! >= 0 && sessionInterface.threeD.threeDViewState.bearing! < 60
@@ -352,7 +352,8 @@ export function useGeoExtentIndicatorLayers() {
   }, [
     // dataSources.allIDs,
     dataSources.byID,
-    sessionInterface,
+    sessionInterface.threeD.threeDViewState.zoom,
+    sessionInterface.threeD.threeDViewState.bearing,
     GPUfiltering,
     elevationOffset,
     GeoExtentIndicatorsVisible,

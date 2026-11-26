@@ -4,7 +4,7 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useMemo } from "react";
 import "@deck.gl/widgets/stylesheet.css";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { LayerExtension, LineLayer, LineLayerProps, TextLayer } from "deck.gl";
+import { LayerExtension, LineLayer, LineLayerProps, PolygonLayer, TextLayer } from "deck.gl";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useExtents } from "../use-extents";
 import { useTheme } from "@mui/material/styles";
@@ -45,7 +45,7 @@ export function useGroundPlaneIndicatorLayers() {
   // depth indicators
   const groundPlaneIndicatorLayers = useMemo(() => {
     if (groundPlaneIndicatorsVisible) {
-      let layers_to_set = [] as (LineLayer | TextLayer)[];
+      let layers_to_set = [] as (LineLayer | TextLayer | PolygonLayer)[];
 
       const main3Dextents = extents["main"] as
         | [number, number, number, number, number, number]
@@ -75,7 +75,7 @@ export function useGroundPlaneIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "NBbound",
+            id: "NBboundGP",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[4],
@@ -93,7 +93,7 @@ export function useGroundPlaneIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "SBbound",
+            id: "SBboundGP",
             getSourcePosition: [
               main3Dextents[3],
               main3Dextents[4],
@@ -111,7 +111,7 @@ export function useGroundPlaneIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "EBbound",
+            id: "EBboundGP",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[1],
@@ -129,7 +129,7 @@ export function useGroundPlaneIndicatorLayers() {
         layers_to_set.push(
           new LineLayer({
             ...commonArgsLine,
-            id: "WBbound",
+            id: "WBboundGP",
             getSourcePosition: [
               main3Dextents[0],
               main3Dextents[4],
@@ -144,7 +144,7 @@ export function useGroundPlaneIndicatorLayers() {
         );
 
         // longitude ticks
-        const xtickvalues = ticks(main3Dextents[0], main3Dextents[3], 100);
+        const xtickvalues = ticks(main3Dextents[0], main3Dextents[3], sessionInterface.threeD.threeDViewState.zoom > 8 ?  15 : 5);
 
         xtickvalues.forEach((xtickvalue) => {
           layers_to_set.push(
@@ -195,7 +195,8 @@ export function useGroundPlaneIndicatorLayers() {
   }, [
     // dataSources.allIDs,
     dataSources.byID,
-    sessionInterface,
+    sessionInterface.threeD.threeDViewState.zoom,
+    sessionInterface.threeD.threeDViewState.bearing,
     GPUfiltering,
     elevationOffset,
     groundPlaneIndicatorsVisible,
