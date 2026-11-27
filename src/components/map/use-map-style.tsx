@@ -187,6 +187,30 @@ export const WorldCoastLines: StyleSpecification = {
   ],
 };
 
+export const IcelandGrunnkort: StyleSpecification = {
+  version: 8,
+  sources: {
+    demplusbg: {
+      type: "raster",
+      tiles: [
+        "https://gis.lmi.is/mapcache/web-mercator/wms?bbox={bbox-epsg-3857}&format=image/png&service=WMS&version=1.3.0&request=GetMap&crs=EPSG:3857&transparent=true&width=256&height=256&layers=grunnkort",
+      ],
+      tileSize: 256,
+      attribution: "Náttúrufræðistofnun",
+    },
+  },
+  layers: [
+    {
+      id: "wms-dem-plus-bg",
+      type: "raster",
+      source: "demplusbg",
+      paint: {
+        "raster-opacity": 1,
+      },
+    },
+  ],
+};
+
 export function useMapStyle() {
   const { mapStyle: selectedStyle, showExtents } = useProjectStore(
     (state) => state.sessionInterface.map,
@@ -200,60 +224,10 @@ export function useMapStyle() {
         ? IcelandDEMStyle
         : selectedStyle == "US"
           ? USDEMStyle
-          : WorldCoastLines;
+          : selectedStyle == "Iceland_base_map"
+            ? IcelandGrunnkort
+            : WorldCoastLines;
 
-    // if (showExtents) {
-    //   if (extentPolygons) {
-    //     Object.keys(extentPolygons).forEach((dataSourceID) => {
-    //       if (extentPolygons[dataSourceID]) {
-    //         mapStyle.sources["extent-source-" + dataSourceID] = {
-    //           type: "geojson",
-    //           data: extentPolygons[dataSourceID],
-    //         };
-    //         // if (
-    //         //   !mapStyle.layers
-    //         //     .map((layer) => layer.id)
-    //         //     .includes("extent-" + dataSourceID)
-    //         // ) {
-    //         //   mapStyle.layers.push({
-    //         //     id: "extent-" + dataSourceID,
-    //         //     type: "line",
-    //         //     source: "extent-source-" + dataSourceID,
-    //         //     paint: {
-    //         //       "line-color": "#000",
-    //         //       "line-opacity": 1,
-    //         //       "line-width": 1.2,
-    //         //     },
-    //         //   });
-    //         // }
-    //       }
-    //     });
-    //   }
-
-      // if (mainExtent) {
-      //   if (extentPolygons) {
-      //     mapStyle.sources["mainExtent"] = {
-      //       type: "geojson",
-      //       data: mainExtent,
-      //     };
-      //     // if (
-      //     //   !mapStyle.layers.map((layer) => layer.id).includes("mainExtent")
-      //     // ) {
-      //     //   mapStyle.layers.push({
-      //     //     id: "mainExtent",
-      //     //     type: "line",
-      //     //     source: "mainExtent",
-      //     //     paint: {
-      //     //       "line-dasharray": [1, 1],
-      //     //       "line-color": "#000",
-      //     //       "line-opacity": 1,
-      //     //       "line-width": 1.2,
-      //     //     },
-      //     //   });
-      //     // }
-      //   }
-      // }
-    // }
     return mapStyle;
   }, [selectedStyle, extentPolygons, showExtents]);
 

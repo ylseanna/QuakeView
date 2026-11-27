@@ -46,6 +46,10 @@ export type AppState = {
       sideBarsVisible: boolean;
       bottombarVisible: boolean;
       timelineBarVisible: boolean;
+      threeDDepthIndicatorsVisible: boolean;
+      threeDFullExtentIndicatorsVisible: boolean;
+      threeDGeoExtentIndicatorsVisible: boolean;
+      threeDGroundPlaneIndicatorsVisible: boolean;
       sidebarOpen: "formatting" | "filtering" | "layers" | null;
       legendVisible: boolean;
       debugVisible: boolean;
@@ -68,6 +72,10 @@ export type AppActions = {
       toggleSideBarsVisible: () => void;
       togglebottombarVisible: () => void;
       toggleTimelineBarVisible: () => void;
+      toggleThreeDDepthIndicatorsVisible: () => void;
+      toggleThreeDFullExtentIndicatorsVisible: () => void;
+      toggleThreeDGeoExtentIndicatorsVisible: () => void;
+      toggleThreeDGroundPlaneIndicatorsVisible: () => void;
       setSidebarOpen: (
         value: "formatting" | "filtering" | "layers" | null,
       ) => void;
@@ -93,6 +101,10 @@ export const defaultInitState: AppState = {
       sideBarsVisible: true,
       bottombarVisible: true,
       timelineBarVisible: false,
+      threeDDepthIndicatorsVisible: true,
+      threeDFullExtentIndicatorsVisible: false,
+      threeDGeoExtentIndicatorsVisible: true,
+      threeDGroundPlaneIndicatorsVisible: false,
       sidebarOpen: null,
       legendVisible: true,
       debugVisible: false,
@@ -131,6 +143,26 @@ export const createAppStore = (initState: AppState = defaultInitState) => {
               set((state) => {
                 state.appInterface.views.timelineBarVisible =
                   !state.appInterface.views.timelineBarVisible;
+              }),
+            toggleThreeDDepthIndicatorsVisible: () =>
+              set((state) => {
+                state.appInterface.views.threeDDepthIndicatorsVisible =
+                  !state.appInterface.views.threeDDepthIndicatorsVisible;
+              }),
+            toggleThreeDFullExtentIndicatorsVisible: () =>
+              set((state) => {
+                state.appInterface.views.threeDFullExtentIndicatorsVisible =
+                  !state.appInterface.views.threeDFullExtentIndicatorsVisible;
+              }),
+            toggleThreeDGeoExtentIndicatorsVisible: () =>
+              set((state) => {
+                state.appInterface.views.threeDGeoExtentIndicatorsVisible =
+                  !state.appInterface.views.threeDGeoExtentIndicatorsVisible;
+              }),
+            toggleThreeDGroundPlaneIndicatorsVisible: () =>
+              set((state) => {
+                state.appInterface.views.threeDGroundPlaneIndicatorsVisible =
+                  !state.appInterface.views.threeDGroundPlaneIndicatorsVisible;
               }),
             toggleLegendVisible: () =>
               set((state) => {

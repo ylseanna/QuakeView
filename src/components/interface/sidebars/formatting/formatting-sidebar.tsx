@@ -23,7 +23,7 @@ export default function FormattingSidebar() {
       <Typography sx={sxtextbox}>
         <b>{t("formatting")}</b>
       </Typography>
-      {!dataSources
+      {!dataSources.byID
         ? null
         : data.allIDs.map((id) => (
             <DataSourceFormattingElement

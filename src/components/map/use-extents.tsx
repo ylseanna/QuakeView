@@ -100,6 +100,8 @@ export function useExtents(type: "twoD" | "threeD" = "twoD") {
         data.allIDs.map((dataSourceID) => data.byID[dataSourceID].bounds),
       );
 
+     
+
       if (combinedBounds) {
         if (type == "twoD") {
           return [
@@ -125,6 +127,7 @@ export function useExtents(type: "twoD" | "threeD" = "twoD") {
       return null;
     }
   }, [data.allIDs, data.byID]);
+
 
   return {
     main: overallExtent! as

@@ -16,29 +16,32 @@ import {
 import { generateDataSourceMapLayers } from "./generate-datasource-layers";
 import MapToolTip from "./map-tooltip";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { ScatterplotLayer } from "deck.gl";
+import {
+  ScatterplotLayer,
+} from "deck.gl";
 import { DataFilterExtensionProps } from "@deck.gl/extensions";
 import { useCatalogData } from "../data/use-data";
 import { useAppStateStore } from "@/providers/app-state-provider";
-import { useCentroids, useExtents } from "./use-extents";
+import { useCentroids, useExtentPolygons, useExtents } from "./use-extents";
 
 import {
   BOTTOMBAR_HEIGHT,
   DRAWER_HEIGHT,
 } from "../interface/bottom-bar/bottom-bar";
 import { useKeyDown } from "@react-hooks-library/core";
+import { useDepthIndicatorLayers } from "./3D-layers/use-depth-indicator-layers";
+import { useFullExtentIndicatorLayers } from "./3D-layers/use-full-extent-indicator-layers";
+import { useGeoExtentIndicatorLayers } from "./3D-layers/use-geo-extent-indicator-layers";
 
-// import { GeoJsonLayer } from "@deck.gl/layers";
-// import { TerrainLayer } from "@deck.gl/geo-layers";
-// import { MaskExtension } from "@deck.gl/extensions";
-// import { TerrainLoader } from "@loaders.gl/terrain";
+import { useGroundPlaneIndicatorLayers } from './3D-layers/use-ground-plane-indicator-layers';
 
-// import { GeoJsonLayer } from "@deck.gl/layers";
 
 export default function ThreeDDeckGLView() {
   const mapContainer = useRef<HTMLElement>(null);
 
   const sessionInterface = useProjectStore((state) => state.sessionInterface);
+  const depthIndicatorsVisible = useAppStateStore((state) => state.appInterface)
+    .views.threeDDepthIndicatorsVisible;
   const GPUfiltering = useProjectStore((state) => state.GPUfiltering);
   const dataSources = useProjectStore((state) => state.dataSources);
 
@@ -79,7 +82,8 @@ export default function ThreeDDeckGLView() {
   const [hoverInfo, setHoverInfo] = useState<PickingInfo<Earthquake>>();
 
   // LAYERS
-  const layers = useMemo(() => {
+
+  const catalogLayers = useMemo(() => {
     let layers_to_set = [] as ScatterplotLayer<
       Earthquake,
       DataFilterExtensionProps
@@ -212,8 +216,6 @@ export default function ThreeDDeckGLView() {
           },
         );
 
-        console.log(longitude, latitude, zoom);
-
         deckRef.current!.deck?.setProps({
           initialViewState: {
             ...initialViewState,
@@ -227,6 +229,14 @@ export default function ThreeDDeckGLView() {
       } catch {}
     }
   }, [zoomTo]);
+
+  const depthIndicatorlayers = useDepthIndicatorLayers();
+
+  const fullExtentIndicatorLayers = useFullExtentIndicatorLayers();
+
+  const geoExtentIndicatorLayers = useGeoExtentIndicatorLayers();
+
+  const groundPlaneIndicatorLayers = useGroundPlaneIndicatorLayers();
 
   const deckRef = useRef<DeckGLRef<MapView>>(null);
 
@@ -245,7 +255,7 @@ export default function ThreeDDeckGLView() {
           scrollZoom: { speed: 0.005, smooth: false },
           inertia: true,
         }}
-        layers={[...layers]}
+        layers={[...catalogLayers, ...depthIndicatorlayers, ...fullExtentIndicatorLayers, ...geoExtentIndicatorLayers, ...groundPlaneIndicatorLayers]}
         initialViewState={initialViewState}
         style={{
           width: "100%",
