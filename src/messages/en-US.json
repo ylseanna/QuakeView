@@ -178,7 +178,7 @@
     "show_3D_depth_indicators": "Show depth indicators",
     "show_3D_full_extent": "Show full extent",
     "show_3D_geo_extent": "Show geographic extent indicator",
-    "show_3D_ground_plane": "Show ground plane"
+    "show_3D_ground_plane": "Show virtual ground plane"
   },
   "Navbar": {
     "GR_plot": "Magnitude vs. frequency",

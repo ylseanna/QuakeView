@@ -145,8 +145,6 @@ export default function TimelineSlider({
     [bounds.x],
   );
 
-  console.log(majorLocator);
-
   const majorBoundaryLocator = useMemo(
     () =>
       majorTimeBoundaryLocator(
@@ -519,7 +517,15 @@ export default function TimelineSlider({
     brushRef.current = brush;
 
     // setIsLoading(true);
-  }, [dimensions, margin.bottom, margin.left, margin.right, margin.top, data, theme.palette]);
+  }, [
+    dimensions,
+    margin.bottom,
+    margin.left,
+    margin.right,
+    margin.top,
+    data,
+    theme.palette,
+  ]);
 
   // set bounds based on ViewState
   useEffect(() => {

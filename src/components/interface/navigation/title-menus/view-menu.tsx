@@ -10,6 +10,7 @@ import {
   Divider,
   ListItemText,
   ListItemIcon,
+  Typography,
 } from "@mui/material";
 
 import { useTranslations } from "next-intl";
@@ -62,9 +63,15 @@ export default function ViewMenu() {
     ) {
       viewActions.toggleThreeDGeoExtentIndicatorsVisible();
       viewActions.toggleThreeDDepthIndicatorsVisible();
-    } else if (views.threeDDepthIndicatorsVisible && !views.threeDGeoExtentIndicatorsVisible ) {
+    } else if (
+      views.threeDDepthIndicatorsVisible &&
+      !views.threeDGeoExtentIndicatorsVisible
+    ) {
       viewActions.toggleThreeDDepthIndicatorsVisible();
-    } else if (views.threeDGeoExtentIndicatorsVisible && !views.threeDDepthIndicatorsVisible) {
+    } else if (
+      views.threeDGeoExtentIndicatorsVisible &&
+      !views.threeDDepthIndicatorsVisible
+    ) {
       viewActions.toggleThreeDGeoExtentIndicatorsVisible();
     } else {
       viewActions.toggleThreeDGeoExtentIndicatorsVisible();
@@ -194,21 +201,14 @@ export default function ViewMenu() {
                           <ListItemText>
                             {t("Titlebar.show_3D_depth_indicators")}
                           </ListItemText>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            A
+                          </Typography>
                         </MenuItem>
-                        <MenuItem
-                          onClick={() =>
-                            viewActions.toggleThreeDFullExtentIndicatorsVisible()
-                          }
-                        >
-                          <ListItemIcon>
-                            {views.threeDFullExtentIndicatorsVisible && (
-                              <Check />
-                            )}
-                          </ListItemIcon>
-                          <ListItemText>
-                            {t("Titlebar.show_3D_full_extent")}
-                          </ListItemText>
-                        </MenuItem>
+
                         <MenuItem
                           onClick={() =>
                             viewActions.toggleThreeDGeoExtentIndicatorsVisible()
@@ -222,6 +222,12 @@ export default function ViewMenu() {
                           <ListItemText>
                             {t("Titlebar.show_3D_geo_extent")}
                           </ListItemText>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            A
+                          </Typography>
                         </MenuItem>
                         <MenuItem
                           onClick={() =>
@@ -236,6 +242,32 @@ export default function ViewMenu() {
                           <ListItemText>
                             {t("Titlebar.show_3D_ground_plane")}
                           </ListItemText>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            G
+                          </Typography>
+                        </MenuItem>
+                        <MenuItem
+                          onClick={() =>
+                            viewActions.toggleThreeDFullExtentIndicatorsVisible()
+                          }
+                        >
+                          <ListItemIcon>
+                            {views.threeDFullExtentIndicatorsVisible && (
+                              <Check />
+                            )}
+                          </ListItemIcon>
+                          <ListItemText>
+                            {t("Titlebar.show_3D_full_extent")}
+                          </ListItemText>
+                          <Typography
+                            variant="body2"
+                            sx={{ color: "text.secondary" }}
+                          >
+                            E
+                          </Typography>
                         </MenuItem>
                       </MenuList>
                     </HoverMenu>

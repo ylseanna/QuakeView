@@ -53,12 +53,15 @@ export default function LayersSidebar() {
               fullWidth
               onChange={(event) => {
                 setMapStyle(
-                  event.target!.value as "Iceland" | "US" | "WorldCountries",
+                  event.target!.value as "Iceland" | "US" | "WorldCountries" | "Iceland_base_map",
                 );
               }}
             >
               <MenuItem value={"Iceland"}>
                 ÍslandsDEM (annotated, Náttúrufræðistofnun)
+              </MenuItem>
+              <MenuItem value={"Iceland_base_map"}>
+                Iceland base map (Náttúrufræðistofnun)
               </MenuItem>
               <MenuItem value={"US"}>3DEPElevation (USGS)</MenuItem>
               <MenuItem value={"WorldCountries"}>

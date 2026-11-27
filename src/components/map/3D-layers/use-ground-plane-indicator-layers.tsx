@@ -4,21 +4,17 @@ import "maplibre-gl/dist/maplibre-gl.css";
 import { useMemo } from "react";
 import "@deck.gl/widgets/stylesheet.css";
 import { useProjectStore } from "@/providers/project-store-provider";
-import { LayerExtension, LineLayer, LineLayerProps, PolygonLayer, TextLayer } from "deck.gl";
+import {
+  LayerExtension,
+  LineLayer,
+  LineLayerProps,
+  PolygonLayer,
+  TextLayer,
+} from "deck.gl";
 import { useAppStateStore } from "@/providers/app-state-provider";
 import { useExtents } from "../use-extents";
 import { useTheme } from "@mui/material/styles";
-import { color, RGBColor, ticks } from "d3";
-
-class FixedSizeExtension extends LayerExtension {
-  getShaders() {
-    return {
-      inject: {
-        'vs:DECKGL_FILTER_SIZE': 'size *= 0.7 * gl_Position.w;'
-      }
-    };
-  }
-}
+import { color, RGBColor, text, ticks } from "d3";
 
 export function useGroundPlaneIndicatorLayers() {
   // theme info
@@ -42,151 +38,92 @@ export function useGroundPlaneIndicatorLayers() {
 
   const textColor = color(theme.palette.text.secondary) as RGBColor;
 
+  const bgColor = color("rgba(255, 255, 255, 0.439)") as RGBColor;
+
   // depth indicators
   const groundPlaneIndicatorLayers = useMemo(() => {
-    if (groundPlaneIndicatorsVisible) {
-      let layers_to_set = [] as (LineLayer | TextLayer | PolygonLayer)[];
+    let layers_to_set = [] as (LineLayer | TextLayer | PolygonLayer)[];
 
-      const main3Dextents = extents["main"] as
-        | [number, number, number, number, number, number]
-        | null;
+    const main3Dextents = extents["main"] as
+      | [number, number, number, number, number, number]
+      | null;
 
-      if (main3Dextents) {
-        const commonArgsLine = {
-          data: main3Dextents,
-          getColor: [127.5, 127.5, 127.5],
-          opacity: textColor!.opacity,
-          getWidth: 1,
-          antialiasing: true,
-        } as unknown as LineLayerProps;
+    if (main3Dextents) {
+      const commonArgsLine = {
+        getColor: [127.5, 127.5, 127.5],
+        opacity: textColor!.opacity,
+        getWidth: 1,
+        antialiasing: true,
+      } as unknown as LineLayerProps;
 
-        const commonArgsText = {
-          data: main3Dextents,
-          getColor: [textColor!.r, textColor!.g, textColor!.b],
-          opacity: 0.1,
-          getSize: 11,
-          antialiasing: true,
-          fontFamily: "Archivo Variable",
-          fontWeight: "100",
-          extensions: [new FixedSizeExtension()],
-        } as unknown as LineLayerProps;
 
-        // northern bottom bound
-        layers_to_set.push(
-          new LineLayer({
-            ...commonArgsLine,
-            id: "NBboundGP",
-            getSourcePosition: [
-              main3Dextents[0],
-              main3Dextents[4],
-              0,
-            ],
-            getTargetPosition: [
-              main3Dextents[3],
-              main3Dextents[4],
-              0,
-            ],
-          }),
-        );
+      const commonArgsPolygon = {
+        stroked: true,
+        getLineColor: [textColor!.r, textColor!.g, textColor!.b, textColor!.opacity * 255],
+        getFillColor: [bgColor!.r, bgColor!.g, bgColor!.b, bgColor!.opacity * 255],
+        lineWidthUnits: "pixels",
+        getLineWidth: 1,
+        antialiasing: true,
+      } as unknown as LineLayerProps;
 
-        // eastern bottom bound
-        layers_to_set.push(
-          new LineLayer({
-            ...commonArgsLine,
-            id: "SBboundGP",
-            getSourcePosition: [
-              main3Dextents[3],
-              main3Dextents[4],
-              0,
-            ],
-            getTargetPosition: [
-              main3Dextents[3],
-              main3Dextents[1],
-              0,
-            ],
-          }),
-        );
+      // polygon
+      layers_to_set.push(
+        new PolygonLayer({
+          ...commonArgsPolygon,
+          data: [[
+            main3Dextents[0],
+            main3Dextents[4],
+            0,
+            main3Dextents[3],
+            main3Dextents[4],
+            0,
+            main3Dextents[3],
+            main3Dextents[1],
+            0,
+            main3Dextents[0],
+            main3Dextents[1],
+            0,
+            main3Dextents[0],
+            main3Dextents[4],
+            0,
+          ]],
+          id: "PlaneGP",
+          getPolygon: data => data,
+          visible: groundPlaneIndicatorsVisible,
+        }),
+      );
 
-        // southern bottom bound
-        layers_to_set.push(
-          new LineLayer({
-            ...commonArgsLine,
-            id: "EBboundGP",
-            getSourcePosition: [
-              main3Dextents[0],
-              main3Dextents[1],
-              0,
-            ],
-            getTargetPosition: [
-              main3Dextents[3],
-              main3Dextents[1],
-              0,
-            ],
-          }),
-        );
+      // longitude ticks
+      const xtickvalues = ticks(
+        main3Dextents[0],
+        main3Dextents[3],
+        sessionInterface.threeD.threeDViewState.zoom > 8 ? 15 : 5,
+      );
 
-        // western bottom bound
-        layers_to_set.push(
-          new LineLayer({
-            ...commonArgsLine,
-            id: "WBboundGP",
-            getSourcePosition: [
-              main3Dextents[0],
-              main3Dextents[4],
-              0,
-            ],
-            getTargetPosition: [
-              main3Dextents[0],
-              main3Dextents[1],
-              0,
-            ],
-          }),
-        );
+      layers_to_set.push(
+        new LineLayer({
+          ...commonArgsLine,
+          data: xtickvalues,
+          id: "xticksGroundPlane",
+          getSourcePosition: (xtickvalue) => [xtickvalue, main3Dextents[1], 0],
+          getTargetPosition: (xtickvalue) => [xtickvalue, main3Dextents[4], 0],
+          visible: groundPlaneIndicatorsVisible,
+        }),
+      );
 
-        // longitude ticks
-        const xtickvalues = ticks(main3Dextents[0], main3Dextents[3], sessionInterface.threeD.threeDViewState.zoom > 8 ?  15 : 5);
+      // longitude ticks
+      const ytickvalues = ticks(main3Dextents[1], main3Dextents[4], 15);
 
-        xtickvalues.forEach((xtickvalue) => {
-          layers_to_set.push(
-            new LineLayer({
-              ...commonArgsLine,
-              id: "xtickGroundPlane" + xtickvalue,
-              getSourcePosition: [
-                xtickvalue,
-                main3Dextents[1],
-                0,
-              ],
-              getTargetPosition: [
-                xtickvalue,
-                main3Dextents[4],
-                0,
-              ],
-            }),
-          );
-        });
-
-        // longitude ticks
-        const ytickvalues = ticks(main3Dextents[1], main3Dextents[4], 15);
-
-        ytickvalues.forEach((ytickvalue) => {
-          layers_to_set.push(
-            new LineLayer({
-              ...commonArgsLine,
-              id: "ytickGroundPlane" + ytickvalue,
-              getSourcePosition: [
-                main3Dextents[0],
-                ytickvalue,
-                0,
-              ],
-              getTargetPosition: [
-                main3Dextents[3],
-                ytickvalue,
-                0,
-              ],
-            }),
-          );
-        });
-      }
+      layers_to_set.push(
+        new LineLayer({
+          ...commonArgsLine,
+          data: ytickvalues,
+          id: "yticksGroundPlane",
+          getSourcePosition: (ytickvalue) => [main3Dextents[0], ytickvalue, 0],
+          getTargetPosition: (ytickvalue) => [main3Dextents[3], ytickvalue, 0],
+          visible: groundPlaneIndicatorsVisible,
+        }),
+      );
 
       return layers_to_set;
     } else {
@@ -197,10 +134,10 @@ export function useGroundPlaneIndicatorLayers() {
     dataSources.byID,
     sessionInterface.threeD.threeDViewState.zoom,
     sessionInterface.threeD.threeDViewState.bearing,
-    GPUfiltering,
     elevationOffset,
     groundPlaneIndicatorsVisible,
     textColor,
+    bgColor,
   ]);
 
   return groundPlaneIndicatorLayers;
